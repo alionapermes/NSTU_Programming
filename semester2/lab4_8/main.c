@@ -4,64 +4,90 @@
 #define TRUE 1
 #define FALSE 0
 
-void inp_str(char* str, int maxlen) {
-    int len;
-    char start = TRUE;
+#define size 4
+#define size_str 127
 
-    len = strlen(str);
+void inp_str(char* str, int maxlen) {
+    char start = TRUE;
+    int len = strlen(str);
+
     do {
-        if (!start) {
-            printf("Text length must be less than %d\n", maxlen + 1);
+        if (start == FALSE) {
+            printf("String length must be less than %d\n", maxlen);
         }
         start = FALSE;
-        printf("Enter your text: ");
+        printf("Enter your string: ");
         gets(str);
     } while (len > maxlen);
 }
 
-void out_str(char* str, int amount_of_numbers, int number) {
-    printf("String number - %d, %s, amount of numbers = %d", number, str, amount_of_numbers);
+void out_str(char* str, int amount_of_digits, int changes) {
+    printf("String '%s', sorted with %d changes, amount of digits = %d\n", str, changes, amount_of_digits);
 }
 
-void sort(char* str) {
-    int sizes[32];
-    int numbers = 0;
-    int index = 0;
-    int words_count = 0;
-    for (int i = 0; i < 32; i++) {
-        sizes[i] = 0;
-    }
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ') {
-            sizes[numbers] = index;
-            words_count++;
-            numbers = 0;
-        } else if (str[i] >= '0' && str[i] <= '9') {
-            numbers++;
-        }
-    }
-
-    int letter;
-    char word[32];
-    for (int i = 31; i >= 0; i--) {
-        if (sizes[i] > 0) {
-            numbers = 0;
-            for (letter = sizes[i]; str[letter] != ' '; letter++) {
-                if (str[letter] >= '0' && str[letter] <= '9') {
-                    numbers++;
-                }
-                word[letter - sizes[i]] = sizes[letter];
+void sort(char list[size][size_str]) {
+    int changes = 0;
+    int start = 0;
+    int index_max = -1;
+    int max = -1;
+    while (start < size) { // each string must be checked
+        max = -1;
+        index_max = -1;
+        for (int str = start; str < size; str++) { // don't check sorted ones
+            int counter = 0;
+            for (int ltr = 0; list[str][ltr] != '\0'; ltr++) { // counting of digits
+                counter += (list[str][ltr] >= '0' && list[str][ltr] <= '9') ? 1 : 0;
             }
-            word[letter - sizes[i] + 1] = '\0';
-            out_str(word, numbers, words_count++);
+            if (counter > max) {
+                max = counter;
+                index_max = str;
+            }
         }
+
+        // copying to temp string
+        char temp[size_str];
+        int ltr = -1;
+        do {
+            ltr++;
+            temp[ltr] = list[index_max][ltr];
+        } while (list[index_max][ltr] != '\0');
+
+        // skip if sorted
+        if (index_max == start) {
+            start++;
+            out_str(temp, max, changes);
+            continue;
+        }
+
+        // string swap start
+        ltr = -1;
+        do {
+            ltr++;
+            list[index_max][ltr] = list[start][ltr];
+        } while (list[start][ltr] != '\0');
+
+        ltr = -1;
+        do {
+            ltr++;
+            list[start][ltr] = temp[ltr];
+        } while (temp[ltr] != '\0');
+        // swap done
+
+        start++;
+        changes++;
+        out_str(temp, max, changes);
     }
 }
 
 int main() {
-    char string[128];
-    inp_str(string, 127);
-    sort(string);
+    char list[size][size_str];
+
+    // filling of list
+    for (int i = 0; i < size; i++) {
+        inp_str(list[i], size_str);
+    }
+
+    sort(list);
 
     return 0;
 }
