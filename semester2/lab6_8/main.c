@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-/*
+
 int main(int argc, char** argv) {
     /// reading arguments
     int counter = 0;
@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-*/
 
 
+/*
 int main(int argc, char** argv) {
     /// reading arguments
     int temp = 0;
@@ -149,3 +149,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+*/

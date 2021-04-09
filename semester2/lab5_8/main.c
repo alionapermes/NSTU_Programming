@@ -10,14 +10,14 @@ struct Route {
     int cost;
 };
 
-/*
+
 int main() {
     struct Route routes[size];
 
     // filling array
+    printf("Typing template: <name> <length> <stops> <cost>\n");
     for (int route = 0; route < size; route++) {
-        printf("Typing template: <name> <length> <stops> <cost>\n");
-        printf("\nRoute's %d data:\n", route + 1);
+        printf("\nRoute's %d data: ", route + 1);
         scanf("%s %d %d %d",
               routes[route].name,
               &routes[route].length,
@@ -27,7 +27,7 @@ int main() {
 
     // print routes
     for (int route = 0; route < size; route++) {
-        printf("\nRoute's %d data:\n", route + 1);
+        printf("\n\nRoute's %d data:", route + 1);
         printf("\n\tName: %s",   routes[route].name);
         printf("\n\tLength: %d", routes[route].length);
         printf("\n\tStops: %d",  routes[route].stops);
@@ -36,7 +36,7 @@ int main() {
 
     return 0;
 }
-*/
+
 
 void sort(struct Route* routes[size]) {
     int start = 0;
@@ -61,7 +61,7 @@ void sort(struct Route* routes[size]) {
     }
 }
 
-int main() {
+/*int main() {
     struct Route* routes[size];
     for (int route = 0; route < size; route++) {
         routes[route] = malloc(sizeof(struct Route));
@@ -90,4 +90,4 @@ int main() {
     }
 
     return 0;
-}
+}*/
