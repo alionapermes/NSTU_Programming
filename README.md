@@ -22,4 +22,4 @@
   - [x] [Лаба 5(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab5_8)
   - [x] [Лаба 6(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab6_8)
   - [x] [Курсова гр.4(15)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/Kursovaya)
-  - [x] [многа-многа чего-то там из 3-его семестра](http://gun.cs.nstu.ru/winprog/)
+  - [ ] [многа-многа чего-то там из 3-его семестра](http://gun.cs.nstu.ru/winprog/)
