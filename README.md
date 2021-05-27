@@ -26,5 +26,5 @@
 
 ## "У меня лапки" how to fix
 На сей случай держи контакты санитаров:
- * [ВГулаге](vk.com/cpp_is_power)
- * [Мессенджер здорового человека](t.me/boolka_breada)
+ * [ВГулаге](https://vk.com/cpp_is_power)
+ * [Мессенджер здорового человека](https://t.me/boolka_breada)
