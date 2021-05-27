@@ -23,3 +23,8 @@
   - [x] [Лаба 6(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab6_8)
   - [x] [Курсова гр.4(15)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/Kursovaya)
   - [ ] [многа-многа чего-то там из 3-его семестра](http://gun.cs.nstu.ru/winprog/)
+
+## "У меня лапки" how to fix
+На сей случай держи контакты санитаров:
+ * [ВГулаге](vk.com/cpp_is_power)
+ * [Мессенджер здорового человека](t.me/boolka_breada)
