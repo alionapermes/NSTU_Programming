@@ -114,7 +114,7 @@ void print_student() {
         printf("@ Курс: %d\n", students[number].year);
         printf("@ Стипендия: %d\n", students[number].scholarship);
     } else {
-        printf("Такой записи нет\n", number+1);
+        printf("Такой записи нет\n");
     }
 }
 
