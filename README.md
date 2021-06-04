@@ -21,7 +21,7 @@
   - [x] [Лаба 4(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab4_8)
   - [x] [Лаба 5(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab5_8)
   - [x] [Лаба 6(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab6_8)
-  - [x] [Курсова гр3.(1, 3, 9, 10) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/Kursovaya)
+  - [x] [Курсова гр3.(1, 3, 9, 10, 19) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/Kursovaya)
   - [ ] [многа-многа чего-то там из 3-его семестра](http://gun.cs.nstu.ru/winprog/)
 
 ## "У меня лапки" how to fix
