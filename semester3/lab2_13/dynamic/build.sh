@@ -2,6 +2,9 @@
 
 if [ -d build ]; then
 	rm -rf build
+fi
+
+if [ -d lib ]; then
 	rm -rf lib
 fi
 
