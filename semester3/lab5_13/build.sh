@@ -22,6 +22,5 @@ rm -f output-*
 
 mkdir build
 
-
-gcc main.c mytools.c -o build/lab3_13
-
+gcc -o build/server server.c ../mytools.c my_mqueue.c -lrt
+gcc -o build/client client.c ../mytools.c my_mqueue.c -lrt
