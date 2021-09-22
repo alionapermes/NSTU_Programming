@@ -34,7 +34,6 @@ main()
 
 	struct mq_attr* attr = malloc(sizeof(struct mq_attr));
 
-
 	// получение имён файлов для обработки от клиента
 	mqd = mq_open_safe(MY_MQ_CTS, O_RDONLY, mode, attr);
 
