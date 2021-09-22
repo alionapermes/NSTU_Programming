@@ -11,35 +11,31 @@
 
 
 int
-main(size_t argc, char** argv) {
+main(size_t argc, char **argv)
+{
 	pid_t pid    = 0;
 	int   status = 0;
 
 	
-	for (size_t filenum = 1; filenum < argc; filenum++) {
-		pid = fork();
+	for (size_t filenum = 1; filenum < argc; filenum++)
+		{
+			pid = fork();
+			ERR_CHECK(pid, -1)
 
-		if (!pid) {
-			int result = execl(LAB2_PATH, LAB2_NAME,
-					argv[filenum], PAIR, NULL);
-
-			if (result < 0) {
-				printf("%s\n", error_msg(errno));
-			}
-		} else if (pid == -1) {
-			printf("%s\n", error_msg(errno));
-		}
-	}
-
-	if (pid > 0) {
-		while (wait(&status) > 0) {
-			printf("child %s\n", status_msg(status));
+			if (pid == 0)
+				{
+					TRY(execl(LAB2_PATH, LAB2_NAME, argv[filenum], PAIR, NULL))
+				}
 		}
 
-		if (errno != ECHILD) {
-			printf("%s\n", error_msg(errno));
+	if (pid > 0)
+		{
+			while (wait(&status) > 0)
+					printf("child's %s\n", status_msg(status));
+
+			if (errno != ECHILD) 
+					puts(error_msg(errno));
 		}
-	}
 
 
 	return 0;

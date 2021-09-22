@@ -30,16 +30,16 @@ main()
 	size_t count  = 0;
 	mode_t mode   = 0666; // -rw-rw-rw-
 
-	char** file_names = calloc(MAX_FILES, sizeof(char*));
+	char **file_names = calloc(MAX_FILES, sizeof(char*));
 
-	struct mq_attr* attr = malloc(sizeof(struct mq_attr));
+	struct mq_attr *attr = malloc(sizeof(struct mq_attr));
 
 	// получение имён файлов для обработки от клиента
 	mqd = mq_open_safe(MY_MQ_CTS, O_RDONLY, mode, attr);
 
 	while (true)
 		{
-			char* buf = calloc(attr->mq_msgsize, sizeof(char));
+			char *buf = calloc(attr->mq_msgsize, sizeof(char));
 
 			TRY(mq_receive(mqd, buf, attr->mq_msgsize, NULL))
 
@@ -101,7 +101,7 @@ main()
 	mq_unlink_safe(MY_MQ_CTS);
 
 	// освобождение выделенной под массив имён памяти
-	for (size_t num = 0; num < count; num++)
+	for (size_t num = 0; num < MAX_FILES; num++)
 			free(file_names[num]);
 	free(file_names);
 

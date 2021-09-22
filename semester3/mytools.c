@@ -4,7 +4,7 @@ char*
 error_msg(int error)
 {
   int   length  = 0;
-  char* message = calloc(MSG_SIZE, sizeof(char));
+  char *message = calloc(MSG_SIZE, sizeof(char));
 
   char  error_description[MSG_SIZE];
 
@@ -32,7 +32,7 @@ char*
 status_msg(int status)
 {
   int   length  = 0;
-  char* message = calloc(MSG_SIZE, sizeof(char));
+  char *message = calloc(MSG_SIZE, sizeof(char));
 
 
   if (WIFEXITED(status))

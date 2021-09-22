@@ -17,19 +17,19 @@
 
 
 int
-main(size_t argc, char** argv)
+main(size_t argc, char **argv)
 {
 	mqd_t  mqd   = 0;
 	mode_t mode  = 0666; // -rw-rw-rw-
 
-	struct mq_attr* attr = malloc(sizeof(struct mq_attr));
+	struct mq_attr *attr = malloc(sizeof(struct mq_attr));
 
 	// отправляем серверу имена файлов для обработки
 	mqd = mq_open_safe(MY_MQ_CTS, O_WRONLY, mode, attr);
 
 	for (size_t num = 1; num <= argc; num++)
 		{
-			char* msg = ((num == argc) ? STOP_WORD : argv[num]);
+			char *msg = ((num == argc) ? STOP_WORD : argv[num]);
 
 			TRY(mq_send(mqd, msg, strlen(msg) + 1, 0))
 		}
@@ -42,7 +42,7 @@ main(size_t argc, char** argv)
 	
 	for (size_t num = 1; num < argc; num++)
 		{
-			char* buf = calloc(attr->mq_msgsize, sizeof(char));
+			char *buf = calloc(attr->mq_msgsize, sizeof(char));
 
 			TRY(mq_receive(mqd, buf, attr->mq_msgsize, NULL))
 

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-rm -f output*
-
 if [ -d build ]; then
 	rm -rf build
 fi
@@ -9,6 +7,8 @@ fi
 if [ -d lib ]; then
 	rm -rf lib
 fi
+
+rm -f output-*
 
 mkdir build
 mkdir lib

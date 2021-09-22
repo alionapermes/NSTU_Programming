@@ -12,10 +12,9 @@
 #define MY_FIFO "/tmp/my_fifo"
 #define RES_LEN 64
 
-#define DEBUG
 
 int
-main(size_t argc, char** argv)
+main(size_t argc, char **argv)
 {
   int fd = 0;
 
@@ -28,52 +27,35 @@ main(size_t argc, char** argv)
 
 
   fd = open(MY_FIFO, O_WRONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
   for (size_t num = 1; num < argc; num++)
     {
       int len = strlen(argv[num]);
 
       if ((write(fd, &len, sizeof(len)) < 0)
-          || (write(fd, argv[num], len) < 0))
+          || (write(fd, argv[num], len + 1) < 0))
         {
           puts(error_msg(errno));
           return -1;
         }
     }
-  close(fd);
+  TRY(close(fd))
 
 
   fd = open(MY_FIFO, O_RDONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
   while(true)
     {
-      int len = 0;
+      int   len = 0;
+      char *buf = calloc(RES_LEN, sizeof(char));
 
-      char* buf = calloc(RES_LEN, sizeof(char));
 
+      TRY(read(fd, &len, sizeof(len)))
+      TRY(read(fd, buf, len + 1))
 
-      if (read(fd, &len, sizeof(len)) == -1)
-        {
-          puts(error_msg(errno));
-          return -1;
-        }
-
-      if (read(fd, buf, len) == -1)
-        {
-          puts(error_msg(errno));
-          return -1;
-        }
-      else if (strlen(buf) == 0)
+      if (strlen(buf) == 0)
         {
           free(buf);
           break;
@@ -83,7 +65,7 @@ main(size_t argc, char** argv)
 
       free(buf);
     }
-  close(fd);
+  TRY(close(fd))
 
   return 0;
 }

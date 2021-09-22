@@ -23,5 +23,9 @@ rm -f output-*
 mkdir build
 
 
-gcc main.c mytools.c -o build/lab3_13
+gcc main.c ../mytools.c -o build/lab3_13
 
+
+if [[ $1 = "--run" ]]; then
+	./build/lab3_13 $2 $3
+fi

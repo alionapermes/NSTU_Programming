@@ -13,11 +13,11 @@
 #define OUTPUT_FILE  "output.txt"
 
 
-size_t replace(char* str, char old_pair[2], char new_pair[2]);
+size_t replace(char *str, char old_pair[2], char new_pair[2]);
 
 
 int
-main(int argc, char** argv)
+main(int argc, char **argv)
 {
   int  replaces = 0;
   int  fd       = 0;
@@ -33,37 +33,22 @@ main(int argc, char** argv)
 
 
   fd = open(argv[1], O_RDONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
-  if (read(fd, buf, BUF_SIZE) < 0)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  // считывание содержимого файла
+  TRY(read(fd, buf, BUF_SIZE))
+  TRY(close(fd))
 
-  // input file processing
+  // обработка полученного содержимого
   replaces = replace(buf, argv[2], NEW_PAIR);
-  close(fd);
 
 
   fd = open(OUTPUT_FILE, O_WRONLY | O_CREAT, 0666);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
-  if (write(fd, buf, strlen(buf)) < 0)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
-
-  close(fd);
+  // запись изменённого содержимого в новый файл
+  TRY(write(fd, buf, strlen(buf)))
+  TRY(close(fd))
 
 
   return replaces;
@@ -71,7 +56,7 @@ main(int argc, char** argv)
 
 
 size_t
-replace(char* str, char old_pair[2], char new_pair[2])
+replace(char *str, char old_pair[2], char new_pair[2])
 {
   size_t replaces = 0;
 

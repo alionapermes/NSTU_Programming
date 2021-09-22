@@ -20,7 +20,7 @@
 
 
 int
-main(size_t argc, char** argv)
+main(size_t argc, char **argv)
 {
 	int    fd    = 0;
 	int    flags = O_RDWR | O_CREAT;

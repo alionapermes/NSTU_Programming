@@ -17,7 +17,6 @@
 #define RES_LEN   64
 #define MAX_FILES 16
 
-#define DEBUG
 
 int
 main()
@@ -38,77 +37,48 @@ main()
 
 
   fd = open(MY_FIFO, O_RDONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
   while (true)
     {
-      int len = 0;
+      int   len = 0;
+      char *buf = NULL;
 
-      char* buf;
 
+      TRY(read(fd, &len, sizeof(int)))
+      buf = calloc(len, sizeof(char));
 
-      if (read(fd, &len, sizeof(int)) == -1)
+      TRY(read(fd, buf, len + 1))
+      
+      if (strlen(buf) == 0)
         {
-          puts(error_msg(errno));
-          return -1;
+          free(buf);
+          break;
         }
 
+      printf("message from cleint: %s\n", buf);
 
-    buf = calloc(len, sizeof(char));
-    if (read(fd, buf, len) == -1)
-      {
-        puts(error_msg(errno));
-        return -1;
-      }
-    else if (strlen(buf) == 0)
-      {
-        free(buf);
-        break;
-      }
-
-    printf("message from cleint: %s\n", buf);
-
-    file_names[count++] = buf;
+      file_names[count++] = buf;
     }
-  file_names = realloc(file_names, count);
-  close(fd);
+  TRY(close(fd))
 
 
   fd = open(MY_FIFO, O_WRONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
   for (size_t num = 0; num < count; num++)
     {
       pid = fork();
-
-      if (pid == -1)
-        {
-          puts(error_msg(errno));
-          return -1;
-        }
+      ERR_CHECK(pid, -1)
 
       if (pid == 0)
         {
-          int result = execl(LAB2_PATH, LAB2_NAME,
-                             file_names[num], PAIR, NULL);
-
-          if (result == -1)
-            {
-              puts(error_msg(errno));
-              return -1;
-            }
+          TRY(execl(LAB2_PATH, LAB2_NAME, file_names[num], PAIR, NULL))
         }
       else if (pid > 0)
         {
           int child = wait(&status);
+          ERR_CHECK(child, -1)
 
           if (child > 0)
             {
@@ -123,15 +93,10 @@ main()
                   puts(error_msg(errno));
                   return -1;
                 }
-              else
-                {
-                  result_status = realloc(result_status, len);
-                  result_status[len] = '\0';
-                }
 
 
               if ((write(fd, &len, sizeof(len)) == -1)
-                  || (write(fd, result_status, len) == -1))
+                  || (write(fd, result_status, len + 1) == -1))
                 {
                   puts(error_msg(errno));
                   return -1;
@@ -139,18 +104,13 @@ main()
 
               free(result_status);
             }
-          else if (child == -1)
-            {
-              puts(error_msg(errno));
-              return -1;
-            }
         }
     }
-  close(fd);
+  TRY(close(fd))
 
 
   // освобождение памяти, выделенной для массива имён файлов
-  for (size_t num = 0; num < count; num++)
+  for (size_t num = 0; num < MAX_FILES; num++)
       free(file_names[num]);
   free(file_names);
 

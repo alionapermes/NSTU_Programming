@@ -13,7 +13,7 @@
 
 
 mqd_t mq_open_safe(const char *name, int oflag,
-									 mode_t mode, struct mq_attr* attr);
+									 mode_t mode, struct mq_attr *attr);
 
 void  mq_close_safe(mqd_t mqdes, const char *name);
 

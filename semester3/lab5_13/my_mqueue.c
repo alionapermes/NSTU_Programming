@@ -2,7 +2,7 @@
 
 
 mqd_t
-mq_open_safe(const char *name, int oflag, mode_t mode, struct mq_attr* attr)
+mq_open_safe(const char *name, int oflag, mode_t mode, struct mq_attr *attr)
 {
 	mqd_t mqd = mq_open(name, oflag);
 

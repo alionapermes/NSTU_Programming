@@ -15,16 +15,16 @@
 
 
 int
-main(int argc, char** argv)
+main(int argc, char **argv)
 {
   int  replaces = 0;
   int  fd       = 0;
 
-  char* output_name   = calloc(BUF_SIZE, sizeof(char));
+  char *output_name   = calloc(BUF_SIZE, sizeof(char));
   char  buf[BUF_SIZE] = {0};
 
-  void*  dl_handle;
-  size_t (*replace)(char*, char*, char*);
+  void   *dl_handle;
+  size_t (*replace)(char*, const char*, const char*);
 
 
   if ((argc != 3) || (strlen(argv[2]) != 2))
@@ -34,37 +34,28 @@ main(int argc, char** argv)
       return -1;
     }
 
-    // dl loading
+  // подключение библиотеки
   dl_handle = dlopen("lib/my_lib.so", RTLD_LAZY);
-  if (!dl_handle)
+  if (dl_handle == NULL)
     {
       puts(error_msg(errno));
       return -1;
     }
 
-  // function loading
+  // загрузка функции
   replace = dlsym(dl_handle, "replace");
-  if (!replace)
+  if (replace == NULL)
     {
-      puts(error_msg(errno));
+      printf("dl function error: %s", dlerror());
       return -1;
     }
 
 
   fd = open(argv[1], O_RDONLY);
-  if (fd == -1)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(fd, -1)
 
-  if (read(fd, buf, BUF_SIZE) < 0)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
-
-  close(fd);
+  TRY(read(fd, buf, BUF_SIZE))
+  TRY(close(fd))
 
 
   // обработка файла
@@ -73,13 +64,8 @@ main(int argc, char** argv)
 
   if (sprintf(output_name, "%s-%x.txt", OUTPUT_FILE, &fd) > 0)
     {
-      fd = open(output_name, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-
-      if (fd == -1)
-        {
-          puts(error_msg(errno));
-          return -1;
-        }
+      fd = open(output_name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+      ERR_CHECK(fd, -1)
     }
   else
     {
@@ -87,13 +73,8 @@ main(int argc, char** argv)
       return -1;
     }
 
-  if (write(fd, buf, strlen(buf)) < 0)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
-
-  close(fd);
+  TRY(write(fd, buf, strlen(buf)))
+  TRY(close(fd))
 
 
   return replaces;
