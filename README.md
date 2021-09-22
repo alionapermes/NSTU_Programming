@@ -38,7 +38,7 @@
   - [x] [Лаба 3(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab3_13)
   - [x] [Лаба 4(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab4_13)
   - [x] [Лаба 5(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab5_13)
-  - [ ] [Лаба 6(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab6_13)
+  - [x] [Лаба 6(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab6_13)
   - [ ] [РГЗ (13)](https://github.com/Linadil/NSTU_Programming/tree/master/RGZ)
 
 </p>
