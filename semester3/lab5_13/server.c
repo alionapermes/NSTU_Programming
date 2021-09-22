@@ -41,7 +41,7 @@ main()
 		{
 			char* buf = calloc(attr->mq_msgsize, sizeof(char));
 
-			mq_receive_safe(mqd, buf, attr->mq_msgsize, NULL);
+			TRY(mq_receive(mqd, buf, attr->mq_msgsize, NULL))
 
 			if (strcmp(buf, STOP_WORD) == 0)
 				{
@@ -62,29 +62,18 @@ main()
 	for (size_t num = 0; num < count; num++)
 		{
 			pid = fork();
-
-			if (pid == -1)
-				{
-					puts(error_msg(errno));
-					return -1;
-				}
+			ERR_CHECK(pid, -1)
 
 			// код для выполнения родительским процессом
 			if (pid == 0)
 				{
-					int result = execl(LAB2_PATH, LAB2_NAME,
-														 file_names[num], PAIR, NULL);
-
-					if (result == -1)
-						{
-							puts(error_msg(errno));
-							return -1;
-						}
+					TRY(execl(LAB2_PATH, LAB2_NAME, file_names[num], PAIR, NULL))
 				}
 			// код для выполнения дочерним процессом
 			else if (pid > 0)
 				{
 					int child = wait(&status);
+					ERR_CHECK(child, -1)
 
 					if (child > 0)
 						{
@@ -100,14 +89,9 @@ main()
 									return -1;
 								}
 
-							mq_send_safe(mqd, result_status, len + 1, 0);
+							TRY(mq_send(mqd, result_status, len + 1, 0))
 
 							free(result_status);
-						}
-					else if (child == -1)
-						{
-							puts(error_msg(errno));
-							return -1;
 						}
 				}
 		}

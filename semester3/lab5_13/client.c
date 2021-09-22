@@ -31,7 +31,7 @@ main(size_t argc, char** argv)
 		{
 			char* msg = ((num == argc) ? STOP_WORD : argv[num]);
 
-			mq_send_safe(mqd, msg, strlen(msg) + 1, 0);
+			TRY(mq_send(mqd, msg, strlen(msg) + 1, 0))
 		}
 
 	mq_close_safe(mqd, NULL);
@@ -44,7 +44,7 @@ main(size_t argc, char** argv)
 		{
 			char* buf = calloc(attr->mq_msgsize, sizeof(char));
 
-			mq_receive_safe(mqd, buf, attr->mq_msgsize, NULL);
+			TRY(mq_receive(mqd, buf, attr->mq_msgsize, NULL))
 
 			printf("message from server: %s\n", buf);
 

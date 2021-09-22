@@ -19,12 +19,5 @@ void  mq_close_safe(mqd_t mqdes, const char *name);
 
 void  mq_unlink_safe(const char *name);
 
-void  mq_receive_safe(mqd_t mqdes, char *msg_ptr,
-                      size_t msg_len, unsigned int *msg_prio);
-
-void  mq_send_safe(mqd_t mqdes, const char *msg_ptr,
-                   size_t msg_len, unsigned int msg_prio);
-
-void  mq_getattr_safe(mqd_t mqdes, struct mq_attr *attr);
 
 #endif
