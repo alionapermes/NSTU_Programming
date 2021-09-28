@@ -10,8 +10,6 @@
 
 #define PAIR      "FF"
 #define NEW_PAIR  "#@"
-//#define LAB2_PATH "../lab2_13/dynamic/build/lab2_13"
-//#define LAB2_NAME "lab2_13"
 #define DL_PATH   "lib/my_lib.so"
 #define BUF_SIZE  128
 #define OUTPUT_F  "output"
