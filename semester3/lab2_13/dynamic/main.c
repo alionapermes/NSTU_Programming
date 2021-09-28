@@ -36,11 +36,7 @@ main(int argc, char **argv)
 
   // подключение библиотеки
   dl_handle = dlopen("lib/my_lib.so", RTLD_LAZY);
-  if (dl_handle == NULL)
-    {
-      puts(error_msg(errno));
-      return -1;
-    }
+  ERR_CHECK(dl_handle, NULL)
 
   // загрузка функции
   replace = dlsym(dl_handle, "replace");
