@@ -17,7 +17,7 @@ mkdir lib
 gcc -fPIC -c my_lib.c -o build/my_lib.o
 gcc -shared build/my_lib.o -o lib/my_lib.so
 
-gcc -ldl main.c ../../mytools.c -o build/lab2_13
+gcc main.c ../../mytools.c -o build/lab2_13 -ldl
 
 
 if [[ $1 = "--run" ]]; then

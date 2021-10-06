@@ -23,7 +23,7 @@ rm -f output-*
 mkdir build
 
 
-gcc main.c ../mytools.c -ldl -pthread -o build/lab7_13
+gcc main.c ../mytools.c -pthread -o build/lab7_13 -ldl
 
 
 if [[ $1 = "--run" ]]; then
