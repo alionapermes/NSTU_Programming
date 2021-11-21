@@ -4,6 +4,8 @@
 #define PAIR      "FF"
 #define LAB2_PATH "../lab2_13/dynamic/build/lab2_13"
 #define LAB2_NAME "lab2_13"
+#define MAX_FILES 16
+#define MAX_NAME 255
 
 size_t
 get_files(const int connfd, char*** files);
@@ -35,33 +37,21 @@ main()
 
 // #####
     files_count = get_files(connfd, &files);
-#ifdef DEBUG
-    printf("files_count: %lu\n", files_count);
-#endif
 
     for (size_t n = 0; n < files_count; n++) {
-#ifdef DEBUG
         printf("%s processing...\n", files[n]);
-#endif
+
         char* msg = process_file(files[n]);
         size_t len = strlen(msg);
 
-#ifdef DEBUG
-        printf("sending to client...\n");
-#endif
         write(connfd, &len, sizeof(len));
         write(connfd, msg, len);
 
-#ifdef DEBUG
         printf("sended: %s\n", msg);
-#endif
+
         free(msg);
     }
-    
-#ifdef DEBUG
-    for (size_t n = 0; n < files_count; n++)
-        printf("files[%lu]: %s\n", n, files[n]);
-#endif
+
 // #####
 
     close(connfd);
@@ -75,49 +65,31 @@ get_files(const int sock, char*** files)
     size_t files_count = 0;
 
     *files = calloc(sizeof(char*), MAX_FILES);
+    read(sock, &files_count, sizeof(files_count));
 
-    while (true) {
+    for (size_t n = 0; n < files_count; n++) {
         size_t len = 0;
         ssize_t bytes = 0;
 
-        (*files)[files_count] = calloc(sizeof(char), MAX_NAME);
+        (*files)[n] = calloc(sizeof(char), MAX_NAME);
+
+        printf("reading from client...\n");
 
         read(sock, &len, sizeof(len));
-        bytes = read(sock, (*files)[files_count], len);
+        bytes = read(sock, (*files)[n], len);
 
-#ifdef DEBUG
-        printf("msg from client[%ld]: %s\n", bytes, (*files)[files_count]);
-#endif
+        printf("msg from client[%ld]: %s\n", bytes, (*files)[n]);
 
-        if (bytes == 0) {
-#ifdef DEBUG
-            printf("wtf??\n");
-#endif
-            free((*files)[files_count]);
-#ifdef DEBUG
-            printf("files[%lu] freed\n", files_count);
-#endif
-            break;
-        }
-
-#ifdef DEBUG
-        printf("files_count++\n");
-#endif
-
-        files_count++;
+        if (bytes == 0)
+            free((*files)[n]);
     }
 
-#ifdef DEBUG
-    printf("get_files -> return\n");
-#endif
     return files_count;
 }
 
 char*
 process_file(const char* file)
 {
-    return "gotcha";
-
     pid_t pid;
     int status;
     char* restrict result_msg = calloc(sizeof(char), BUF_SIZE);
@@ -126,13 +98,7 @@ process_file(const char* file)
     ERR_CHECK(pid, -1)
 
     if (pid == 0) {
-#ifdef DEBUG
-        printf("executing...\n");
-#endif
         TRY(execl(LAB2_PATH, LAB2_NAME, file, PAIR, NULL))
-#ifdef DEBUG
-        printf("unkown error\n");
-#endif
     } else if (pid > 0) {
         int child = wait(&status);
 
@@ -149,9 +115,7 @@ process_file(const char* file)
         }
     }
 
-#ifdef DEBUG
     printf("result_msg: %s\n", result_msg);
-#endif
 
     return result_msg;
 }
