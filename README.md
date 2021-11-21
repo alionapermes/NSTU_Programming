@@ -19,7 +19,7 @@
   - [x] [Лаба 4(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab4_8)
   - [x] [Лаба 5(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab5_8)
   - [x] [Лаба 6(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab6_8)
-  - [x] [Курсовая гр3.(1, 3, 9, 10, 19) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/Kursovaya)
+  - [x] [Курсовая гр3.(1, 3, 9, 10, 19) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/coursework)
 
 </p>
 </details>
@@ -35,7 +35,7 @@
   - [x] [Лаба 6(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab6_13)
   - [x] [Лаба 7(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab7_13)
   - [x] [Лаба 8(13)](https://github.com/Linadil/NSTU_Programming/tree/master/semester3/lab8_13)
-  - [ ] [РГЗ (13)](https://github.com/Linadil/NSTU_Programming/tree/master/RGZ)
+  - [ ] [РГР (13)](https://github.com/Linadil/NSTU_Programming/tree/master/coursework)
 
 </p>
 </details>
