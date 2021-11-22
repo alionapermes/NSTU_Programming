@@ -5,8 +5,8 @@
 Считайте ссылку на этот репо стоп-словом, на случай, ежели Си начнёт чересчур доминировать над вашим, изнеженным скриптовыми языками, мозгом.
 
 ## Таки чего в итоге?
-Лабы/РГЗ здесь будут появляться по мере выполнения. Ежели есть вопросы по коду - ниже указаны контакты.
-Я не против помочь, однако по мере сил и в свободное время.
+Лабы/РГЗ здесь будут появляться по мере выполнения. Ежели есть вопросы по коду - листай в самый низ.
+Всегда рад помочь, однако по мере сил и в свободное время.
 
 На данный момент дела обстоят следующим образом:
 
@@ -19,7 +19,7 @@
   - [x] [Лаба 4(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab4_8)
   - [x] [Лаба 5(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab5_8)
   - [x] [Лаба 6(8)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/lab6_8)
-  - [x] [Курсовая гр3.(1, 3, 9, 10, 19) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/coursework)
+  - [x] [Курсовая гр.3(1, 3, 9, 10, 19) гр.4(1, 8, 11, 20)](https://github.com/Linadil/NSTU_Programming/tree/master/semester2/coursework)
 
 </p>
 </details>
@@ -43,5 +43,5 @@
 ## "У меня лапки" how to fix
 На сей случай держи контакты санитаров:
  * [ВГулаге](https://vk.com/cpp_is_power)
- * [Мессенджер здорового человека](https://t.me/boolka_breada)
+ * [Мессенджер здорового человека](https://t.me/alionapermes)
 
