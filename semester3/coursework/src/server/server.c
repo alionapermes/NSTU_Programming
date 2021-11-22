@@ -5,6 +5,7 @@
 #define PORT 5000
 #define HOST "127.0.0.1"
 
+
 int
 main(int argc, char** argv)
 {
@@ -24,6 +25,9 @@ main(int argc, char** argv)
 
     connfd = s_accept(listenfd, NULL, NULL);
     
+    //
+
+    s_close(connfd);
 
     return 0;
 }
