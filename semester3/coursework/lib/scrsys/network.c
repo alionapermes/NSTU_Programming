@@ -57,3 +57,16 @@ s_inet_pton(int af, const char* restrict src, void* restrict dst)
 
     return 0;
 }
+
+int
+s_bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen)
+{
+    int result = bind(sockfd, addr, addrlen);
+
+    if (result == -1) {
+        printf("error %d: %s\n", errno, strerror(errno));
+        exit(-1);
+    }
+
+    return result;
+}

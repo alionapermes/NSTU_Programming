@@ -24,5 +24,8 @@ s_listen(int sockfd, int backlog);
 int
 s_inet_pton(int af, const char* src, void* dst);
 
+int
+s_bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
+
 
 #endif
