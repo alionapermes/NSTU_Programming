@@ -4,6 +4,7 @@ LIBS=../../lib/scrsys/io.c ../../lib/scrsys/network.c
 EXECUTABLE=client
 BINPATH=../../bin
 
+
 client: clear
 	$(CC) -o $(BINPATH)/$(EXECUTABLE) $(SOURCES) # $(LIBS)
 
