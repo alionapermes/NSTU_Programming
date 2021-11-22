@@ -44,8 +44,8 @@ main()
         char* msg = process_file(files[n]);
         size_t len = strlen(msg);
 
-        write(connfd, &len, sizeof(len));
-        write(connfd, msg, len);
+        TRY(write(connfd, &len, sizeof(len)))
+        TRY(write(connfd, msg, len))
 
         printf("sended: %s\n", msg);
 
@@ -65,7 +65,7 @@ get_files(const int sock, char*** files)
     size_t files_count = 0;
 
     *files = calloc(sizeof(char*), MAX_FILES);
-    read(sock, &files_count, sizeof(files_count));
+    TRY(read(sock, &files_count, sizeof(files_count)))
 
     for (size_t n = 0; n < files_count; n++) {
         size_t len = 0;
@@ -75,8 +75,10 @@ get_files(const int sock, char*** files)
 
         printf("reading from client...\n");
 
-        read(sock, &len, sizeof(len));
+        TRY(read(sock, &len, sizeof(len)))
+
         bytes = read(sock, (*files)[n], len);
+        ERR_CHECK(bytes, -1)
 
         printf("msg from client[%ld]: %s\n", bytes, (*files)[n]);
 
