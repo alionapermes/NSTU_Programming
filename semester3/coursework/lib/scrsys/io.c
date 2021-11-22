@@ -25,3 +25,16 @@ s_read(int fd, void* buf, size_t count)
 
     return bytes;
 }
+
+int
+s_close(int fd)
+{
+    int result = close(fd);
+
+    if (result == -1) {
+        printf("error %d: %s\n", errno, strerror(errno));
+        exit(-1);
+    }
+
+    return result;
+}
