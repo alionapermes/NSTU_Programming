@@ -38,3 +38,16 @@ s_close(int fd)
 
     return result;
 }
+
+int
+s_open(const char* pathname, int flags, mode_t mode)
+{
+    int fd = open(pathname, flags, mode);
+
+    if (fd == -1) {
+        printf("error %d: %s\n", errno, strerror(errno));
+        exit(-1);
+    }
+
+    return fd;
+}
