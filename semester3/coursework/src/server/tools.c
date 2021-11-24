@@ -1,8 +1,5 @@
 #include "tools.h"
 
-#include <stdint.h>
-#include <arpa/inet.h>
-
 
 void
 init_sockaddr_in(struct sockaddr_in* addr, uint16_t port)
