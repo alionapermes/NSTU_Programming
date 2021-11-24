@@ -6,7 +6,7 @@ BINPATH=../../bin
 
 
 client: clear
-	$(CC) -o $(BINPATH)/$(EXECUTABLE) $(SOURCES) # $(LIBS)
+	$(CC) -o $(BINPATH)/$@/$(EXECUTABLE) $(SOURCES) # $(LIBS)
 
 clear:
 	rm -rf build
