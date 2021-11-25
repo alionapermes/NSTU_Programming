@@ -31,3 +31,29 @@ receive_data(int sockfd, char*** filenames)
 
     return files_count;
 }
+
+char*
+process_file(char* filename, char* pair)
+{
+    pid_t pid;
+    int status;
+    char* restrict result_msg = calloc(sizeof(char), MAX_RESULT);
+
+
+    if ((pid = fork()) < 0) {
+        printf("bad fork\n");
+        exit(-1);
+    }
+
+    if (pid == 0) {
+        execl(PROCESSOR_PATH, PROCESSOR_NAME, filename, pair, NULL);
+    } else {
+        int child = wait(&status);
+
+        // if (child > 0) {
+        //     int len = sprintf(result_msg, "%s", status_msg(status));
+        // }
+    }
+
+    return result_msg;
+}
