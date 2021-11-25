@@ -17,12 +17,12 @@ s_accept(
     struct sockaddr* restrict addr,
     socklen_t* restrict addrlen)
 {
-    int fd = accept(fd, addr, addrlen);
+    int sockfd = accept(fd, addr, addrlen);
 
-    if (fd == -1)
+    if (sockfd == -1)
         throw_error(errno);
 
-    return fd;
+    return sockfd;
 }
 
 int
