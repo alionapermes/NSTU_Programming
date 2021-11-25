@@ -12,6 +12,17 @@ s_socket(int domain, int type, int protocol)
 }
 
 int
+s_connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen)
+{
+    int result = connect(sockfd, addr, addrlen);
+
+    if (result == -1)
+        throw_error(errno);
+
+    return result;
+}
+
+int
 s_accept(
     int fd,
     struct sockaddr* restrict addr,
