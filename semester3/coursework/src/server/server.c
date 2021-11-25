@@ -3,13 +3,12 @@
 #include "tools.h"
 
 #define PORT 5000
-#define HOST "127.0.0.1"
 
 
 int
 main(int argc, char** argv)
 {
-    printf("[+] server started");
+    printf("[+] server started\n");
 
     struct sockaddr_in addr;
     size_t files_count = 0;
@@ -27,13 +26,20 @@ main(int argc, char** argv)
     s_listen(listenfd, 1);
     printf("[+] listening started\n");
 
+
     connfd = s_accept(listenfd, NULL, NULL);
     printf("[+] connection accepted\n");
     
-    //
+
+    files_count = receive_data(connfd, &files);
+
+    // for (size_t n = 0; n < files_count; n++) {
+        
+    // }
+
 
     s_close(connfd);
-    printf("[+] socket closed\n");
+    printf("[+] connection closed*\n");
 
     printf("[+] server stopped\n");
     return 0;
