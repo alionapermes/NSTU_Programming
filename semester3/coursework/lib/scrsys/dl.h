@@ -2,6 +2,9 @@
 #define DL_H
 
 #include <dlfcn.h>
+#include <stddef.h>
+
+#include "error.h"
 
 
 void*
