@@ -7,7 +7,7 @@ LIBS=$(LIB)/scrsys/io.c\
 	$(LIB)/log/log.c
 EXECUTABLE=processor
 BINPATH=../../bin/server
-FLAG=-ldl
+FLAG=-ldl -std=c99 -std=gnu99
 
 
 processor: clear funclib

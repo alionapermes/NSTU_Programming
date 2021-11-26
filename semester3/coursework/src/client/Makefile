@@ -7,7 +7,7 @@ LIBS=$(LIB)/scrsys/io.c\
 	$(LIB)/log/log.c
 EXECUTABLE=client
 BINPATH=../../bin/client
-FLAG=-ldl
+FLAG=-ldl -std=c99 -std=gnu99
 
 
 client: clear
