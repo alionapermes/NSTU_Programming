@@ -46,7 +46,7 @@ process_args(
     char** target,
     char** pair)
 {
-    if ((argc != 3)
+    if ((argc != 4)
         || (strlen(argv[2]) != 2)
         || (strlen(argv[3]) != 2)
     ) {
