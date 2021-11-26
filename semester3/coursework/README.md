@@ -54,12 +54,12 @@ make all
         |   +-- file2.txt
 ```
 
-##### Запуск сервера
+##### __Запуск сервера__
 Находясь в директории `coursework/bin/server`
 ```sh
 ./server
 ```
-##### Запуск клиента
+##### __Запуск клиента__
 Находясь в директории `coursework/bin/client`
 ```sh
 ./client -t "FF" -p "#@" -f file1.txt -f file2.txt
