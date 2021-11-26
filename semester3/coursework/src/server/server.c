@@ -14,7 +14,9 @@ main(int argc, char** argv)
     size_t files_count = 0;
     int listenfd = 0;
     int connfd = 0;
-    char** files;
+    char** filenames = NULL;
+    char* target = NULL;
+    char* pair = NULL;
 
 
     init_sockaddr_in(&addr, PORT);
@@ -31,11 +33,21 @@ main(int argc, char** argv)
     printf("[+] connection accepted\n");
     
 
-    files_count = receive_data(connfd, &files);
+    files_count = receive_data(connfd, &filenames, &target, &pair);
 
-    // for (size_t n = 0; n < files_count; n++) {
-        
-    // }
+    for (size_t n = 0; n < files_count; n++) {
+        printf("processing '%s'...\n", filenames[n]);
+
+        char* msg = process_file(filenames[n], target, pair);
+        size_t len = strlen(msg);
+        printf("[+] processed successful\n");
+
+        s_write(connfd, &len, sizeof(len));
+        s_write(connfd, msg, len);
+        printf("[+] result sended to client\n");
+
+        free(msg);
+    }
 
 
     s_close(connfd);
