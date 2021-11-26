@@ -14,7 +14,12 @@ void
 status_msg(int status, char* buf);
 
 void
-process_args(size_t argc, char** argv, char** filename, char** pair);
+process_args(
+    size_t argc,
+    char** argv,
+    char** filename,
+    char** target,
+    char** pair);
 
 
 #endif

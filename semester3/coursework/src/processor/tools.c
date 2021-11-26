@@ -4,7 +4,7 @@
 void
 print_help(void)
 {
-    printf("Usage: processor [FILE] [CHARS PAIR]\n");
+    printf("Usage: processor [FILE] [TARGET PAIR] [REPLACE PAIR]\n");
 }
 
 void
@@ -40,9 +40,17 @@ status_msg(int status, char* buf)
 }
 
 void
-process_args(size_t argc, char** argv, char** filename, char** pair)
+process_args(
+    size_t argc,
+    char** argv,
+    char** filename,
+    char** target,
+    char** pair)
 {
-    if ((argc != 3) || (strlen(argv[2]) != 2)) {
+    if ((argc != 3)
+        || (strlen(argv[2]) != 2)
+        || (strlen(argv[3]) != 2)
+    ) {
         printf("wrong args\n");
         print_help();
 
@@ -50,5 +58,6 @@ process_args(size_t argc, char** argv, char** filename, char** pair)
     }
 
     *filename = argv[1];
-    *pair = argv[2];
+    *target = argv[2];
+    *pair = argv[3];
 }
