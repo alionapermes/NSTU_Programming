@@ -15,10 +15,10 @@ void
 init_sockaddr_in(struct sockaddr_in* addr, uint16_t port);
 
 size_t
-receive_data(int connfd, char*** filenames);
+receive_data(int connfd, char*** filenames, char** target, char** pair);
 
 char*
-process_file(char* filename, char* pair);
+process_file(char* filename, char** target, char* pair);
 
 
 #endif

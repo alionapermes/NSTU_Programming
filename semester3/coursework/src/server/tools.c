@@ -10,7 +10,7 @@ init_sockaddr_in(struct sockaddr_in* addr, uint16_t port)
 }
 
 size_t
-receive_data(int sockfd, char*** filenames)
+receive_data(int sockfd, char*** filenames, char** target, char** pair)
 {
     size_t files_count = 0;
 
@@ -33,7 +33,7 @@ receive_data(int sockfd, char*** filenames)
 }
 
 char*
-process_file(char* filename, char* pair)
+process_file(char* filename, char** taget, char* pair)
 {
     pid_t pid;
     int status;
