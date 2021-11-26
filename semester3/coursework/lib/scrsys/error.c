@@ -13,7 +13,7 @@ throw_error(int err)
 }
 
 void
-throw_dlerror()
+throw_dlerror(void)
 {
     char* msg = dlerror();
 
