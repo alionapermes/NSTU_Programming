@@ -36,7 +36,6 @@ status_msg(int status, char* buf)
         throw_error(errno);
 
     buf = realloc(buf, (size_t)length);
-    return buf;
 }
 
 void

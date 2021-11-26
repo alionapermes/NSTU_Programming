@@ -2,6 +2,7 @@
 #define PROCESSOR_TOOLS_H
 
 #include <stdlib.h>
+#include <sys/wait.h>
 #include <sys/types.h>
 
 #include "../../lib/scrsys/error.h"
