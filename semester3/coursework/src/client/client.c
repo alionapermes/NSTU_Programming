@@ -5,8 +5,6 @@
 #define PORT 5000
 #define HOST "127.0.0.1"
 
-#define MAX_FILES 16
-
 
 int
 main(size_t argc, char** argv)

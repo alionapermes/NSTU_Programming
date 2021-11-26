@@ -1,5 +1,5 @@
-#ifndef TOOLS_H
-#define TOOLS_H
+#ifndef CLIENT_TOOLS_H
+#define CLIENT_TOOLS_H
 
 #define DEBUG
 
@@ -16,8 +16,9 @@
 
 #define DEFAULT_TARGET "FF"
 #define DEFAULT_PAIR "#@"
-#define MAX_ANSWER 32
 #define LOGMSG_SIZE 64
+#define MAX_ANSWER 32
+#define MAX_FILES 16
 
 #define PATH_DEBUGLOG "./client-debug.log"
 

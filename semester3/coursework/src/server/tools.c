@@ -38,8 +38,20 @@ receive_data(int sockfd, char*** filenames, char target[3], char pair[3])
 
         printf("reading from client...\n");
         s_read(sockfd, &len, sizeof(len));
+
+        if (len > MAX_NAME) {
+            char* error_msg = "filename is too long";
+
+            printf("error: %s\n", error_msg);
+            write_log(PATH_ERRORLOG, error_msg, strlen(error_msg));
+            
+            while (n >= 0)
+                free((*filenames)[n--]);
+
+            exit(-1);
+        }
+
         s_read(sockfd, (*filenames)[n], len);
-        
         printf("[+] received: %s\n", (*filenames)[n]);
 
 #ifdef DEBUG

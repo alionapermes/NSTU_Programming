@@ -1,5 +1,5 @@
-#ifndef TOOLS_H
-#define TOOLS_H
+#ifndef SERVER_TOOLS_H
+#define SERVER_TOOLS_H
 
 #define DEBUG
 
@@ -11,11 +11,10 @@
 
 #include "../../lib/scrsys/error.h"
 
-#define MAX_NAME 255
+#define MAX_NAME 256
 #define MAX_RESULT 32
 #define LOGMSG_SIZE 64
 
-//#define PROCESSOR_PATH "/home/linadl/projects/c/NSTU_Programming/semester3/coursework/bin/server/processor"
 #define PROCESSOR_PATH "./processor"
 #define PROCESSOR_NAME "processor"
 #define PATH_DEBUGLOG "./server-debug.log"

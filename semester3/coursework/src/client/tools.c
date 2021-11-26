@@ -5,7 +5,7 @@ void
 print_help(void)
 {
     printf(
-        "Usage: client [OPTION]... [FILE]...\n\n"
+        "Usage: client [OPTION]... -f [FILE]...\n\n"
         "\t-t    target chars pair\n"
         "\t-p    chars pair to replace\n"
         "\t-f    file to process\n"
@@ -33,6 +33,9 @@ process_args(
     }
 
     while ((opt = getopt(argc, argv, "t:p:f:h")) != -1) {
+        if (files_count == MAX_FILES)
+            break;
+
         switch (opt)
         {
             case 't':
@@ -61,10 +64,9 @@ process_args(
                 (*filenames)[files_count++] = optarg;
                 break;
             case 'h':
+            default:
                 print_help();
                 exit(0);
-                break;
-            default:
                 break;
         }
     }
