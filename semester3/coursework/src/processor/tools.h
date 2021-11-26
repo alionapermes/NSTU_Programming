@@ -12,9 +12,6 @@ void
 print_help(void);
 
 void
-status_msg(int status, char* buf);
-
-void
 process_args(
     size_t argc,
     char** argv,

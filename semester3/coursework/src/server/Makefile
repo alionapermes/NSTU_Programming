@@ -1,16 +1,16 @@
 CC=gcc
-SOURCES=client.c tools.c
+SOURCES=server.c tools.c
 LIB=../../lib
 LIBS=$(LIB)/scrsys/io.c\
 	$(LIB)/scrsys/network.c\
 	$(LIB)/scrsys/error.c\
 	$(LIB)/log/log.c
-EXECUTABLE=client
-BINPATH=../../bin/client
+EXECUTABLE=server
+BINPATH=../../bin/server
 FLAG=-ldl
 
 
-client: clear
+server: clear
 	$(CC) -o $(BINPATH)/$(EXECUTABLE) $(SOURCES) $(LIBS) $(FLAG)
 
 clear:

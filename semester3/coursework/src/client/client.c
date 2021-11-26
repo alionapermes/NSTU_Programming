@@ -21,10 +21,6 @@ main(size_t argc, char** argv)
 
 
     files_count = process_args(argc, argv, &target, &pair, &filenames);
-    // printf("target: %s\n", target);
-    // printf("pair: %s\n", pair);
-    // for (size_t n = 0; n < files_count; n++)
-    //     printf("file %lu: %s\n", n, filenames[n]);
 
 
     init_sockaddr_in(&addr, PORT);
@@ -32,16 +28,18 @@ main(size_t argc, char** argv)
     sockfd = s_socket(AF_INET, SOCK_STREAM, 0);
     s_inet_pton(AF_INET, HOST, &addr.sin_addr);
 
+
     printf("connecting to server...\n");
     s_connect(sockfd, (struct sockaddr*)&addr, sizeof(addr));
     printf("[+] connected sucessful\n");
 
-    send_data(sockfd, filenames, files_count);
-    
+
+    send_data(sockfd, filenames, files_count, target, pair);
+
     for (size_t n = 0; n < files_count; n++)
         receive_data(sockfd);
 
-    // ####
+
     s_close(sockfd);
     printf("[+] connection closed*\n");
 

@@ -26,6 +26,11 @@ process_args(
     bool target_catched = false;
     bool pair_catched = false;
 
+    
+    if (argc == 1) {
+        print_help();
+        exit(-1);
+    }
 
     while ((opt = getopt(argc, argv, "t:p:f:h")) != -1) {
         switch (opt)
@@ -64,6 +69,12 @@ process_args(
         }
     }
 
+    if (*target == NULL)
+        *target = DEFAULT_TARGET;
+
+    if (*pair == NULL)
+        *pair = DEFAULT_PAIR;
+
     if (!validate_args(*target, *pair)) {
         printf("wrong keys\n");
         print_help();
@@ -79,9 +90,28 @@ validate_args(const char* target, const char* pair)
 { return ((strlen(target) == 2) && (strlen(pair) == 2)); }
 
 void
-send_data(int sockfd, char** filenames, size_t files_count)
+send_data(
+    int sockfd,
+    char** filenames,
+    size_t files_count,
+    char* target,
+    char* pair)
 {
+#ifdef DEBUG
+    char log_msg[LOGMSG_SIZE] = {0};
+    sprintf(
+        log_msg,
+        "SEND count: %lu; target: %s; pair: %s",
+        files_count, target, pair
+    );
+
+    write_log(PATH_DEBUGLOG, log_msg, strlen(log_msg));
+#endif
+
     s_write(sockfd, &files_count, sizeof(files_count));
+    s_write(sockfd, target, 2);
+    s_write(sockfd, pair, 2);
+
 
     for (size_t n = 0; n < files_count; n++) {
         size_t len = strlen(filenames[n]);
@@ -105,6 +135,13 @@ receive_data(int sockfd)
     s_read(sockfd, buf, len);
 
     printf("[+] received: %s\n", buf);
+
+#ifdef DEBUG
+    char log_msg[LOGMSG_SIZE] = {0};
+    sprintf(log_msg, "READ len: %lu; buf: %s", len, buf);
+
+    write_log(PATH_DEBUGLOG, log_msg, strlen(log_msg));
+#endif
 }
 
 void

@@ -45,5 +45,7 @@ main(size_t argc, char** argv)
     s_write(fd, buf, strlen(buf));
     s_close(fd);
 
-    return 0;
+    s_dlclose(dl_handle);
+
+    return replaces;
 }
