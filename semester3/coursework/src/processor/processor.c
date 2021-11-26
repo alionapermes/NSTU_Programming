@@ -10,6 +10,7 @@
 #define MAX_NAME 32
 #define BUF_SIZE 128
 #define OUTPUT_PREFIX "output"
+#define LIB_PATH "./funclib.so"
 
 
 int
@@ -29,7 +30,7 @@ main(size_t argc, char** argv)
 
     process_args(argc, argv, &filename, &target, &pair);
 
-    dl_handle = s_dlopen("dlib/funclib.so", RTLD_LAZY);
+    dl_handle = s_dlopen(LIB_PATH, RTLD_LAZY);
     replace = s_dlsym(dl_handle, "replace");
 
     fd = s_open(filename, O_RDONLY, 0);
