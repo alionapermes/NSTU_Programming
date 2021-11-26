@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include "../log/log.h"
 
@@ -13,6 +14,9 @@
 
 void
 throw_error(int err);
+
+void
+throw_dlerror();
 
 
 #endif

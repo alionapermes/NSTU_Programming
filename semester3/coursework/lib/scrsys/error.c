@@ -11,3 +11,14 @@ throw_error(int err)
 
     exit(-1);
 }
+
+void
+throw_dlerror()
+{
+    char* msg = dlerror();
+
+    write_log(PATH_ERRORLOG, msg, strlen(msg));
+    printf("dlerror: %s\n", msg);
+
+    exit(-1);
+}
