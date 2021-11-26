@@ -15,7 +15,7 @@ processor: clear funclib
 	$(CC) -o $(BINPATH)/$(EXECUTABLE) $(SOURCES) $(LIBS) $(FLAG)
 
 funclib:
-	gcc -o build/funclib.o $(LIB)/funclib/funclib.c -fPIC -c
+	gcc -o build/funclib.o $(LIB)/funclib/funclib.c -fPIC -c -std=c99 -std=gnu99
 	gcc -o $(BINPATH)/funclib.so build/funclib.o -shared
 
 clear:
