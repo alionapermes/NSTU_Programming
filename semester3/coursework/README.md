@@ -30,7 +30,7 @@ make all
 | -f | Имя файла для обработки. Указывается для каждого файла. |
 | -h | Информация об использовании. |
 
-#### Пример
+### Пример
 ```sh
 git clone https://github.com/alionapermes/NSTU_Programming.git
 ```
@@ -54,13 +54,13 @@ coursework
         └── server
 ```
 
-##### __Запуск сервера__
-Находясь в директории `coursework/bin/server`
+#### __Запуск сервера__
+##### Находясь в директории `coursework/bin/server`
 ```sh
 ./server
 ```
-##### __Запуск клиента__
-Находясь в директории `coursework/bin/client`
+#### __Запуск клиента__
+##### Находясь в директории `coursework/bin/client`
 ```sh
 ./client -t "FF" -p "#@" -f file1.txt -f file2.txt
 ```
