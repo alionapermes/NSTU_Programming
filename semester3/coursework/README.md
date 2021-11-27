@@ -42,16 +42,16 @@ make all
 ```
 
 ```
-+-- coursework
-|   +-- bin
-    |   +-- client
-    |   |   +-- client
-    |   +-- server
-        |   +-- server
-        |   +-- processor
-        |   +-- funclib.so
-        |   +-- file1.txt
-        |   +-- file2.txt
+coursework
+└── bin
+    ├── client
+    │   └── client
+    └── server
+        ├── file1.txt
+        ├── file2.txt
+        ├── funclib.so
+        ├── processor
+        └── server
 ```
 
 ##### __Запуск сервера__
