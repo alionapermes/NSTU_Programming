@@ -4,7 +4,10 @@
 void
 write_log(const char* path, const char* content, size_t count)
 {
-    int fd = s_open(path, O_CREAT | O_APPEND | O_WRONLY, 0644);
+    if (count == 0)
+        count = strlen(content);
+
+    int fd = s_open(path, O_CREAT | O_APPEND | O_WRONLY, 0666);
     char* msg = calloc(sizeof(char), count + TIMESTAMP_LENGTH);
 
     build_msg(msg, content);
