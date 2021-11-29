@@ -38,8 +38,8 @@ main(size_t argc, char** argv)
         receive_data(sockfd);
 
 
-    s_close(sockfd);
-    printf("[+] connection closed*\n");
+    //s_close(sockfd);
+    //printf("[+] connection closed*\n");
 
     free(filenames);
     return 0;

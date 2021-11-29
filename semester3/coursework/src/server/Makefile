@@ -4,6 +4,7 @@ LIB=../../lib
 LIBS=$(LIB)/scrsys/io.c\
 	$(LIB)/scrsys/network.c\
 	$(LIB)/scrsys/error.c\
+	$(LIB)/scrsys/proc.c\
 	$(LIB)/log/log.c
 EXECUTABLE=server
 BINPATH=../../bin/server

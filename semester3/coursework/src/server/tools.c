@@ -15,8 +15,13 @@ receive_data(int sockfd, char*** filenames, char target[3], char pair[3])
     size_t files_count = 0;
 
     s_read(sockfd, &files_count, sizeof(files_count));
+    
+    if (files_count == 0)
+        return files_count;
+
     s_read(sockfd, target, 2);
     s_read(sockfd, pair, 2);
+
 
 #ifdef DEBUG
     char log_msg[LOGMSG_SIZE] = {0};
@@ -25,7 +30,7 @@ receive_data(int sockfd, char*** filenames, char target[3], char pair[3])
         "count: %lu; target: %s; pair: %s",
         files_count, target, pair
     );
-    
+
     write_log(PATH_DEBUGLOG, log_msg, strlen(log_msg));
 #endif
 
@@ -33,17 +38,15 @@ receive_data(int sockfd, char*** filenames, char target[3], char pair[3])
 
     for (size_t n = 0; n < files_count; n++) {
         size_t len = 0;
+        char log_msg[LOGMSG_SIZE] = {0};
 
         (*filenames)[n] = calloc(sizeof(char), MAX_NAME);
 
-        printf("reading from client...\n");
+        write_log(PATH_ACTLOG, "reading from client...", 0);
         s_read(sockfd, &len, sizeof(len));
 
         if (len > MAX_NAME) {
-            char* error_msg = "filename is too long";
-
-            printf("error: %s\n", error_msg);
-            write_log(PATH_ERRORLOG, error_msg, strlen(error_msg));
+            write_log(PATH_ERRORLOG, "filename is too long", 0);
             
             while (n >= 0)
                 free((*filenames)[n--]);
@@ -52,7 +55,9 @@ receive_data(int sockfd, char*** filenames, char target[3], char pair[3])
         }
 
         s_read(sockfd, (*filenames)[n], len);
-        printf("[+] received: %s\n", (*filenames)[n]);
+
+        sprintf(log_msg, "[+] received: %s", (*filenames)[n]);
+        write_log(PATH_ACTLOG, log_msg, 0);
 
 #ifdef DEBUG
         memset(log_msg, 0, LOGMSG_SIZE);
@@ -78,7 +83,8 @@ process_file(char* filename, char* target, char* pair)
 
 
     if ((pid = fork()) < 0) {
-        printf("bad fork\n");
+        write_log(PATH_ERRORLOG, "bad fork", 0);
+        free(result_msg);
         exit(-1);
     }
 
