@@ -15,10 +15,19 @@
 * Максимальная длина имени/пути файла - 255
 
 ## Сборка
-Находясь в директории `coursework/src`
----
+Для корректной сборки проекта необходимо изменить имя пользователя в unit-файле и путь к исполняемому файлу
+#### Находясь в директории `coursework/src/server`
 ```sh
-make all
+vim myserver.service
+```
+```
+[Service]
+    ExecStart=/home/<username>/<path_to_repo>/NSTU_Programming/semester3/coursework/bin/server/server
+    WorkingDirectory=/home/<username>/<path_to_repo>/NSTU_Programming/semester3/coursework/bin/server
+```
+#### Находясь в директории `coursework/src`
+```sh
+sudo make all
 ```
 
 ## Использование
@@ -35,12 +44,26 @@ make all
 git clone https://github.com/alionapermes/NSTU_Programming.git
 ```
 ```sh
-cd NSTU_Programming/semester3/coursework/src
+cd NSTU_Programming/semester3/coursework/src/server
 ```
 ```sh
-make all
+vim myserver.service
 ```
-
+```sh
+[Service]
+    ExecStart=/home/linadl/projects/c/NSTU_Programming/semester3/coursework/bin/server/server
+    WorkingDirectory=/home/linadl/projects/c/NSTU_Programming/semester3/coursework/bin/server
+```
+```sh
+cd ..
+```
+```sh
+sudo make all
+```
+```sh
+sudo systemctl daemon-reload
+```
+##### Вид каталога `coursework/bin` после сборки
 ```
 coursework
 └── bin
@@ -55,9 +78,8 @@ coursework
 ```
 
 #### __Запуск сервера__
-##### Находясь в директории `coursework/bin/server`
 ```sh
-./server
+sudo systemctl start myserver
 ```
 #### __Запуск клиента__
 ##### Находясь в директории `coursework/bin/client`
@@ -71,6 +93,7 @@ coursework
 ##### __Примечания:__
  * *Для запуска приложения рекомендуется использовать разные окна (или вкладки) терминала, чтобы не смешивать вывод клиентской и серверной части*
  * *Некоторые символы терминал может интерпретировать особым образом, поэтому стоит ставить кавычки*
+ * *Порт, используемый по умолчанию - 5000*
 
 ## Рабочее окружение и инструменты
 ---
