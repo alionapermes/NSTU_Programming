@@ -1,0 +1,12 @@
+[Unit]
+    Description=avt019-11
+
+[Service]
+    Type=forking
+    Restart=always
+    RuntimeMaxSec=300
+    ExecStart=/home/alionapermes/avt019-11/server
+    WorkingDirectory=/home/alionapermes/avt019-11
+
+[Install]
+    WantedBy=multi-user.target
