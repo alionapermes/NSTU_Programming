@@ -18,22 +18,26 @@
 #define MAX_FILES 16
 
 
-// program count files...
+// ./client <count> <file...>
 int main(size_t argc, char** argv) {
     int fd = 0;
     int flags = O_RDWR | O_CREAT;
     int prot = PROT_READ | PROT_WRITE;
     mode_t mode = 0666;
-    size_t count = atoi(argv[1]);
-    size_t files_num = argc - 2;
-    
+    size_t count = 0; atoi(argv[1]);
+    size_t files_num = 0; argc - 2;
+
     sem_t* toServer = NULL;
     sem_t* fromServer = NULL;
     char* buf = NULL;
 
+    if (argc < 3) {
+        printf("Usage: client <count> <file...>");
+        exit(-1);
+    }
 
     if (count == 0) {
-        printf("heuta\n");
+        printf("first arg must be a number\n");
         exit(-1);
     }
 
@@ -63,7 +67,6 @@ int main(size_t argc, char** argv) {
         size_t len = strlen(name) + 1;
 
         try(sem_wait(fromServer), -1);
-        // printf("name: %s(%lu)\n", name, len);
         memcpy(buf, name, len);
         try(msync(buf, len, prot), -1);
         try(sem_post(toServer), -1);
