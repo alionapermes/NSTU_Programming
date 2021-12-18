@@ -24,8 +24,8 @@ int main(size_t argc, char** argv) {
     int flags = O_RDWR | O_CREAT;
     int prot = PROT_READ | PROT_WRITE;
     mode_t mode = 0666;
-    size_t count = 0; atoi(argv[1]);
-    size_t files_num = 0; argc - 2;
+    size_t count = 0;
+    size_t files_num = 0;
 
     sem_t* toServer = NULL;
     sem_t* fromServer = NULL;
@@ -35,6 +35,9 @@ int main(size_t argc, char** argv) {
         printf("Usage: client <count> <file...>");
         exit(-1);
     }
+
+    count = atoi(argv[1]);
+    files_num = argc - 2;
 
     if (count == 0) {
         printf("first arg must be a number\n");
