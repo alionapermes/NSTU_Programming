@@ -17,6 +17,8 @@ int main()
 
         myserver();
     }
+    
+    return 0;
 }
 
 void myserver()
