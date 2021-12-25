@@ -34,6 +34,7 @@ void myserver()
     readFromClient(ifd, &files_num, sizeof(files_num));
     files = calloc(files_num, sizeof(char*));
 
+    sleep(1);
     readFromClient(ifd, &count, sizeof(count));
 
     for (size_t n = 0; n < files_num; n++) {
@@ -41,6 +42,7 @@ void myserver()
         char m[80] = {0};
         writeLog(INFO, "listening...");
 
+        sleep(1);
         readFromClient(ifd, msg, MAX_NAME);
         snprintf(m, 79, "message from client: %s", msg);
         writeLog(INFO, m);
