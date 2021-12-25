@@ -8,7 +8,7 @@
     Restart=always
     RuntimeMaxSec=300
     ExecStart=/root/rgr_24/server
-    WorkingDirectory=/root/rgr_24/test/
+    WorkingDirectory=/root/rgr_24/
 
 [Install]
     WantedBy=multi-user.target
