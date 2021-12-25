@@ -27,5 +27,6 @@ clean:
 	rm -f func.o func.so child client server
 	rm -f /etc/systemd/system/$(SERVICE)
 	rm -f *-with-*.txt log.txt
+	clear
 
 .PHONY: client server child func
