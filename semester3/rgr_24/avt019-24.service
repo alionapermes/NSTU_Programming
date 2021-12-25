@@ -2,13 +2,13 @@
     Description=avt019 v24 Kheynov Server
 
 [Service]
-    User=alionapermes
-    Group=alionapermes
+    User=root
+    Group=root
     Type=forking
     Restart=always
     RuntimeMaxSec=300
-    ExecStart=/home/alionapermes/test/server
-    WorkingDirectory=/home/alionapermes/test/
+    ExecStart=/root/rgr_24/server
+    WorkingDirectory=/root/rgr_24/test/
 
 [Install]
     WantedBy=multi-user.target
