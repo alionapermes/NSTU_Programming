@@ -1,7 +1,7 @@
 CC=gcc
 SERVICE=myserv.service
 
-all: client server func child
+all: clean client server func child
 	cp ./$(SERVICE) /etc/systemd/system/$(SERVICE)
 	systemctl daemon-reload
 	clear
