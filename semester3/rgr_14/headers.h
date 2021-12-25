@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <dlfcn.h>
 #include <ctype.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
