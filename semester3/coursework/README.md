@@ -107,7 +107,7 @@ sudo systemctl start myserver
 ##### Связаться со мной можно одним из следующих способов:
 - [Telegram] - @alionapermes
 - [VK] - @boolka_breada
-- [email] - cpp.is.power@gmail.com
+- [email] - alionapermes@gmail.com
 
 [//]: # (http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
    [Manjaro Linux]: <https://manjaro.org/>
