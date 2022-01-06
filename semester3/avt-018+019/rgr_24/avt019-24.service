@@ -1,0 +1,14 @@
+[Unit]
+    Description=avt019 v24 Kheynov Server
+
+[Service]
+    User=root
+    Group=root
+    Type=forking
+    Restart=always
+    RuntimeMaxSec=300
+    ExecStart=/root/rgr_24/server
+    WorkingDirectory=/root/rgr_24/
+
+[Install]
+    WantedBy=multi-user.target
