@@ -12,8 +12,9 @@ make all
 ./build/<program_name> <filename>
 ```
 
-### Пример
+## Пример
 
 ```sh
+make all
 ./build/lab text.txt
 ```
