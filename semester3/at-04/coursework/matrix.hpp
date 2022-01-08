@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <exception>
-#include <stdio.h>
+#include <cstring>
 
 using namespace std;
 
@@ -12,175 +12,372 @@ template <typename DT> // Data Type
 class matrix
 {
 public:
-    matrix()
-    {
-        rows = 0;
-        cols = 0;
-        data = nullptr;
-    }
+    matrix();
 
-    matrix(size_t _rows, size_t _cols)
-    {
-        rows = _rows;
-        cols = _cols;
+    matrix(size_t _rows, size_t _cols);
 
-        allocate();
-    }
+    matrix(const matrix& m);
 
-    matrix(const matrix& m)
-    {
-        rows = m.rows;
-        cols = m.cols;
-        
-        allocate();
+    matrix(const initializer_list<initializer_list<DT>>& m);
 
-        for (size_t row = 0; row < rows; row++) {
-            for (size_t col = 0; col < cols; col++) {
-                data[row][col] = m[row][col];
-            }
-        }
-    }
+    ~matrix();
 
-    ~matrix()
-    {
-        free_data();
-    }
+    matrix& operator=(const matrix& m);
 
-    friend ostream& operator<<(ostream& os, const matrix<DT>& m)
-    {
-        os << m.data_to_string();
-        return os;
-    }
+    DT* operator[](size_t row) const;
 
-    matrix<DT>& operator=(const matrix<DT>& m)
-    {
-        free_data();
+    matrix& operator+=(const matrix& m);
 
-        rows = m.rows;
-        cols = m.cols;
+    matrix& operator-=(const matrix& m);
 
-        allocate();
+    matrix& operator*=(const DT& val);
 
-        for (auto row = 0; row < rows; row++) {
-            for (auto col = 0; col < cols; col++) {
-                data[row][col] = m[row][col];
-            }
-        }
+    matrix& operator/=(const DT& val);
 
-        return *this;
-    }
+    matrix& operator+(matrix& m);
 
-    friend bool operator==(const matrix<DT>& m1, const matrix<DT>& m2)
-    {
-        if ((m1.get_rows() != m2.get_rows())
-            || (m1.get_cols() != m2.get_cols())
-        ) { return false; }
+    template <typename T>
+    friend bool operator==(const matrix<T>& m1, const matrix<T>& m2);
 
-        for (size_t row = 0; row < m1.get_rows(); row++) {
-            for (size_t col = 0; col < m1.get_cols(); col++) {
-                if ((m1[row][col] != m2[row][col])) {
-                    return false;
-                }
-            }
-        }
+    template <typename T>
+    friend bool operator!=(const matrix<T>& m1, const matrix<T>& m2);
 
-        return true;
-    }
+    template <typename T>
+    friend bool operator>(const matrix<T>& m1, const matrix<T>& m2);
 
-    friend matrix<DT> operator+(const matrix<DT>& m1, const matrix<DT>& m2)
-    {
-        if ((m1.rows != m2.rows) || (m1.cols != m2.cols)) {
-            throw runtime_error("both of matrix must be the same size!");
-        }
+    template <typename T>
+    friend bool operator<(const matrix<T>& m1, const matrix<T>& m2);
 
-        matrix<DT> m(m1.rows, m1.cols);
+    template <typename T>
+    friend bool operator>=(const matrix<T>& m1, const matrix<T>& m2);
 
-        for (size_t row = 0; row < m.rows; row++) {
-            for (size_t col = 0; col < m.cols; col++) {
-                m[row][col] += m1[row][col] + m2[row][col];
-            }
-        }
+    template <typename T>
+    friend bool operator<=(const matrix<T>& m1, const matrix<T>& m2);
 
-        return m;
-    }
+    template <typename T>
+    friend matrix<T> operator*(matrix<T> m, const matrix<T>& cm);
 
-    DT* operator[](size_t row) const
-    {
-        return data[row];
-    }
+    template <typename T>
+    friend matrix<T> operator/(matrix<T> m, const matrix<T>& cm);
 
-    void resize(size_t _rows, size_t _cols)
-    {
-        DT** resized = new DT*[_rows];
-        for (size_t row = 0; row < _rows; row++) {
-            resized[row] = new int[_cols];
-        }
+    template <typename T>
+    friend matrix<T> operator+(matrix<T> m, const matrix<T>& cm);
 
-        for (size_t row = 0; row < _rows; row++) {
-            for (size_t col = 0; col < _cols; col++) {
-                if ((row < rows) && (col < cols)) {
-                    resized[row][col] = data[row][col];
-                }
-            }
-        }
+    template <typename T>
+    friend matrix<T> operator-(matrix<T> m, const matrix<T>& cm);
 
-        free_data();
-        
-        data = resized;
-        rows = _rows;
-        cols = _cols;
-    }
+    void resize(size_t _rows, size_t _cols);
 
-    void print() const
-    {
-        printf(data_to_string().c_str());
-    }
+    void transpose();
 
-    const size_t& get_rows() const
-    {
-        return rows;
-    }
+    string& out(string& str) const;
 
-    const size_t& get_cols() const
-    {
-        return cols;
-    }
+    const size_t& get_rows() const;
+
+    const size_t& get_cols() const;
 
 private:
     DT** data;
     size_t rows;
     size_t cols;
 
-    string data_to_string() const
-    {
-        string str;
 
-        for (size_t row = 0; row < rows; row++ ) {
-            str += "| ";
+    void free_data();
 
-            for (size_t col = 0; col < cols; col++) {
-                str += to_string(data[row][col]) + " ";
-            }
-
-            str +="|\n";
-        }
-
-        return str;
-    }
-
-    void free_data()
-    {
-        for (size_t row = 0; row < rows; row++) {
-            delete[] data[row];
-        }
-        delete[] data;
-    }
-
-    void allocate()
-    {
-        data = new DT*[rows];
-        for (size_t row = 0; row < rows; row++) {
-            data[row] = new DT[cols];
-        }
-    }
+    void allocate();
 };
+
+
+template <typename DT>
+matrix<DT>::matrix()
+{
+    rows = 0;
+    cols = 0;
+    data = nullptr;
+}
+
+template <typename DT>
+matrix<DT>::matrix(size_t _rows, size_t _cols)
+{
+    rows = _rows;
+    cols = _cols;
+
+    allocate();
+}
+
+template <typename DT>
+matrix<DT>::matrix(const initializer_list<initializer_list<DT>>& m)
+: matrix(m.size(), m.begin()->size())
+{
+    for (size_t row = 0; row < m.size(); row++) {
+        auto m_row = m.begin() + row;
+
+        for (size_t col = 0; col < m_row->size(); col++) {
+            data[row][col] = *(m_row->begin() + col); // m[row][col];
+        }
+    }
+}
+
+template <typename DT>
+matrix<DT>::matrix(const matrix& m)
+{
+    rows = m.rows;
+    cols = m.cols;
+    
+    allocate();
+
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            data[row][col] = m[row][col];
+        }
+    }
+}
+
+template <typename DT>
+matrix<DT>::~matrix()
+{ free_data(); }
+
+template <typename DT>
+DT* matrix<DT>::operator[](size_t row) const
+{ return data[row]; }
+
+template <typename DT>
+matrix<DT>& matrix<DT>::operator=(const matrix<DT>& m)
+{
+    free_data();
+
+    rows = m.rows;
+    cols = m.cols;
+
+    allocate();
+
+    for (auto row = 0; row < rows; row++) {
+        for (auto col = 0; col < cols; col++) {
+            data[row][col] = m[row][col];
+        }
+    }
+
+    return *this;
+}
+
+template <typename DT>
+matrix<DT>& matrix<DT>::operator+=(const matrix<DT>& m)
+{
+    if ((rows != m.rows) || (cols != m.cols)) {
+        throw runtime_error("both of matrix must be the same size!");
+    }
+
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            data[row][col] += m[row][col];
+        }
+    }
+
+    return *this;
+}
+
+template <typename DT>
+matrix<DT>& matrix<DT>::operator-=(const matrix<DT>& m)
+{
+    if ((rows != m.rows) || (cols != m.cols)) {
+        throw runtime_error("both of matrix must be the same size!");
+    }
+
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            data[row][col] -= m[row][col];
+        }
+    }
+
+    return *this;
+}
+
+template <typename DT>
+matrix<DT>& matrix<DT>::operator*=(const DT& val)
+{
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            data[row][col] *= val;
+        }
+    }
+
+    return *this;
+}
+
+template <typename DT>
+matrix<DT>& matrix<DT>::operator/=(const DT& val)
+{
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            data[row][col] /= val;
+        }
+    }
+
+    return *this;
+}
+
+template <typename T>
+bool operator==(const matrix<T>& m1, const matrix<T>& m2)
+{
+    if ((m1.rows != m2.rows) || (m1.cols != m2.cols)) {
+        throw runtime_error("Матрицы должны быть одного размера!");
+    }
+
+    for (size_t row = 0; row < m1.get_rows(); row++) {
+        for (size_t col = 0; col < m1.get_cols(); col++) {
+            if (m1[row][col] != m2[row][col]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
+bool operator!=(const matrix<T>& m1, const matrix<T>& m2)
+{ return !(m1 == m2); }
+
+template <typename T>
+bool operator>(const matrix<T>& m1, const matrix<T>& m2)
+{
+    if ((m1.rows != m2.rows) || (m1.cols != m2.cols)) {
+        throw runtime_error("Матрицы должны быть одного размера!");
+    }
+
+    bool first = true;
+    bool res   = m1[0][0] > m2[0][0];
+
+    for (size_t row = 0; row < m1.rows; row++) {
+        for (size_t col = 0; col < m1.cols; col++) {
+            if (first) {
+                first = false;
+            } else {
+                if (res != (m1[row][col] > m2[row][col])) {
+                    throw runtime_error("Некорректное сравнение!");
+                }
+            }
+        }
+    }
+
+    return res;
+}
+
+template <typename T>
+bool operator<(const matrix<T>& m1, const matrix<T>& m2)
+{ return ((m1 != m2) && !(m1 > m2)); }
+
+template <typename T>
+bool operator>=(const matrix<T>& m1, const matrix<T>& m2)
+{ return ((m1 == m2) || (m1 > m2)); }
+
+template <typename T>
+bool operator<=(const matrix<T>& m1, const matrix<T>& m2)
+{ return ((m1 == m2) || (m1 < m2)); }
+
+template <typename T>
+matrix<T> operator*(matrix<T> m, const T& cm)
+{
+    m *= cm;
+    return m;
+}
+
+template <typename T>
+matrix<T> operator/(matrix<T> m, const T& cm)
+{
+    m /= cm;
+    return m;
+}
+
+template <typename T>
+matrix<T> operator+(matrix<T> m, const matrix<T>& cm)
+{
+    m += cm;
+    return m;
+}
+
+template <typename T>
+matrix<T> operator-(matrix<T> m, const matrix<T>& cm)
+{
+    m -= cm;
+    return m;
+}
+
+template <typename DT>
+void matrix<DT>::resize(size_t _rows, size_t _cols)
+{
+    DT** resized = new DT*[_rows];
+    for (size_t row = 0; row < _rows; row++) {
+        resized[row] = new int[_cols];
+    }
+
+    for (size_t row = 0; row < _rows; row++) {
+        for (size_t col = 0; col < _cols; col++) {
+            if ((row < rows) && (col < cols)) {
+                resized[row][col] = data[row][col];
+            }
+        }
+    }
+
+    free_data();
+    
+    data = resized;
+    rows = _rows;
+    cols = _cols;
+}
+
+template <typename DT>
+void matrix<DT>::transpose()
+{
+    matrix<DT> m(cols, rows);
+
+    for (size_t row = 0; row < rows; row++) {
+        for (size_t col = 0; col < cols; col++) {
+            m[col][row] = data[row][col];
+        }
+    }
+
+    *this = m;
+}
+
+template <typename DT>
+const size_t& matrix<DT>::get_rows() const
+{ return rows; }
+
+template <typename DT>
+const size_t& matrix<DT>::get_cols() const
+{ return cols; }
+
+template <typename DT>
+string& matrix<DT>::out(string& str) const
+{
+    for (size_t row = 0; row < rows; row++ ) {
+        str += "| ";
+
+        for (size_t col = 0; col < cols; col++) {
+            str += to_string(data[row][col]) + " ";
+        }
+
+        str += "|\n";
+    }
+
+    return str;
+}
+
+template <typename DT>
+void matrix<DT>::free_data()
+{
+    for (size_t row = 0; row < rows; row++) {
+        delete[] data[row];
+    }
+    delete[] data;
+}
+
+template <typename DT>
+void matrix<DT>::allocate()
+{
+    data = new DT*[rows];
+    for (size_t row = 0; row < rows; row++) {
+        data[row] = new DT[cols];
+    }
+}
