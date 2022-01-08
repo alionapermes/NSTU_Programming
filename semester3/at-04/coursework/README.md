@@ -22,6 +22,8 @@
 
 * `matrix(const initializer_list<initializer_list<T>>& m)`
 
+При некорректном использовании операторов может быть выброшено исключение `runtime_error`
+
 ## Сборка тестов
 
 ```sh
