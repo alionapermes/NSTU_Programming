@@ -325,12 +325,6 @@ TEST(transpose, methods)
     ASSERT_EQ(test_m, transposed);
 }
 
-TEST(to_str, methods)
-{
-    //
-}
-
-
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);

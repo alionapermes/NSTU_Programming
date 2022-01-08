@@ -8,7 +8,7 @@
 using namespace std;
 
 
-template <typename DT> // Data Type
+template <typename T>
 class matrix
 {
 public:
@@ -18,53 +18,53 @@ public:
 
     matrix(const matrix& m);
 
-    matrix(const initializer_list<initializer_list<DT>>& m);
+    matrix(const initializer_list<initializer_list<T>>& m);
 
     ~matrix();
 
     matrix& operator=(const matrix& m);
 
-    DT* operator[](size_t row) const;
+    T* operator[](size_t row) const;
 
     matrix& operator+=(const matrix& m);
 
     matrix& operator-=(const matrix& m);
 
-    matrix& operator*=(const DT& val);
+    matrix& operator*=(const T& val);
 
-    matrix& operator/=(const DT& val);
+    matrix& operator/=(const T& val);
 
     matrix& operator+(matrix& m);
 
-    template <typename T>
-    friend bool operator==(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator==(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend bool operator!=(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator!=(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend bool operator>(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator>(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend bool operator<(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator<(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend bool operator>=(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator>=(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend bool operator<=(const matrix<T>& m1, const matrix<T>& m2);
+    template <typename U>
+    friend bool operator<=(const matrix<U>& m1, const matrix<U>& m2);
 
-    template <typename T>
-    friend matrix<T> operator*(matrix<T> m, const matrix<T>& cm);
+    template <typename U>
+    friend matrix<U> operator*(matrix<U> m, const matrix<U>& cm);
 
-    template <typename T>
-    friend matrix<T> operator/(matrix<T> m, const matrix<T>& cm);
+    template <typename U>
+    friend matrix<U> operator/(matrix<U> m, const matrix<U>& cm);
 
-    template <typename T>
-    friend matrix<T> operator+(matrix<T> m, const matrix<T>& cm);
+    template <typename U>
+    friend matrix<U> operator+(matrix<U> m, const matrix<U>& cm);
 
-    template <typename T>
-    friend matrix<T> operator-(matrix<T> m, const matrix<T>& cm);
+    template <typename U>
+    friend matrix<U> operator-(matrix<U> m, const matrix<U>& cm);
 
     void resize(size_t _rows, size_t _cols);
 
@@ -72,12 +72,12 @@ public:
 
     string& out(string& str) const;
 
-    const size_t& get_rows() const;
+    size_t get_rows() const;
 
-    const size_t& get_cols() const;
+    size_t get_cols() const;
 
 private:
-    DT** data;
+    T** data;
     size_t rows;
     size_t cols;
 
@@ -88,16 +88,16 @@ private:
 };
 
 
-template <typename DT>
-matrix<DT>::matrix()
+template <typename T>
+matrix<T>::matrix()
 {
     rows = 0;
     cols = 0;
     data = nullptr;
 }
 
-template <typename DT>
-matrix<DT>::matrix(size_t _rows, size_t _cols)
+template <typename T>
+matrix<T>::matrix(size_t _rows, size_t _cols)
 {
     rows = _rows;
     cols = _cols;
@@ -105,8 +105,8 @@ matrix<DT>::matrix(size_t _rows, size_t _cols)
     allocate();
 }
 
-template <typename DT>
-matrix<DT>::matrix(const initializer_list<initializer_list<DT>>& m)
+template <typename T>
+matrix<T>::matrix(const initializer_list<initializer_list<T>>& m)
 : matrix(m.size(), m.begin()->size())
 {
     for (size_t row = 0; row < m.size(); row++) {
@@ -118,8 +118,8 @@ matrix<DT>::matrix(const initializer_list<initializer_list<DT>>& m)
     }
 }
 
-template <typename DT>
-matrix<DT>::matrix(const matrix& m)
+template <typename T>
+matrix<T>::matrix(const matrix& m)
 {
     rows = m.rows;
     cols = m.cols;
@@ -133,16 +133,16 @@ matrix<DT>::matrix(const matrix& m)
     }
 }
 
-template <typename DT>
-matrix<DT>::~matrix()
+template <typename T>
+matrix<T>::~matrix()
 { free_data(); }
 
-template <typename DT>
-DT* matrix<DT>::operator[](size_t row) const
+template <typename T>
+T* matrix<T>::operator[](size_t row) const
 { return data[row]; }
 
-template <typename DT>
-matrix<DT>& matrix<DT>::operator=(const matrix<DT>& m)
+template <typename T>
+matrix<T>& matrix<T>::operator=(const matrix<T>& m)
 {
     free_data();
 
@@ -160,8 +160,8 @@ matrix<DT>& matrix<DT>::operator=(const matrix<DT>& m)
     return *this;
 }
 
-template <typename DT>
-matrix<DT>& matrix<DT>::operator+=(const matrix<DT>& m)
+template <typename T>
+matrix<T>& matrix<T>::operator+=(const matrix<T>& m)
 {
     if ((rows != m.rows) || (cols != m.cols)) {
         throw runtime_error("both of matrix must be the same size!");
@@ -176,8 +176,8 @@ matrix<DT>& matrix<DT>::operator+=(const matrix<DT>& m)
     return *this;
 }
 
-template <typename DT>
-matrix<DT>& matrix<DT>::operator-=(const matrix<DT>& m)
+template <typename T>
+matrix<T>& matrix<T>::operator-=(const matrix<T>& m)
 {
     if ((rows != m.rows) || (cols != m.cols)) {
         throw runtime_error("both of matrix must be the same size!");
@@ -192,8 +192,8 @@ matrix<DT>& matrix<DT>::operator-=(const matrix<DT>& m)
     return *this;
 }
 
-template <typename DT>
-matrix<DT>& matrix<DT>::operator*=(const DT& val)
+template <typename T>
+matrix<T>& matrix<T>::operator*=(const T& val)
 {
     for (size_t row = 0; row < rows; row++) {
         for (size_t col = 0; col < cols; col++) {
@@ -204,8 +204,8 @@ matrix<DT>& matrix<DT>::operator*=(const DT& val)
     return *this;
 }
 
-template <typename DT>
-matrix<DT>& matrix<DT>::operator/=(const DT& val)
+template <typename T>
+matrix<T>& matrix<T>::operator/=(const T& val)
 {
     for (size_t row = 0; row < rows; row++) {
         for (size_t col = 0; col < cols; col++) {
@@ -216,8 +216,8 @@ matrix<DT>& matrix<DT>::operator/=(const DT& val)
     return *this;
 }
 
-template <typename T>
-bool operator==(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator==(const matrix<U>& m1, const matrix<U>& m2)
 {
     if ((m1.rows != m2.rows) || (m1.cols != m2.cols)) {
         throw runtime_error("Матрицы должны быть одного размера!");
@@ -234,12 +234,12 @@ bool operator==(const matrix<T>& m1, const matrix<T>& m2)
     return true;
 }
 
-template <typename T>
-bool operator!=(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator!=(const matrix<U>& m1, const matrix<U>& m2)
 { return !(m1 == m2); }
 
-template <typename T>
-bool operator>(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator>(const matrix<U>& m1, const matrix<U>& m2)
 {
     if ((m1.rows != m2.rows) || (m1.cols != m2.cols)) {
         throw runtime_error("Матрицы должны быть одного размера!");
@@ -263,50 +263,50 @@ bool operator>(const matrix<T>& m1, const matrix<T>& m2)
     return res;
 }
 
-template <typename T>
-bool operator<(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator<(const matrix<U>& m1, const matrix<U>& m2)
 { return ((m1 != m2) && !(m1 > m2)); }
 
-template <typename T>
-bool operator>=(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator>=(const matrix<U>& m1, const matrix<U>& m2)
 { return ((m1 == m2) || (m1 > m2)); }
 
-template <typename T>
-bool operator<=(const matrix<T>& m1, const matrix<T>& m2)
+template <typename U>
+bool operator<=(const matrix<U>& m1, const matrix<U>& m2)
 { return ((m1 == m2) || (m1 < m2)); }
 
-template <typename T>
-matrix<T> operator*(matrix<T> m, const T& cm)
+template <typename U>
+matrix<U> operator*(matrix<U> m, const U& cm)
 {
     m *= cm;
     return m;
 }
 
-template <typename T>
-matrix<T> operator/(matrix<T> m, const T& cm)
+template <typename U>
+matrix<U> operator/(matrix<U> m, const U& cm)
 {
     m /= cm;
     return m;
 }
 
-template <typename T>
-matrix<T> operator+(matrix<T> m, const matrix<T>& cm)
+template <typename U>
+matrix<U> operator+(matrix<U> m, const matrix<U>& cm)
 {
     m += cm;
     return m;
 }
 
-template <typename T>
-matrix<T> operator-(matrix<T> m, const matrix<T>& cm)
+template <typename U>
+matrix<U> operator-(matrix<U> m, const matrix<U>& cm)
 {
     m -= cm;
     return m;
 }
 
-template <typename DT>
-void matrix<DT>::resize(size_t _rows, size_t _cols)
+template <typename T>
+void matrix<T>::resize(size_t _rows, size_t _cols)
 {
-    DT** resized = new DT*[_rows];
+    T** resized = new T*[_rows];
     for (size_t row = 0; row < _rows; row++) {
         resized[row] = new int[_cols];
     }
@@ -326,10 +326,10 @@ void matrix<DT>::resize(size_t _rows, size_t _cols)
     cols = _cols;
 }
 
-template <typename DT>
-void matrix<DT>::transpose()
+template <typename T>
+void matrix<T>::transpose()
 {
-    matrix<DT> m(cols, rows);
+    matrix<T> m(cols, rows);
 
     for (size_t row = 0; row < rows; row++) {
         for (size_t col = 0; col < cols; col++) {
@@ -340,16 +340,16 @@ void matrix<DT>::transpose()
     *this = m;
 }
 
-template <typename DT>
-const size_t& matrix<DT>::get_rows() const
+template <typename T>
+size_t matrix<T>::get_rows() const
 { return rows; }
 
-template <typename DT>
-const size_t& matrix<DT>::get_cols() const
+template <typename T>
+size_t matrix<T>::get_cols() const
 { return cols; }
 
-template <typename DT>
-string& matrix<DT>::out(string& str) const
+template <typename T>
+string& matrix<T>::out(string& str) const
 {
     for (size_t row = 0; row < rows; row++ ) {
         str += "| ";
@@ -364,8 +364,8 @@ string& matrix<DT>::out(string& str) const
     return str;
 }
 
-template <typename DT>
-void matrix<DT>::free_data()
+template <typename T>
+void matrix<T>::free_data()
 {
     for (size_t row = 0; row < rows; row++) {
         delete[] data[row];
@@ -373,11 +373,11 @@ void matrix<DT>::free_data()
     delete[] data;
 }
 
-template <typename DT>
-void matrix<DT>::allocate()
+template <typename T>
+void matrix<T>::allocate()
 {
-    data = new DT*[rows];
+    data = new T*[rows];
     for (size_t row = 0; row < rows; row++) {
-        data[row] = new DT[cols];
+        data[row] = new T[cols];
     }
 }
