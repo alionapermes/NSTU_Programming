@@ -96,7 +96,24 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 
-	bidir_list(){};
+	bidir_list(){}
+
+    ~bidir_list()
+    { clear(); }
+
+    bidir_list(bidir_list& list)
+    {
+        for (auto it = list.begin(); it != end(); it++) {
+            push_back(*it);
+        }
+    }
+
+    bidir_list(const initializer_list<T>& list)
+    {
+        for (auto it = list.begin(); it != end(); it++) {
+            push_back(*it);
+        }
+    }
 
 	iterator
 	begin()
@@ -133,6 +150,23 @@ public:
 	size_t
 	size() const
 	{ return _size; }
+
+    bool
+    empty() const
+    { return _size == 0; }
+
+    void
+    clear()
+    {
+        if (_size == 0) return;
+
+        for (auto ptr = first->next; ptr != &border; ptr = ptr->next) {
+            delete ptr->prev;
+        }
+        delete last;
+
+        _size = 0;
+    }
 
 	void
 	push_front(const T& value)
