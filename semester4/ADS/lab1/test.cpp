@@ -12,14 +12,14 @@ make_list(const size_t size);
 TEST(copy, ctor)
 {
     const size_t items_count = 10;
-    auto list(make_list(items_count));
-    size_t value = 0;
+    auto list1 = make_list(items_count);
 
-    for (auto it = list.begin(); it != list.end(); it++) {
-        ASSERT_EQ(*it, value++);
+    bidir_list<size_t> list2(list1);
+    ASSERT_EQ(list1.size(), list2.size());
+
+    for (size_t n = 0; n < items_count; n++) {
+        ASSERT_EQ(list1[n], list2[n]);
     }
-
-    ASSERT_EQ(list.size(), value);
 }
 
 TEST(init_list, ctor)
@@ -76,6 +76,18 @@ TEST(clear, methods)
     ASSERT_EQ(0, list.size());
 }
 
+TEST(find, methods)
+{
+    const size_t items_count = 10;
+    
+    auto list = make_list(items_count);
+    
+    for (auto it = list.begin(); it != list.end(); it++) {
+        auto target = list.find(list.begin(), list.end(), *it);
+        ASSERT_EQ(*target, *it);
+    }
+}
+
 TEST(forward, iterators)
 {
 	const size_t items_count = 10;
@@ -99,6 +111,50 @@ TEST(reverse, iterators)
 		ASSERT_EQ(*rit, --value);
 	}
 }
+
+TEST(index_write, operator)
+{
+    const size_t items_count = 10;
+    auto list = make_list(items_count);
+
+    for (size_t n = 0; n < list.size(); n++) {
+        list[n] = 0;
+    }
+
+    for (auto it = list.begin(); it != list.end(); it++) {
+        ASSERT_EQ(*it, 0);
+    }
+}
+
+TEST(index_read, operator)
+{
+    const size_t items_count = 10;
+    size_t value = 0;
+
+    auto list = make_list(items_count);
+    for (size_t n = 0; n < list.size(); n++) {
+        ASSERT_EQ(list[n], value++);
+    }
+}
+
+TEST(copy, operator)
+{
+    const size_t items_count = 10;
+    auto list1 = make_list(items_count);
+    auto list2 = list1;
+
+    ASSERT_EQ(list1.size(), list2.size());
+
+    for (size_t n = 0; n < items_count; n++) {
+        ASSERT_EQ(list1[n], list2[n]);
+    }
+
+    list1.clear();
+    for (size_t n = 0; n < items_count; n++) {
+        ASSERT_EQ(list2[n], n);
+    }
+}
+
 
 int main(int argc, char** argv)
 {
