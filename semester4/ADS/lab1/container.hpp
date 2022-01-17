@@ -31,6 +31,7 @@ public:
     struct list_iterator
     {
     public:
+        friend class bidir_list;
         using iterator_category = bidirectional_iterator_tag;
         using iterator          = list_iterator;
         using difference_type   = ptrdiff_t;
@@ -99,7 +100,6 @@ public:
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-
     bidir_list(){}
 
     ~bidir_list()
@@ -135,7 +135,7 @@ public:
     }
 
     reference
-    operator=(bidir_list& list)
+    operator=(const bidir_list& list)
     {
         for (auto it = list.begin(); it != list.end(); it++) {
             push_back(*it);
@@ -150,7 +150,7 @@ public:
         auto lhs_it = lhs.begin();
         auto rhs_it = rhs.begin();
 
-        while ((lhs_it != lhs_it.end()) && (rhs_it != rhs_it.end())) {
+        while ((lhs_it != lhs.end()) && (rhs_it != rhs.end())) {
             if (*lhs_it != *rhs_it) { return false; }
             lhs_it++; rhs_it++;
         }
@@ -168,6 +168,14 @@ public:
 
     iterator
     end()
+    { return iterator(last->next); }
+
+    const_iterator
+    begin() const
+    { return iterator(first); }
+
+    const_iterator
+    end() const
     { return iterator(last->next); }
 
     reverse_iterator
@@ -248,6 +256,10 @@ public:
     }
 
     iterator
+    find(const_reference value)
+    { return find(begin(), end(), value); }
+
+    iterator
     find(iterator first, iterator last, const_reference value)
     {
         for (auto it = first; it != last; it++) {
@@ -257,6 +269,17 @@ public:
         }
 
         return last;
+    }
+
+    iterator
+    insert(iterator pos, const_reference value)
+    {
+        member* m = new member(value, pos.m_ptr->prev, pos.m_ptr);
+        pos.m_ptr->prev->next = m;
+        pos.m_ptr->prev       = m;
+
+        _size++;
+        return iterator(m);
     }
 
 private:

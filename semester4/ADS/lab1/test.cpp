@@ -88,6 +88,18 @@ TEST(find, methods)
     }
 }
 
+TEST(insert, methods)
+{
+    bidir_list<size_t> list1 = {1, 2, 3, 4};
+    bidir_list<size_t> list2 = {1, 2, 5, 3, 4};
+
+    auto it = list1.find(3);
+    list1.insert(it, 5);
+
+    ASSERT_EQ(list1.size(), list2.size());
+    ASSERT_EQ(list1, list2);
+}
+
 TEST(forward, iterators)
 {
 	const size_t items_count = 10;
