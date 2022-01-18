@@ -16,6 +16,9 @@ class bidir_list
 public:
     struct member
     {
+    public:
+        friend class bidir_list;
+
         member() {}
 
         member(const T& _value) : value(_value) {}
@@ -23,6 +26,7 @@ public:
         member(const T& _value, member* _prev, member* _next)
         : value(_value), prev(_prev), next(_next) {}
 
+    private:
         T value;
         member* next = nullptr;
         member* prev = nullptr;
@@ -40,6 +44,8 @@ public:
         using pointer           = value_type*;
 
         list_iterator(member* ptr) : m_ptr(ptr) {}
+
+        list_iterator(const member* ptr) : m_ptr(ptr) {}
 
         iterator&
         operator++()
@@ -105,7 +111,7 @@ public:
     ~bidir_list()
     { clear(); }
 
-    bidir_list(bidir_list& list)
+    bidir_list(const bidir_list& list)
     {
         for (auto it = list.begin(); it != list.end(); it++) {
             push_back(*it);
@@ -168,7 +174,7 @@ public:
 
     iterator
     end()
-    { return iterator(last->next); }
+    { return iterator(&border); }
 
     const_iterator
     begin() const
@@ -176,7 +182,7 @@ public:
 
     const_iterator
     end() const
-    { return iterator(last->next); }
+    { return iterator(&border); }
 
     reverse_iterator
     rbegin()
@@ -227,7 +233,7 @@ public:
     push_front(const_reference value)
     {
         if (_size == 0) {
-            first = new member(value, &border, &border);
+            first       = new member(value, &border, &border);
             last        = first;
             border.prev = last;
         } else {
@@ -243,7 +249,7 @@ public:
     push_back(const_reference value)
     {
         if (_size == 0) {
-            last  = new member(value, &border, &border);
+            last        = new member(value, &border, &border);
             first       = last;
             border.next = first;
         } else {
@@ -255,12 +261,38 @@ public:
         _size++;
     }
 
+    void
+    pop_front()
+    {
+        if (_size == 0) { return; }
+
+        member* m   = first;
+        first       = first->next;
+        first->prev = &border;
+
+        delete m;
+        _size--;
+    }
+
+    void
+    pop_back()
+    {
+        if (_size == 0) { return; }
+        
+        member* m  = last;
+        last       = last->prev;
+        last->next = &border;
+
+        delete m;
+        _size--;
+    }
+
     iterator
-    find(const_reference value)
+    find(const_reference value) const
     { return find(begin(), end(), value); }
 
     iterator
-    find(iterator first, iterator last, const_reference value)
+    find(iterator first, iterator last, const_reference value) const
     {
         for (auto it = first; it != last; it++) {
             if (*it == value) {
@@ -274,12 +306,45 @@ public:
     iterator
     insert(iterator pos, const_reference value)
     {
+        if (pos == end()) {
+            push_back(value);
+            return iterator(last);
+        }
+
+        if (pos.m_ptr == first) {
+            push_front(value);
+            return iterator(first);
+        }
+
         member* m = new member(value, pos.m_ptr->prev, pos.m_ptr);
         pos.m_ptr->prev->next = m;
         pos.m_ptr->prev       = m;
 
         _size++;
         return iterator(m);
+    }
+
+    iterator
+    erase(iterator pos)
+    {
+        member* m     = pos.m_ptr;
+        member* next  = m->next;
+        m->prev->next = m->next;
+        m->next->prev = m->prev;
+
+        delete m;
+        _size--;
+        
+        return iterator(next);
+    }
+
+    iterator
+    erase(const_reference value)
+    {
+        auto pos = find(value);
+
+        if (pos == end()) { return pos; }
+        else { return remove(pos); }
     }
 
 private:

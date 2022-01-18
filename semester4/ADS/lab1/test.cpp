@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <string>
 
 #include "container.hpp"
 
@@ -90,14 +89,27 @@ TEST(find, methods)
 
 TEST(insert, methods)
 {
+    size_t items_count = 10;
     bidir_list<size_t> list1 = {1, 2, 3, 4};
     bidir_list<size_t> list2 = {1, 2, 5, 3, 4};
+    bidir_list<size_t> list3;
 
     auto it = list1.find(3);
     list1.insert(it, 5);
 
     ASSERT_EQ(list1.size(), list2.size());
     ASSERT_EQ(list1, list2);
+
+    for (size_t n = 0; n < items_count; n++) {
+        list3.insert(list3.end(), n);
+        ASSERT_EQ(list3.back(), n);
+        ASSERT_EQ(list3.size(), n + 1);
+    }
+}
+
+TEST(erase, methods)
+{
+    //
 }
 
 TEST(forward, iterators)
@@ -165,6 +177,18 @@ TEST(copy, operator)
     for (size_t n = 0; n < items_count; n++) {
         ASSERT_EQ(list2[n], n);
     }
+}
+
+TEST(compare, operator)
+{
+    const size_t items_count = 10;
+    auto list1 = make_list(items_count);
+    auto list2 = make_list(items_count);
+    auto list3 = make_list(items_count);
+
+    list3[0] = list3[1];
+    ASSERT_EQ(list1, list2);
+    ASSERT_NE(list2, list3);
 }
 
 
