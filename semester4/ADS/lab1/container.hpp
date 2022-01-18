@@ -112,7 +112,7 @@ public:
     }
 
     ~bidir_list()
-    { clear(); }
+    { clear(); delete border; }
 
     bidir_list(const bidir_list& list) : bidir_list()
     {
