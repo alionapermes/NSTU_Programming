@@ -45,8 +45,6 @@ public:
 
         list_iterator(member* ptr) : m_ptr(ptr) {}
 
-        list_iterator(const member* ptr) : m_ptr(ptr) {}
-
         iterator&
         operator++()
         {
@@ -106,19 +104,24 @@ public:
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    bidir_list(){}
+    bidir_list()
+    {
+        border = new member();
+        border->next = first;
+        border->prev = last;
+    }
 
     ~bidir_list()
     { clear(); }
 
-    bidir_list(const bidir_list& list)
+    bidir_list(const bidir_list& list) : bidir_list()
     {
         for (auto it = list.begin(); it != list.end(); it++) {
             push_back(*it);
         }
     }
 
-    bidir_list(const initializer_list<T>& list)
+    bidir_list(const initializer_list<T>& list) : bidir_list()
     {
         for (auto it = list.begin(); it != list.end(); it++) {
             push_back(*it);
@@ -174,7 +177,7 @@ public:
 
     iterator
     end()
-    { return iterator(&border); }
+    { return iterator(border); }
 
     const_iterator
     begin() const
@@ -182,7 +185,7 @@ public:
 
     const_iterator
     end() const
-    { return iterator(&border); }
+    { return iterator(border); }
 
     reverse_iterator
     rbegin()
@@ -221,7 +224,7 @@ public:
     {
         if (_size == 0) return;
 
-        for (auto ptr = first->next; ptr != &border; ptr = ptr->next) {
+        for (auto ptr = first->next; ptr != border; ptr = ptr->next) {
             delete ptr->prev;
         }
         delete last;
@@ -233,15 +236,15 @@ public:
     push_front(const_reference value)
     {
         if (_size == 0) {
-            first       = new member(value, &border, &border);
-            last        = first;
-            border.prev = last;
+            first        = new member(value, border, border);
+            last         = first;
+            border->prev = last;
         } else {
-            first->prev = new member(value, &border, first);
-            first       = first->prev;
+            first->prev  = new member(value, border, first);
+            first        = first->prev;
         }
 
-        border.next = first;
+        border->next = first;
         _size++;
     }
 
@@ -249,15 +252,15 @@ public:
     push_back(const_reference value)
     {
         if (_size == 0) {
-            last        = new member(value, &border, &border);
-            first       = last;
-            border.next = first;
+            last         = new member(value, border, border);
+            first        = last;
+            border->next = first;
         } else {
-            last->next = new member(value, last, &border);
-            last	   = last->next;
+            last->next   = new member(value, last, border);
+            last	     = last->next;
         }
 
-        border.prev = last;
+        border->prev = last;
         _size++;
     }
 
@@ -266,11 +269,12 @@ public:
     {
         if (_size == 0) { return; }
 
-        member* m   = first;
-        first       = first->next;
-        first->prev = &border;
+        auto m_ptr   = first;
+        first        = first->next;
+        first->prev  = border;
+        border->next = first;
 
-        delete m;
+        delete m_ptr;
         _size--;
     }
 
@@ -279,11 +283,12 @@ public:
     {
         if (_size == 0) { return; }
         
-        member* m  = last;
-        last       = last->prev;
-        last->next = &border;
+        auto m_ptr   = last;
+        last         = last->prev;
+        last->next   = border;
+        border->prev = last;
 
-        delete m;
+        delete m_ptr;
         _size--;
     }
 
@@ -306,14 +311,12 @@ public:
     iterator
     insert(iterator pos, const_reference value)
     {
-        if (pos == end()) {
-            push_back(value);
-            return iterator(last);
-        }
-
-        if (pos.m_ptr == first) {
+        if (pos == begin()) {
             push_front(value);
             return iterator(first);
+        } else if (pos == end()) {
+            push_back(value);
+            return iterator(last);
         }
 
         member* m = new member(value, pos.m_ptr->prev, pos.m_ptr);
@@ -327,6 +330,16 @@ public:
     iterator
     erase(iterator pos)
     {
+        if (pos == end()) { return pos; }
+
+        if (pos.m_ptr == first) {
+            pop_front();
+            return begin();
+        } else if (pos.m_ptr == last) {
+            pop_back();
+            return end();
+        }
+
         member* m     = pos.m_ptr;
         member* next  = m->next;
         m->prev->next = m->next;
@@ -340,17 +353,12 @@ public:
 
     iterator
     erase(const_reference value)
-    {
-        auto pos = find(value);
-
-        if (pos == end()) { return pos; }
-        else { return remove(pos); }
-    }
+    { return erase(find(value)); }
 
 private:
     size_t  _size  = 0;
     member* first  = nullptr;
     member* last   = nullptr;
-    member  border;
+    member* border = nullptr;
 };
 

@@ -56,6 +56,36 @@ TEST(push_back, methods)
 	}
 }
 
+TEST(pop_front, methods)
+{
+    const size_t items_count = 10;
+
+    auto list = make_list(items_count);
+    for (size_t n = 0; n < items_count; n++) {
+        list.pop_front();
+
+        if (list.size() > 0) {
+            ASSERT_EQ(list.front(), n + 1);
+        }
+    }
+    ASSERT_EQ(list.size(), 0);
+}
+
+TEST(pop_back, methods)
+{
+    const size_t items_count = 10;
+
+    auto list = make_list(items_count);
+    for (size_t n = 0; n < items_count; n++) {
+        list.pop_back();
+
+        if (list.size() > 0) {
+            ASSERT_EQ(list.back(), items_count - n - 2);
+        }
+    }
+    ASSERT_EQ(list.size(), 0);
+}
+
 TEST(size, methods)
 {
 	const size_t items_count = 10;
@@ -109,7 +139,30 @@ TEST(insert, methods)
 
 TEST(erase, methods)
 {
-    //
+    const size_t items_count = 10;
+    
+    auto list1 = make_list(items_count);
+    for (int n = 0; n < items_count; n++) {
+        auto next = list1.erase(n);
+        ASSERT_EQ(next, (
+            list1.size() == 0
+            ? list1.end()
+            : list1.begin()
+        ));
+    }
+    ASSERT_EQ(list1.size(), 0);
+
+    auto list2 = make_list(items_count);
+    for (int n = items_count - 1; n >= 0; n--) {
+        auto next = list2.erase(n);
+        ASSERT_EQ(next, list2.end());
+    }
+    ASSERT_EQ(list2.size(), 0);
+
+    bidir_list<size_t> list3 = {1, 2, 3};
+    list3.erase(2);
+    ASSERT_EQ(list3.find(2), list3.end());
+    ASSERT_EQ(list3.size(), 2);
 }
 
 TEST(forward, iterators)
