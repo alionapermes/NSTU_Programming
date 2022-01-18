@@ -36,6 +36,7 @@ public:
     {
     public:
         friend class bidir_list;
+        
         using iterator_category = bidirectional_iterator_tag;
         using iterator          = list_iterator;
         using difference_type   = ptrdiff_t;
