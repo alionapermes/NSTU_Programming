@@ -1,8 +1,7 @@
 #include <string>
 #include <exception>
+#include <stdexcept>
 #include <cstring>
-
-using namespace std;
 
 
 template <typename T>
@@ -33,7 +32,7 @@ public:
         }
     }
 
-    matrix(const initializer_list<initializer_list<T>>& m)
+    matrix(const std::initializer_list<std::initializer_list<T>>& m)
     : matrix(m.size(), m.begin()->size())
     {
         for (size_t row = 0; row < m.size(); row++) {
@@ -75,7 +74,7 @@ public:
     operator+=(const matrix& m)
     {
         if ((rows != m.rows) || (cols != m.cols)) {
-            throw runtime_error("both of matrix must be the same size!");
+            throw std::runtime_error("Матрицы должны быть одного размера!");
         }
 
         for (size_t row = 0; row < rows; row++) {
@@ -91,7 +90,7 @@ public:
     operator-=(const matrix& m)
     {
         if ((rows != m.rows) || (cols != m.cols)) {
-            throw runtime_error("both of matrix must be the same size!");
+            throw std::runtime_error("Матрицы должны быть одного размера!");
         }
 
         for (size_t row = 0; row < rows; row++) {
@@ -131,7 +130,7 @@ public:
     operator==(const matrix& lhs, const matrix& rhs)
     {
         if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) {
-            throw runtime_error("Матрицы должны быть одного размера!");
+            throw std::runtime_error("Матрицы должны быть одного размера!");
         }
 
         for (size_t row = 0; row < lhs.get_rows(); row++) {
@@ -153,7 +152,7 @@ public:
     operator>(const matrix& lhs, const matrix& rhs)
     {
         if ((lhs.rows != rhs.rows) || (lhs.cols != rhs.cols)) {
-            throw runtime_error("Матрицы должны быть одного размера!");
+            throw std::runtime_error("Матрицы должны быть одного размера!");
         }
 
         bool first = true;
@@ -165,7 +164,7 @@ public:
                     first = false;
                 } else {
                     if (res != (lhs[row][col] > rhs[row][col])) {
-                        throw runtime_error("Некорректное сравнение!");
+                        throw std::runtime_error("Некорректное сравнение!");
                     }
                 }
             }
@@ -265,8 +264,8 @@ public:
         *this = m;
     }
 
-    string&
-    out(string& str) const
+    std::string&
+    out(std::string& str) const
     {
         for (size_t row = 0; row < rows; row++ ) {
             str += "| ";
