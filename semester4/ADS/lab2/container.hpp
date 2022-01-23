@@ -88,7 +88,15 @@ public:
 
     iterator
     begin()
-    { return iterator(root); }
+    {
+        node* tmp = root;
+
+        while (tmp->left != nullptr) {
+            tmp = tmp->left;
+        }
+
+        return iterator(tmp);
+    }
 
     iterator
     end()
@@ -112,30 +120,43 @@ public:
 
     void
     clear()
-    {
-        // todo
-    }
+    { erase(iterator(root)); }
 
     iterator
     insert(const_reference value)
     {
-        // todo
-        iterator it;
+        if (root == nullptr) {
+            root = new node(value);
+            return iterator(root);
+        }
 
-        for (it = begin(); it != end(); it++) {
+        auto it = iterator(root);
+
+        while (true) {
             if (value < *it) {
-                // to left
+                if (it.m_ptr->left == nullptr) {
+                    it.m_ptr->left = new node(value);
+                    ++_size;
+                    return iterator(it.m_ptr->left);
+                } else {
+                    it = iterator(it.m_ptr->left);
+                }
             } else {
-                // to right
+                if (it.m_ptr->right == nullptr) {
+                    it.m_ptr->right = new node(value);
+                    ++_size;
+                    return iterator(it.m_ptr->right);
+                } else {
+                    it = iterator(it.m_ptr->right);
+                }
             }
         }
 
-        _size++;
         return it;
     }
 
     iterator
-    erase(iterator pos)
+    erase(iterator pos, bool recursive = false)
     {
         // todo
         return pos;
