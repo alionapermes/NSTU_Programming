@@ -58,7 +58,7 @@ TEST(sum_set, operator)
                 );
             }
         }
-    } catch (const exception& e) {
+    } catch (const std::exception& e) {
         printf("error: %s\n", e.what());
     }
 }
@@ -85,7 +85,7 @@ TEST(dif_set, operator)
                 );
             }
         }
-    } catch (const exception& e) {
+    } catch (const std::exception& e) {
         printf("error: %s\n", e.what());
     }
 }
@@ -244,14 +244,6 @@ TEST(le_ge, operator)
     ASSERT_GE(m1, m2);
     ASSERT_LE(m2, m1);
     ASSERT_GE(m2, m1);
-}
-
-TEST(default, constructor)
-{
-    matrix<int> m;
-
-    ASSERT_EQ(m.get_rows(), 0);
-    ASSERT_EQ(m.get_cols(), 0);
 }
 
 TEST(params, constructor)
