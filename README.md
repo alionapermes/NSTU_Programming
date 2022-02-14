@@ -47,10 +47,10 @@
 <details><summary>Семестр 4</summary>
 <p>
 
-  - [x] [Лаба 1(5)](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/lab1)
-  - [ ] [Лаба 2(5)](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/lab2)
-  - [ ] [Лаба 3()](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/lab3)
-  - [ ] [Лаба 4()](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/lab4)
+  - [x] [Лаба 1(5)](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/ADS/lab1)
+  - [ ] [Лаба 2(5)](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/ADS/lab2)
+  - [ ] [Лаба 3()](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/ADS/lab3)
+  - [ ] [Лаба 4()](https://github.com/Linadil/NSTU_Programming/tree/master/semester4/ADS/lab4)
 
 </p>
 </details>
