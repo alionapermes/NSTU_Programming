@@ -1,84 +1,105 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <array>
+#include <vector>
+#include <string>
 
 #define DEBUG
 
 using namespace std;
 
-const int SIZE = 8;
-const char* ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+int  buble_sort(vector<int>& keys);
+void fill_random(vector<int>& keys);
+void fill_best(vector<int>& keys);
+void fill_worst(vector<int>& keys);
+bool has_key(const vector<int>& keys, int key);
 
-int  buble_sort(array<char, SIZE>& keys);
-void fill_random(array<char, SIZE>& keys);
-bool has_key(const array<char, SIZE>& keys, char key);
+
+int amounts[] = {8, 32, 64, 88, 108};
+int amount;
 
 
 int main()
 {
-    array<char, 8> keys;
-    fill_random(keys);
-    
-#ifdef DEBUG
-    for (auto& key : keys)
-        cout << key;
-    cout << endl;
-#endif
+    for (int i = 0; i < 5; i++) {
+        amount = amounts[i];
+        vector<int> keys(amount);
 
-    int counter = buble_sort(keys);
-    cout << "Потребовалось сравнений: " << counter << endl;
+        cout << "[Трудоёмкость алгоритма для " << amount << " кнопок]\n";
 
-#ifdef DEBUG
-    for (auto& key : keys)
-        cout << key;
-    cout << endl;
-#endif
+        fill_random(keys);
+        cout << "Средний случай: " << buble_sort(keys) << endl;
+        
+        fill_best(keys);
+        cout << "Лучший случай: " << buble_sort(keys) << endl;
+
+        fill_worst(keys);
+        cout << "Худший случай: " << buble_sort(keys) << endl;
+
+        cout << endl;
+    }
 
     return 0;
 }
 
-int buble_sort(array<char, SIZE>& keys)
+int buble_sort(vector<int>& keys)
 {
     bool sorted = false;
     int counter = 0;
 
-    while (!sorted) {
+    for (int i = 0; i + 1 < amount; i++) {
         sorted = true;
 
-        for (int x = 0; x + 1 < SIZE; x++) {
+        for (int x = 0; x + 1 < amount; x++) {
             counter++;
 
             if (keys[x + 1] < keys[x]) {
-                char tmp    = keys[x + 1];
+                int tmp     = keys[x + 1];
                 keys[x + 1] = keys[x];
                 keys[x]     = tmp;
                 sorted      = false;
             }
         }
+
+        if (sorted)
+            break;
     }
 
     return counter;
 }
 
-void fill_random(array<char, SIZE>& keys)
+void fill_random(vector<int>& keys)
 {
     srand(time(nullptr));
 
-    for (int i = 0; i < SIZE; i++) {
-        char key;
+    for (int i = 0; i < amount; i++) {
+        int key;
 
         do {
-            key = ALPHABET[rand() % 26];
+            key = rand() % amount + 1;
         } while (has_key(keys, key));
 
         keys[i] = key;
     }
 }
 
-bool has_key(const array<char, SIZE>& keys, char key)
+void fill_worst(vector<int>& keys)
 {
-    for (int i = 0; i < SIZE; i++) {
+    for (int i = 0; i < amount; i++) {
+        keys[i] = amount - i;
+    }
+}
+
+void fill_best(vector<int>& keys)
+{
+    for (int i = 0; i < amount; i++) {
+        keys[i] = i;
+    }
+}
+
+bool has_key(const vector<int>& keys, int key)
+{
+    for (int i = 0; i < amount; i++) {
         if (keys[i] == key)
             return true;
     }
