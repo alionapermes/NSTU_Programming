@@ -1,0 +1,7 @@
+[requires]
+tl-expected/1.0.0
+gtest/1.11.0
+
+[generators]
+cmake
+

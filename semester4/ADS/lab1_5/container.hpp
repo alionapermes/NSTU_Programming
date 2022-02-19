@@ -7,8 +7,6 @@
 #include <exception>
 #include <stdexcept>
 
-using namespace std;
-
 
 template <typename T>
 class bidir_list
@@ -37,7 +35,7 @@ public:
     public:
         friend class bidir_list;
         
-        using iterator_category = bidirectional_iterator_tag;
+        using iterator_category = std::bidirectional_iterator_tag;
         using iterator          = list_iterator;
         using difference_type   = ptrdiff_t;
         using value_type        = T;
@@ -122,7 +120,7 @@ public:
         }
     }
 
-    bidir_list(const initializer_list<T>& list) : bidir_list()
+    bidir_list(const std::initializer_list<T>& list) : bidir_list()
     {
         for (auto it = list.begin(); it != list.end(); it++) {
             push_back(*it);
@@ -133,7 +131,7 @@ public:
     operator[](size_t pos)
     {
         if (pos >= _size) {
-            throw out_of_range("position is out of range");
+            throw std::out_of_range("position is out of range");
         }
 
         for (auto it = begin(); it != end(); it++) {
