@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <exception>
 #include <stdexcept>
+#include <ostream>
 
 
 template <typename T>
@@ -169,6 +170,22 @@ public:
     friend bool
     operator!=(const bidir_list& lhs, const bidir_list& rhs)
     { return !(lhs == rhs); }
+
+    friend std::ostream&
+    operator<<(std::ostream& os, const bidir_list& rhs)
+    {
+        size_t n = 0;
+        os << "[";
+
+        for (const auto& item : rhs) {
+            os << item;
+            if (++n < rhs.size())
+                os << ", ";
+        }
+
+        os << "]";
+        return os;
+    }
 
     iterator
     begin()

@@ -1,4 +1,7 @@
-#include <gtest/gtest.h>
+#include <iostream>
+#include <ostream>
+
+#include "gtest/gtest.h"
 
 #include "container.hpp"
 
@@ -242,6 +245,18 @@ TEST(compare, operator)
     list3[0] = list3[1];
     ASSERT_EQ(list1, list2);
     ASSERT_NE(list2, list3);
+}
+
+TEST(output, operator)
+{
+    const size_t items_count = 10;
+    const char* output       = "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]";
+    const auto list          = make_list(items_count);
+
+    stringstream ss;
+    ss << list;
+
+    ASSERT_STREQ(output, ss.str().c_str());
 }
 
 
