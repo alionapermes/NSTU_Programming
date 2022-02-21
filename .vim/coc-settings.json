@@ -5,8 +5,6 @@
             "filetypes": ["h", "hpp", "c", "cc", "cpp", "c++"],
             "rootPatterns": ["compile_commands.json"]
         }
-    },
-    "clangd.semanticHighlighting": true,
-    "coc.preferences.semanticTokensHighlights": false
+    }
 }   
 
