@@ -19,6 +19,7 @@ public:
 
 private:
     T** head     = nullptr;
+    T** tail     = nullptr;
     T** pointers = nullptr;
 };
 

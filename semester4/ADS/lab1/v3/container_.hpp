@@ -10,45 +10,46 @@
 
 
 template <typename T>
-class bidir_list
+class list_v3
 {
 public:
     struct member
     {
     public:
-        friend class bidir_list;
+        friend class list_v3;
 
-        member() {}
+        member() = default;
 
-        member(const T& _value) : value(_value) {}
+        member(const T& value) : _value(value) {}
 
-        member(const T& _value, member* _prev, member* _next)
-        : value(_value), prev(_prev), next(_next) {}
+        member(const T& value, int prev, int next)
+            : _value(value), _prev(prev), _next(next) {}
 
     private:
-        T value;
-        member* next = nullptr;
-        member* prev = nullptr;
+        T _value;
+        int _next = -1;
+        int _prev = -1;
     };
 
-    struct list_iterator
+    struct lisv_v5_iterator
     {
     public:
-        friend class bidir_list;
+        friend class list_v3;
         
         using iterator_category = std::bidirectional_iterator_tag;
-        using iterator          = list_iterator;
+        using iterator          = lisv_v5_iterator;
         using difference_type   = ptrdiff_t;
         using value_type        = T;
         using reference         = value_type&;
         using pointer           = value_type*;
 
-        list_iterator(member* ptr) : m_ptr(ptr) {}
+        lisv_v5_iterator(member* ptr, member* data)
+            : _ptr(ptr), _data(data) {}
 
         iterator&
         operator++()
         {
-            m_ptr = m_ptr->next;
+            _ptr = _ptr->next;
             return *this;
         }
 
@@ -63,7 +64,7 @@ public:
         iterator&
         operator--()
         {
-            m_ptr = m_ptr->prev;
+            _ptr = _ptr->prev;
             return *this;
         }
 
@@ -77,55 +78,54 @@ public:
 
         reference
         operator*()
-        { return m_ptr->value; }
+        { return _ptr->value; }
 
         pointer
         operator->()
-        { return &m_ptr->value; }
+        { return &_ptr->value; }
 
         friend bool
         operator==(const iterator& lhs, const iterator& rhs)
-        { return lhs.m_ptr == rhs.m_ptr; }
+        { return lhs._ptr == rhs._ptr; }
 
         friend bool
         operator!=(const iterator& lhs, const iterator& rhs)
-        { return lhs.m_ptr != rhs.m_ptr; }
+        { return lhs._ptr != rhs._ptr; }
 
     private:
-        member* m_ptr = nullptr;
+        member* _ptr  = nullptr;
+        member* _data = nullptr;
     };
 
     using value_type             = T;
     using size_type              = size_t;
     using reference              = value_type&;
     using const_reference        = const value_type&;
-    using iterator				 = list_iterator;
+    using iterator				 = lisv_v5_iterator;
     using const_iterator         = const iterator;
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    bidir_list()
-    {
-        border = new member();
-        border->next = first;
-        border->prev = last;
+    list_v3()
+    {   
+        _border = new member();
+        /* _border->next = _first; */
+        /* _border->prev = _last; */
     }
 
-    ~bidir_list()
-    { clear(); delete border; }
-
-    bidir_list(const bidir_list& list) : bidir_list()
+    list_v3(const list_v3& list) : list_v3()
     {
-        for (auto it = list.begin(); it != list.end(); it++) {
-            push_back(*it);
+        reserve(list.size());
+
+        for (const auto& item : list) {
+            push_back(item);
         }
     }
 
-    bidir_list(const std::initializer_list<T>& list) : bidir_list()
+    ~list_v3()
     {
-        for (auto it = list.begin(); it != list.end(); it++) {
-            push_back(*it);
-        }
+        clear();
+        delete[] _data;
     }
 
     reference
@@ -135,16 +135,11 @@ public:
             throw std::out_of_range("position is out of range");
         }
 
-        for (auto it = begin(); it != end(); it++) {
-            if (pos-- == 0) { return *it; }
-        }
-
-        // never returns
-        return *end();
+        return _data[pos].value;
     }
 
     reference
-    operator=(const bidir_list& list)
+    operator=(const list_v3& list)
     {
         clear();
 
@@ -154,56 +149,60 @@ public:
     }
 
     friend bool
-    operator==(const bidir_list& lhs, const bidir_list& rhs)
+    operator==(const list_v3& lhs, const list_v3& rhs)
     {
-        if (lhs.size() != rhs.size()) { return false; }
+        if (lhs.size() != rhs.size())
+            return false;
 
         auto lhs_it = lhs.begin();
         auto rhs_it = rhs.begin();
 
         while ((lhs_it != lhs.end()) && (rhs_it != rhs.end())) {
-            if (*lhs_it != *rhs_it) { return false; }
-            lhs_it++; rhs_it++;
+            if (*lhs_it != *rhs_it)
+                return false;
+
+            lhs_it++;
+            rhs_it++;
         }
 
         return true;
     }
 
     friend bool
-    operator!=(const bidir_list& lhs, const bidir_list& rhs)
+    operator!=(const list_v3& lhs, const list_v3& rhs)
     { return !(lhs == rhs); }
 
     friend std::ostream&
-    operator<<(std::ostream& os, const bidir_list& rhs)
+    operator<<(std::ostream& os, const list_v3& rhs)
     {
         size_t n = 0;
-        os << "[";
 
+        os << "[";
         for (const auto& item : rhs) {
             os << item;
             if (++n < rhs.size())
                 os << ", ";
         }
-
         os << "]";
+
         return os;
     }
 
     iterator
     begin()
-    { return iterator(first); }
+    { return iterator(_first, _data); }
 
     iterator
     end()
-    { return iterator(border); }
+    { return iterator(_border, _data); }
 
     const_iterator
     begin() const
-    { return iterator(first); }
+    { return iterator(_first, _data); }
 
     const_iterator
     end() const
-    { return iterator(border); }
+    { return iterator(_border, _data); }
 
     reverse_iterator
     rbegin()
@@ -215,19 +214,19 @@ public:
 
     reference
     front()
-    { return first->value; }
+    { return _first->value; }
 
     const_reference
     front() const
-    { return first->value; }
+    { return _first->value; }
 
     reference
     back()
-    { return last->value; }
+    { return _last->value; }
 
     const_reference
     back() const
-    { return last->value; }
+    { return _last->value; }
 
     size_type
     size() const
@@ -240,12 +239,13 @@ public:
     void
     clear()
     {
-        if (_size == 0) return;
+        if (_size == 0)
+            return;
 
-        for (auto ptr = first->next; ptr != border; ptr = ptr->next) {
-            delete ptr->prev;
+        for (size_t n = 0; n < _size; ++n) {
+            delete _data[n];
         }
-        delete last;
+        /* delete[] _data; */
 
         _size = 0;
     }
@@ -254,15 +254,15 @@ public:
     push_front(const_reference value)
     {
         if (_size == 0) {
-            first        = new member(value, border, border);
-            last         = first;
-            border->prev = last;
+            _first        = new member(value, _border, _border);
+            _last         = _first;
+            _border->prev = _last;
         } else {
-            first->prev  = new member(value, border, first);
-            first        = first->prev;
+            _first->prev = new member(value, _border, _first);
+            _first       = _first->prev;
         }
 
-        border->next = first;
+        _border->next = _first;
         _size++;
     }
 
@@ -270,15 +270,15 @@ public:
     push_back(const_reference value)
     {
         if (_size == 0) {
-            last         = new member(value, border, border);
-            first        = last;
-            border->next = first;
+            _last         = new member(value, _border, _border);
+            _first        = _last;
+            _border->next = _first;
         } else {
-            last->next   = new member(value, last, border);
-            last	     = last->next;
+            _last->next = new member(value, _last, _border);
+            _last	    = _last->next;
         }
 
-        border->prev = last;
+        _border->prev = _last;
         _size++;
     }
 
@@ -287,13 +287,22 @@ public:
     {
         if (_size == 0) { return; }
 
-        auto m_ptr   = first;
-        first        = first->next;
-        first->prev  = border;
-        border->next = first;
+        auto _tmp = _data;
 
-        delete m_ptr;
+        _data++;
+        _first = _data;
+        _first->prev = -1;
+
+        delete _tmp;
         _size--;
+
+        /* auto _index   = _first; */
+        /* _first        = _first->next; */
+        /* _first->prev  = _border; */
+        /* _border->next = _first; */
+
+        /* /1* delete ; *1/ */
+        /* _size--; */
     }
 
     void
@@ -301,12 +310,12 @@ public:
     {
         if (_size == 0) { return; }
         
-        auto m_ptr   = last;
-        last         = last->prev;
-        last->next   = border;
-        border->prev = last;
+        auto _ptr   = _last;
+        _last         = last->prev;
+        _last->next   = _border;
+        _border->prev = _last;
 
-        delete m_ptr;
+        delete _ptr;
         _size--;
     }
 
@@ -315,15 +324,15 @@ public:
     { return find(begin(), end(), value); }
 
     iterator
-    find(iterator first, iterator last, const_reference value) const
+    find(iterator _first, iterator _last, const_reference value) const
     {
-        for (auto it = first; it != last; it++) {
+        for (auto it = _first; it != _last; it++) {
             if (*it == value) {
                 return it;
             }
         }
 
-        return last;
+        return _last;
     }
 
     iterator
@@ -331,15 +340,15 @@ public:
     {
         if (pos == begin()) {
             push_front(value);
-            return iterator(first);
+            return iterator(_first);
         } else if (pos == end()) {
             push_back(value);
-            return iterator(last);
+            return iterator(_last);
         }
 
-        member* m = new member(value, pos.m_ptr->prev, pos.m_ptr);
-        pos.m_ptr->prev->next = m;
-        pos.m_ptr->prev       = m;
+        member* m = new member(value, pos._ptr->prev, pos._ptr);
+        pos._ptr->prev->next = m;
+        pos._ptr->prev       = m;
 
         _size++;
         return iterator(m);
@@ -350,15 +359,15 @@ public:
     {
         if (pos == end()) { return pos; }
 
-        if (pos.m_ptr == first) {
+        if (pos._ptr == _first) {
             pop_front();
             return begin();
-        } else if (pos.m_ptr == last) {
+        } else if (pos._ptr == _last) {
             pop_back();
             return end();
         }
 
-        member* m     = pos.m_ptr;
+        member* m     = pos._ptr;
         member* next  = m->next;
         m->prev->next = m->next;
         m->next->prev = m->prev;
@@ -374,9 +383,10 @@ public:
     { return erase(find(value)); }
 
 private:
-    size_t  _size  = 0;
-    member* first  = nullptr;
-    member* last   = nullptr;
-    member* border = nullptr;
+    size_t  _size   = 0;
+    member* _first  = nullptr;
+    member* _last   = nullptr;
+    member* _border = nullptr;
+    member** _data  = nullptr;
 };
 
