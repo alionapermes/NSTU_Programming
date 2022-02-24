@@ -31,19 +31,19 @@ public:
         int _prev = -1;
     };
 
-    struct lisv_v5_iterator
+    struct list_v3_iterator
     {
     public:
         friend class list_v3;
         
         using iterator_category = std::bidirectional_iterator_tag;
-        using iterator          = lisv_v5_iterator;
+        using iterator          = list_v3_iterator;
         using difference_type   = ptrdiff_t;
         using value_type        = T;
         using reference         = value_type&;
         using pointer           = value_type*;
 
-        lisv_v5_iterator(member* ptr, member* data)
+        list_v3_iterator(member* ptr, member* data)
             : _ptr(ptr), _data(data) {}
 
         iterator&
@@ -101,7 +101,7 @@ public:
     using size_type              = size_t;
     using reference              = value_type&;
     using const_reference        = const value_type&;
-    using iterator				 = lisv_v5_iterator;
+    using iterator				 = list_v3_iterator;
     using const_iterator         = const iterator;
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
