@@ -26,13 +26,13 @@ public:
 
     struct list_iterator
     {
-        //
+        list_iterator() = default;
     };
 
     list_v3() = default;
 
-    list_v3(size_t capacity)
-    { reserve(capacity); }
+    list_v3(size_t cap)
+    { reserve(cap); }
 
     list_v3(const list_v3<T>& src)
     { *this = src; }
@@ -43,30 +43,26 @@ public:
     reference
     operator[](size_t pos)
     {
-        if (pos >= _cap) {
-            std::out_of_range("pos must be less than capacity");
-        }
+        if (pos >= _cap)
+            std::out_of_range("pos is out of range!");
 
-        list_item* item_ptr = _items[pos];
+        list_item*& item_ptr = _items[pos];
         if (!item_ptr) {
             item_ptr        = new list_item();
-            item_ptr->_prev = pos - 1;
-            item_ptr->_next = (pos + 1 < _cap ? pos + 1 : -1);
-
-            /* _items[item_ptr->_prev] = */ 
+            item_ptr->_prev = nearest_index(pos, false);
+            item_ptr->_next = nearest_index(pos, true);
         }
 
-        return item_ptr->_value;
+        return _items[pos]->_value;
     }
 
     list_v3<T>&
     operator=(const list_v3<T>& rhs)
     {
         clear();
-        _items = new list_item*[rhs._cap];
+        allocate(rhs._size);
 
         _size = rhs._size;
-        _cap  = rhs._cap;
 
         for (size_t n = 0; n < _size; n++) {
             list_item* item_ptr = rhs._items[n];
@@ -103,17 +99,18 @@ public:
         if (new_cap <= _cap)
             return;
 
+        if (!_items) {
+            allocate(new_cap);
+            return;
+        }
+
         auto old_ptr = _items;
-        _items       = new list_item*[new_cap];
-        _cap         = new_cap;
+        allocate(new_cap);
+        /* _items       = new list_item*[new_cap]; */
+        /* _cap         = new_cap; */
 
         for (size_t n = 0; n < _cap; n++) {
-            if (!old_ptr[n]) {
-                _items[n] = new list_item();
-                _items[n]->_prev = (n >= 1 ? n - 1 : -1);
-                _items[n]->_next = (n + 1 < _cap ? n + 1 : -1);
-            } else
-                _items[n] = old_ptr[n];
+            _items[n] = old_ptr[n];
         }
 
         for (size_t n = 0; n < _size; n++) {
@@ -145,5 +142,50 @@ private:
     size_t _cap        = 0;
     size_t _size       = 0;
     list_item** _items = nullptr;
+
+
+    void
+    allocate(size_t cap)
+    {
+        _items = new list_item*[cap]();
+        _cap   = cap;
+    }
+
+    int
+    nearest_index(size_t pos, bool forward)
+    {
+        if (forward)
+            return nearest_forward(pos);
+        
+        return nearest_backward(pos);
+    }
+
+    int
+    nearest_forward(size_t pos)
+    {
+        if (pos + 1 == _cap)
+            return -1;
+
+        for (size_t n = pos + 1; n < _cap; n++) {
+            if (_items[n])
+                return n;
+        }
+
+        return -1;
+    }
+
+    int
+    nearest_backward(size_t pos)
+    {
+        if (pos == 0)
+            return -1;
+
+        for (size_t n = pos - 1; n >= 0; n--) {
+            if (_items[n])
+                return n;
+        }
+
+        return -1;
+    }
 };
 

@@ -28,21 +28,21 @@ TEST(ctor, reserve)
 TEST(methods, reserve)
 {
     list_v3<size_t> list1 = make_list(4);
-    /* list_v3<size_t> list2 = list1; */
-    /* const size_t new_cap  = list1.capacity() * 2; */
+    list_v3<size_t> list2 = list1;
+    const size_t new_cap  = list1.capacity() * 2;
 
-    /* list2.reserve(new_cap); */
-    /* ASSERT_EQ(list2.capacity(), new_cap); */
+    list2.reserve(new_cap);
+    ASSERT_EQ(list2.capacity(), new_cap);
 
-    /* for (size_t n = 0; n < list1.size(); n++) { */
-    /*     ASSERT_EQ(list1[n], list2[n]); */
-    /* } */
+    for (size_t n = 0; n < list1.size(); n++) {
+        ASSERT_EQ(list1[n], list2[n]);
+    }
 
-    /* list2.reserve(list2.capacity()); */
-    /* ASSERT_EQ(list2.capacity(), new_cap); */
+    list2.reserve(list2.capacity());
+    ASSERT_EQ(list2.capacity(), new_cap);
 
-    /* list2.reserve(list2.capacity() / 2); */
-    /* ASSERT_EQ(list2.capacity(), new_cap); */
+    list2.reserve(list2.capacity() / 2);
+    ASSERT_EQ(list2.capacity(), new_cap);
 }
 
 
