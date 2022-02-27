@@ -6,7 +6,7 @@ using namespace std;
 
 
 list_v3<size_t>
-make_list(size_t capacity);
+make_list(size_t cap);
 
 
 TEST(ctor, default)
@@ -17,15 +17,55 @@ TEST(ctor, default)
     ASSERT_EQ(l.capacity(), 0);
 }
 
-TEST(ctor, reserve)
+TEST(operator, index)
+{
+    list_v3<size_t> l(10);
+
+    for (size_t n = 0; n < l.capacity(); n++) {
+        l[n] = n;
+        ASSERT_EQ(l[n], n);
+    }
+}
+
+TEST(operator, copy_assignment)
+{
+    const list_v3<size_t> list1 = make_list(4);
+    const list_v3<size_t> list2 = list1;
+
+    ASSERT_EQ(list1.size(), list2.size());
+    ASSERT_EQ(list1.capacity(), list2.capacity());
+
+    for (size_t n = 0; n < list1.size(); n++)
+        ASSERT_EQ(list1[n], list2[n]);
+}
+
+TEST(method, size)
+{
+    list_v3<int> l(4);
+    ASSERT_EQ(l.size(), 0);
+
+    for (int i = 0; i < 4; i++) {
+        l[i] = i;
+        ASSERT_EQ(l.size(), i + 1);
+    }
+}
+
+TEST(method, capacity)
 {
     list_v3<int> l(10);
-
-    ASSERT_EQ(l.size(), 0);
     ASSERT_EQ(l.capacity(), 10);
 }
 
-TEST(methods, reserve)
+TEST(method, clear)
+{
+    list_v3<int> l(10);
+    l.clear();
+
+    ASSERT_EQ(l.size(), 0);
+    ASSERT_EQ(l.capacity(), 0);
+}
+
+TEST(method, reserve)
 {
     list_v3<size_t> list1 = make_list(4);
     list_v3<size_t> list2 = list1;
@@ -34,15 +74,25 @@ TEST(methods, reserve)
     list2.reserve(new_cap);
     ASSERT_EQ(list2.capacity(), new_cap);
 
-    for (size_t n = 0; n < list1.size(); n++) {
+    for (size_t n = 0; n < list1.size(); n++)
         ASSERT_EQ(list1[n], list2[n]);
-    }
 
     list2.reserve(list2.capacity());
     ASSERT_EQ(list2.capacity(), new_cap);
 
     list2.reserve(list2.capacity() / 2);
     ASSERT_EQ(list2.capacity(), new_cap);
+}
+
+TEST(method, foreach)
+{
+    list_v3<size_t> l = make_list(4);
+    size_t n          = 0;
+
+    for (const auto& item : l)
+        ASSERT_EQ(item, n++);
+
+    ASSERT_EQ(l.size(), n);
 }
 
 
@@ -53,14 +103,12 @@ int main(int argc, char** argv)
 }
 
 list_v3<size_t>
-make_list(size_t capacity)
+make_list(size_t cap)
 {
-    list_v3<size_t> l(capacity);
+    list_v3<size_t> l(cap);
 
-    for (size_t n = 0; n < capacity; n++) {
-        /* EXPECT_TRUE(false) << "n: " << n << "\n"; */
+    for (size_t n = 0; n < cap; n++)
         l[n] = n;
-    }
 
     return l;
 }
