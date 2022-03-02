@@ -23,7 +23,7 @@ public:
         member(const T& _value) : value(_value) {}
 
         member(const T& _value, member* _prev, member* _next)
-        : value(_value), prev(_prev), next(_next) {}
+            : value(_value), prev(_prev), next(_next) {}
 
     private:
         T value;

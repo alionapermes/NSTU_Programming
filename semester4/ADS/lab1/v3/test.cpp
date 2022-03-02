@@ -95,6 +95,20 @@ TEST(method, foreach)
     ASSERT_EQ(l.size(), n);
 }
 
+TEST(method, front)
+{
+    list_v3<size_t> l = make_list(4);
+    ASSERT_EQ(l.front(), l[0]);
+}
+
+TEST(method, back)
+{
+    list_v3<size_t> test_l  = make_list(4);
+    const size_t last_index = test_l.size() - 1;
+
+    ASSERT_EQ(test_l.back(), test_l[last_index]);
+}
+
 
 int main(int argc, char** argv)
 {

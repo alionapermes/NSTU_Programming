@@ -1,8 +1,27 @@
+/**
+ * 1. Реализовать функцию для решения задачи:
+ * Друзья решили подшутить над Василием и переставили
+ * в его клавиатуре 8 кнопок местами.
+ * Сколько сравнений необходимо выполнить Василию,
+ * чтобы найти все перестановки.
+ *
+ * 2. Написать функцию, которая оценивает трудоемкость алгоритмов из п. 1
+ * для следующего количества кнопок: 8, 32, 64, 88, 108
+ * для худшего, лучшего и среднего
+ * (например, генерация выборки случайным образом) случаев.
+ *
+ * Оцените асимптотическую сложность реализованных алгоритмов.
+ * Выведите на экран значения в соответствии с таблицей.
+ */
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
+#include <codecvt>
+#include <locale>
 
 #define DEBUG
 
@@ -21,22 +40,44 @@ int amount;
 
 int main()
 {
+    const string border   = " | ";
+    const int col_width   = 8;
+    const int total_width = col_width * 7 + border.length() * 6;
+
+    cout
+        << setw(col_width) << "num"      << border
+        << setw(col_width) << "Te1"      << border
+        << setw(col_width) << "Te2"      << border
+        << setw(col_width) << "T1"       << border
+        << setw(col_width) << "T2"       << border
+        << setw(col_width) << "Te1 / T1" << border
+        << setw(col_width) << "Te2 / T2" << endl;
+
+    for (int i = 0; i < total_width; i++)
+        cout << "-";
+    cout << endl;
+
     for (int i = 0; i < 5; i++) {
         amount = amounts[i];
         vector<int> keys(amount);
 
-        cout << "[Трудоёмкость алгоритма для " << amount << " кнопок]\n";
-
         fill_random(keys);
-        cout << "Средний случай: " << buble_sort(keys) << endl;
-        
+        int avg = buble_sort(keys);
+
         fill_best(keys);
-        cout << "Лучший случай: " << buble_sort(keys) << endl;
+        int best = buble_sort(keys);
 
         fill_worst(keys);
-        cout << "Худший случай: " << buble_sort(keys) << endl;
+        int worst = buble_sort(keys);
 
-        cout << endl;
+        cout
+            << setw(col_width) << amount << border
+            << setw(col_width) << best   << border
+            << setw(col_width) << best   << border
+            << setw(col_width) << worst  << border
+            << setw(col_width) << worst  << border
+            << setw(col_width) << avg    << border
+            << setw(col_width) << avg    << endl;
     }
 
     return 0;

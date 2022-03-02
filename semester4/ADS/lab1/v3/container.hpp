@@ -37,13 +37,17 @@ public:
 
         list_iterator() = default;
 
-        list_iterator(list_item* ptr, list_item** items)
-            : _ptr(ptr), _items(items) {}
+        list_iterator(const list_v3* const owner, list_item* ptr)
+            : _owner(owner), _ptr(ptr) {}
 
         iterator&
         operator++()
         {
-            _ptr = _items[_ptr->_next];
+            if (_ptr->_next < 0)
+                _ptr = _owner->_border;
+            else
+                _ptr = _owner->_items[_ptr->_next];
+
             return *this;
         }
 
@@ -80,8 +84,8 @@ public:
         { return !(lhs == rhs); }
 
     private:
+        const list_v3* const _owner;
         list_item*  _ptr;
-        list_item** _items;
     };
 
     list_v3() = default;
@@ -103,21 +107,22 @@ public:
 
         list_item*& item_ptr = _items[pos];
         if (!item_ptr) {
-            item_ptr        = new list_item();
-            item_ptr->_prev = nearest_index(pos, false);
-            item_ptr->_next = nearest_index(pos, true);
+            // todo...
+
+            /* item_ptr        = new list_item(); */
+            /* item_ptr->_next = nearest_index(pos, true); */
+
+            /* int nearest_prev = nearest_index(pos, false); */
             
-            if (item_ptr->_prev < 0)
-                _first = item_ptr;
-            else
-                _items[item_ptr->_prev]->_next = pos;
+            /* if (nearest_prev < 0) */
+            /*     _first = item_ptr; */
+            /* else */
+            /*     _items[nearest_prev]->_next = pos; */
 
-            if (item_ptr->_next < 0)
-                _last = item_ptr;
-            else
-                _items[item_ptr->_next]->_prev = pos;
+            /* if (item_ptr->_next < 0) */
+            /*     _last = item_ptr; */
 
-            _size++;
+            /* _size++; */
         }
 
         return _items[pos]->_value;
@@ -190,19 +195,19 @@ public:
 
     iterator
     beging()
-    { return iterator(_first, _items); }
+    { return iterator(this, _first); }
 
     iterator
     end()
-    { return iterator(_last, _items); }
+    { return iterator(this, _border); }
 
     const_iterator
     begin() const
-    { return iterator(_first, _items); }
+    { return iterator(this, _first); }
 
     const_iterator
     end() const
-    { return iterator(_last, _items); }
+    { return iterator(this, _border); }
 
     reference
     front()
@@ -210,7 +215,7 @@ public:
 
     reference
     back()
-    { /**/ }
+    { return _last->_value; }
 
     const_reference
     front() const
@@ -218,7 +223,52 @@ public:
 
     const_reference
     back() const
-    { /**/ }
+    { return _last->_value; }
+
+    void
+    shift(size_t pos, int n)
+    {
+        if (n == 0)
+            return;
+        else if (n < 0)
+            shift_front(pos, n);
+        else if (n > 0)
+            shift_back(pos, n);
+    }
+
+    iterator
+    insert(size_t pos, value_type value)
+    {
+        /* list_item** old_items = _items; */
+        reserve(_capacity + 1);
+
+        /* for (const auto it = begin(); it != end(); it++) { */
+        /*     if (it == pos) { */
+        /*         shift(++it, 1); */
+        /*         *it = value; */
+        /*         break; */
+        /*     } */
+        /* } */
+
+
+
+
+
+        /* int nearest_prev    = nearest_index(pos, false); */
+        /* list_item* item_ptr = new list_item(); */
+        /* item_ptr->_next     = nearest_index(pos, true); */
+        
+        /* if (nearest_prev < 0) */
+        /*     _first = item_ptr; */
+        /* else */
+        /*     _items[nearest_prev]->_next = pos; */
+        /* pos._ptr->_next = pos; */
+
+        /* if (item_ptr->_next < 0) */
+        /*     _last = item_ptr; */
+
+        /* _size++; */
+    }
 
 private:
     struct list_item
@@ -228,14 +278,13 @@ private:
     public:
         list_item() = default;
 
-        list_item(const_reference value, int prev, int next)
-            : _prev(prev), _next(next), _value(value) {}
+        list_item(const_reference value, int next)
+            : _next(next), _value(value) {}
 
         list_item(const list_item& item)
-            : list_item(item._value, item._prev, item._next) {}
+            : list_item(item._value, item._next) {}
 
     private:
-        int _prev = -1;
         int _next = -1;
         value_type _value;
     };
@@ -290,6 +339,31 @@ private:
         }
 
         return -1;
+    }
+
+    void
+    shift_front(size_t pos, size_t n)
+    {
+        int beyond = (_size + n) - _capacity;
+
+        for (int x = 0; x < beyond; x++)
+            delete _items[_capacity - x];
+
+        for (int x = pos + n; x >= pos; x--) {
+            if (x + n >= _capacity) {
+                delete _items[x];
+                continue;
+            }
+
+            _items[x + n] = _items[x];
+            _items[x]     = nullptr;
+        }
+    }
+
+    void
+    shift_back(size_t pos, size_t n)
+    {
+        int beyond = ()
     }
 };
 
