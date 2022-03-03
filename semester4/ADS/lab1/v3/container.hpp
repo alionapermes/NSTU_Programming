@@ -342,28 +342,29 @@ private:
     }
 
     void
-    shift_front(size_t pos, size_t n)
+    shift_front(size_t pos, size_t offset)
     {
-        int beyond = (_size + n) - _capacity;
+        for (ssize_t n = _capacity - 1; n >= pos; n--) {
+            if (n + offset < _capacity)
+                _items[n + offset] = _items[n];
+            else
+                delete _items[n];
 
-        for (int x = 0; x < beyond; x++)
-            delete _items[_capacity - x];
-
-        for (int x = pos + n; x >= pos; x--) {
-            if (x + n >= _capacity) {
-                delete _items[x];
-                continue;
-            }
-
-            _items[x + n] = _items[x];
-            _items[x]     = nullptr;
+            _items[n] = nullptr;
         }
     }
 
     void
-    shift_back(size_t pos, size_t n)
+    shift_back(size_t pos, size_t offset)
     {
-        int beyond = ()
+        for (ssize_t n = 0; n <= pos; n++) {
+            if (n - offset >= 0)
+                _items[n - offset] = _items[n];
+            else
+                delete _items[n];
+
+            _items[n] = nullptr;
+        }
     }
 };
 
