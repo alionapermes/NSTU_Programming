@@ -109,6 +109,34 @@ TEST(method, back)
     ASSERT_EQ(test_l.back(), test_l[last_index]);
 }
 
+TEST(method, push_front)
+{
+    size_t counter = 0;
+    list_v3<size_t> l;
+    
+    for (; counter < 10; counter++) {
+        l.push_front(counter);
+        ASSERT_EQ(l.front(), counter);
+    }
+
+    ASSERT_EQ(l.size(), counter);
+    ASSERT_EQ(l.capacity(), counter);
+}
+
+TEST(method, push_back)
+{
+    size_t counter = 0;
+    list_v3<size_t> l;
+
+    for (; counter < 10; counter++) {
+        l.push_back(counter);
+        ASSERT_EQ(l.back(), counter);
+    }
+
+    ASSERT_EQ(l.size(), counter);
+    ASSERT_EQ(l.capacity(), counter);
+}
+
 
 int main(int argc, char** argv)
 {

@@ -107,22 +107,8 @@ public:
 
         list_item*& item_ptr = _items[pos];
         if (!item_ptr) {
-            // todo...
-
-            /* item_ptr        = new list_item(); */
-            /* item_ptr->_next = nearest_index(pos, true); */
-
-            /* int nearest_prev = nearest_index(pos, false); */
-            
-            /* if (nearest_prev < 0) */
-            /*     _first = item_ptr; */
-            /* else */
-            /*     _items[nearest_prev]->_next = pos; */
-
-            /* if (item_ptr->_next < 0) */
-            /*     _last = item_ptr; */
-
-            /* _size++; */
+            item_ptr = replace(pos);
+            _size++;
         }
 
         return _items[pos]->_value;
@@ -136,11 +122,11 @@ public:
     operator=(const list_v3<T>& rhs)
     {
         clear();
-        allocate(rhs._size);
+        allocate(rhs._capacity);
 
         _size = rhs._size;
 
-        for (size_t n = 0; n < _size; n++) {
+        for (size_t n = 0; n < _capacity; n++) {
             list_item* item_ptr = rhs._items[n];
 
             if (item_ptr)
@@ -184,10 +170,11 @@ public:
             return;
         }
 
-        auto old_ptr = _items;
+        list_item** old_ptr = _items;
+        size_t old_capacity = _capacity;
         allocate(new_cap);
 
-        for (size_t n = 0; n < _capacity; n++)
+        for (size_t n = 0; n < old_capacity; n++)
             _items[n] = old_ptr[n];
 
         delete[] old_ptr;
@@ -226,48 +213,83 @@ public:
     { return _last->_value; }
 
     void
-    shift(size_t pos, int n)
+    shift(ssize_t pos, ssize_t offset)
     {
-        if (n == 0)
+        if (pos < 0 || pos >= _capacity)
+            throw std::out_of_range("pos is out of range!");
+
+        if (offset == 0)
             return;
-        else if (n < 0)
-            shift_front(pos, n);
-        else if (n > 0)
-            shift_back(pos, n);
+        else if (offset > 0)
+            shift_front(pos, offset);
+        else if (offset < 0)
+            shift_back(pos, -offset);
     }
 
     iterator
-    insert(size_t pos, value_type value)
+    insert(size_t pos, const_reference value)
     {
-        /* list_item** old_items = _items; */
+        if (pos >= _capacity)
+            throw std::out_of_range("pos is out of range!");
+
         reserve(_capacity + 1);
+        shift(pos + 1, 1);
 
-        /* for (const auto it = begin(); it != end(); it++) { */
-        /*     if (it == pos) { */
-        /*         shift(++it, 1); */
-        /*         *it = value; */
-        /*         break; */
-        /*     } */
-        /* } */
+        list_item* item_ptr = replace(pos + 1, &value);
+        _size++;
 
+        if (item_ptr->_next < 0)
+            _last = item_ptr;
 
+        return iterator(this, item_ptr);
+    }
 
+    list_item*
+    replace(size_t pos, const value_type* value = nullptr)
+    {
+        if (pos >= _capacity)
+            throw std::out_of_range("pos is out of range!");
 
-
-        /* int nearest_prev    = nearest_index(pos, false); */
-        /* list_item* item_ptr = new list_item(); */
-        /* item_ptr->_next     = nearest_index(pos, true); */
+        int nearest_prev = nearest_index(pos, false);
+        auto item_ptr    = new list_item();
+        item_ptr->_next  = nearest_index(pos, true);
         
-        /* if (nearest_prev < 0) */
-        /*     _first = item_ptr; */
-        /* else */
-        /*     _items[nearest_prev]->_next = pos; */
-        /* pos._ptr->_next = pos; */
+        if (nearest_prev < 0)
+            _first = item_ptr;
+        else
+            _items[nearest_prev]->_next = pos;
 
-        /* if (item_ptr->_next < 0) */
-        /*     _last = item_ptr; */
+        if (item_ptr->_next < 0)
+            _last = item_ptr;
 
-        /* _size++; */
+        if (value)
+            item_ptr->_value = *value;;
+
+        _items[pos] = item_ptr;
+
+        return item_ptr;
+    }
+
+    void
+    push_back(const_reference value)
+    {
+        if (_capacity > 0) {
+            insert(_capacity - 1, value);
+            return;
+        }
+
+        reserve(1);
+        replace(0, &value);
+        _size++;
+    }
+
+    void
+    push_front(const_reference value)
+    {
+        reserve(_capacity + 1);
+        shift(0, 1);
+        replace(0, &value);
+        _size++;
     }
 
 private:
@@ -342,7 +364,7 @@ private:
     }
 
     void
-    shift_front(size_t pos, size_t offset)
+    shift_front(ssize_t pos, ssize_t offset)
     {
         for (ssize_t n = _capacity - 1; n >= pos; n--) {
             if (n + offset < _capacity)
@@ -355,7 +377,7 @@ private:
     }
 
     void
-    shift_back(size_t pos, size_t offset)
+    shift_back(ssize_t pos, ssize_t offset)
     {
         for (ssize_t n = 0; n <= pos; n++) {
             if (n - offset >= 0)
