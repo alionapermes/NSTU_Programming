@@ -29,6 +29,8 @@ public:
 
     struct list_iterator
     {
+        friend list_v3;
+
     public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = ptrdiff_t;
@@ -76,11 +78,11 @@ public:
         { return this->operator->(); }
 
         friend bool
-        operator==(iterator& lhs, iterator& rhs)
+        operator==(const_iterator& lhs, const_iterator& rhs)
         { return lhs._ptr == rhs._ptr; }
 
         friend bool
-        operator!=(iterator& lhs, iterator& rhs)
+        operator!=(const_iterator& lhs, const_iterator& rhs)
         { return !(lhs == rhs); }
 
     private:
@@ -292,6 +294,49 @@ public:
         _size++;
     }
 
+    iterator
+    erase(iterator pos)
+    {
+        if (pos == end())
+            return end();
+
+        return erase(get_index(pos._ptr));
+
+        /* iterator it = begin(); */
+
+        /* for (; it != pos; ++it) { */
+        /*     if (it == end()) */
+        /*         return end(); */
+        /* } */
+
+        /* size_t index = get_index(it._ptr); */
+
+        /* delete _items[index]; */
+        /* _items[index] = nullptr; */
+        /* _size--; */
+
+        /* shift(index, -1); */
+
+        /* return iterator(this, _items[index]); */
+    }
+
+    iterator
+    erase(size_t pos)
+    {
+        if (pos >= _capacity)
+            throw std::out_of_range("pos is out of range!");
+
+        list_item*& item_ptr = _items[pos];
+
+        shift(pos + 1, -1);
+
+        delete item_ptr;
+        item_ptr = nullptr;
+        _size--;
+
+        return (_size > 0 ? iterator(this, _items[pos]) : end());
+    }
+
 private:
     struct list_item
     {
@@ -387,6 +432,19 @@ private:
 
             _items[n] = nullptr;
         }
+    }
+
+    size_t
+    get_index(const list_item* item_ptr)
+    {
+        size_t pos;
+
+        for (pos = 0; pos < _capacity; pos++) {
+            if (item_ptr == _items[pos])
+                break;
+        }
+
+        return pos;
     }
 };
 

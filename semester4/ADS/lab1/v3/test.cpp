@@ -137,6 +137,19 @@ TEST(method, push_back)
     ASSERT_EQ(l.capacity(), counter);
 }
 
+TEST(method, erase)
+{
+    size_t remain     = 10;
+    list_v3<size_t> l = make_list(remain);
+
+    const size_t cap = l.capacity();
+    for (size_t n = 0; n < cap; n++) {
+        l.erase(n);
+        ASSERT_EQ(l.size(), --remain);
+        ASSERT_EQ(l.capacity(), cap);
+    }
+}
+
 
 int main(int argc, char** argv)
 {
