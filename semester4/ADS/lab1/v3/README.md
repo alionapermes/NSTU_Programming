@@ -4,6 +4,14 @@
 
 ## Сборка тестов
 
+Убедитесь, что у вас установлен пакетный менеджер 
+[conan](https://conan.io) и произведены его 
+необходимые базовые настройки:  
+```sh
+conan profile new default --detect
+conan profile update settings.compiler.libcxx=libstdc++11 default
+```
+
 ```sh
 mkdir build
 cd build
