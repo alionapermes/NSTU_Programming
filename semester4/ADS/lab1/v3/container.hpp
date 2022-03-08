@@ -215,17 +215,17 @@ public:
     { return _last->_value; }
 
     void
-    shift(ssize_t pos, ssize_t offset)
+    shift(ssize_t pos_from, ssize_t pos_to, ssize_t offset)
     {
-        if (pos < 0 || pos >= _capacity)
+        if (pos_from < 0 || pos_to > _capacity)
             throw std::out_of_range("pos is out of range!");
 
         if (offset == 0)
             return;
         else if (offset > 0)
-            shift_front(pos, offset);
+            shift_front(pos_from, pos_to, offset);
         else if (offset < 0)
-            shift_back(pos, -offset);
+            shift_back(pos_from, pos_to, -offset);
     }
 
     iterator
@@ -275,13 +275,8 @@ public:
     void
     push_back(const_reference value)
     {
-        if (_capacity > 0) {
-            insert(_capacity - 1, value);
-            return;
-        }
-
-        reserve(1);
-        replace(0, &value);
+        reserve(_capacity + 1);
+        replace(_capacity - 1, &value);
         _size++;
     }
 
@@ -289,7 +284,7 @@ public:
     push_front(const_reference value)
     {
         reserve(_capacity + 1);
-        shift(0, 1);
+        shift(0, _capacity, 1);
         replace(0, &value);
         _size++;
     }
@@ -326,15 +321,14 @@ public:
         if (pos >= _capacity)
             throw std::out_of_range("pos is out of range!");
 
-        list_item*& item_ptr = _items[pos];
+        int next = delete_item(pos);
+        shift(pos + 1, _capacity, -1);
 
-        shift(pos + 1, -1);
-
-        delete item_ptr;
-        item_ptr = nullptr;
+        /* delete item_ptr; */
+        /* item_ptr = nullptr; */
         _size--;
 
-        return (_size > 0 ? iterator(this, _items[pos]) : end());
+        return (next > 0 ? iterator(this, _items[next - 1]) : end());
     }
 
 private:
@@ -375,13 +369,13 @@ private:
     nearest_index(size_t pos, bool forward)
     {
         if (forward)
-            return nearest_forward(pos);
+            return nearest_next(pos);
         
-        return nearest_backward(pos);
+        return nearest_prev(pos);
     }
 
     int
-    nearest_forward(size_t pos)
+    nearest_next(size_t pos)
     {
         if (pos + 1 == _capacity)
             return -1;
@@ -395,7 +389,7 @@ private:
     }
 
     int
-    nearest_backward(size_t pos)
+    nearest_prev(size_t pos)
     {
         if (pos == 0)
             return -1;
@@ -408,43 +402,71 @@ private:
         return -1;
     }
 
-    void
-    shift_front(ssize_t pos, ssize_t offset)
+    int
+    nearest_remap(size_t pos)
     {
-        for (ssize_t n = _capacity - 1; n >= pos; n--) {
-            if (n + offset < _capacity)
-                _items[n + offset] = _items[n];
-            else
-                delete _items[n];
+        int prev = nearest_prev(pos);
+        int next = nearest_next(pos);
+        
+        if (prev >= 0)
+            _items[prev]->_next = next;
 
-            _items[n] = nullptr;
+        return next;
+    }
+
+    void
+    shift_front(ssize_t pos_from, ssize_t pos_to, ssize_t offset)
+    {
+        for (ssize_t n = pos_to - 1; n >= pos_from; n--) {
+            if (n + offset < _capacity) {
+                if (_items[n]->_next + offset < _capacity)
+                    _items[n]->_next += offset;
+                else
+                    _items[n]->_next = -1;
+
+                _items[n + offset] = _items[n];
+                _items[n]          = nullptr;
+            } else if (_items[n]) {
+                delete_item(n);
+                _size--;
+            }
         }
     }
 
     void
-    shift_back(ssize_t pos, ssize_t offset)
+    shift_back(ssize_t pos_from, ssize_t pos_to, ssize_t offset)
     {
-        for (ssize_t n = 0; n <= pos; n++) {
-            if (n - offset >= 0)
+        for (ssize_t n = pos_from; n < pos_to; n++) {
+            if (n - offset >= 0) {
                 _items[n - offset] = _items[n];
-            else
-                delete _items[n];
-
-            _items[n] = nullptr;
+                _items[n]          = nullptr;
+            } else if (_items[n]) {
+                delete_item(n);
+                _size--;
+            }
         }
     }
 
     size_t
     get_index(const list_item* item_ptr)
     {
-        size_t pos;
+        size_t pos = 0;
 
-        for (pos = 0; pos < _capacity; pos++) {
+        for (; pos < _capacity; pos++) {
             if (item_ptr == _items[pos])
                 break;
         }
 
         return pos;
+    }
+
+    int
+    delete_item(size_t pos)
+    {
+        delete _items[pos];
+
+        _items[pos] = nullptr;
+        return nearest_remap(pos);
     }
 };
 

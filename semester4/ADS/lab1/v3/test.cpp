@@ -109,6 +109,18 @@ TEST(method, back)
     ASSERT_EQ(test_l.back(), test_l[last_index]);
 }
 
+TEST(method, shift)
+{
+    list_v3<size_t> base_l = make_list(4);
+    list_v3<size_t> test_l = base_l;
+
+    test_l.shift(0, test_l.capacity(), -1);
+    ASSERT_EQ(test_l.size(), base_l.size() - 1);
+
+    for (size_t n = 0; n < test_l.size(); n++)
+        ASSERT_EQ(test_l[n], base_l[n + 1]);
+}
+
 TEST(method, push_front)
 {
     size_t counter = 0;
