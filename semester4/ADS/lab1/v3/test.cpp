@@ -162,6 +162,16 @@ TEST(method, erase)
     }
 }
 
+TEST(method, find)
+{
+    const list_v3<size_t> l = make_list(4);
+
+    for (size_t n = 0; n < l.size(); n++) {
+        const size_t item = l[n];
+        ASSERT_EQ(*l.find(item), item);
+    }
+}
+
 
 int main(int argc, char** argv)
 {

@@ -1,6 +1,3 @@
-// Вариант 3 - односвязная структура данных
-// на базе массива с индексными указателями
-
 #pragma once
 
 #include <cstddef>
@@ -118,7 +115,10 @@ public:
 
     const_reference
     operator[](size_t pos) const
-    { return static_cast<list_v3>(*this)[pos]; }
+    {
+        list_v3<value_type>& tmp = *const_cast<list_v3<value_type>*>(this);
+        return tmp[pos];
+    }
 
     list_v3<T>&
     operator=(const list_v3<T>& rhs)
@@ -296,23 +296,6 @@ public:
             return end();
 
         return erase(get_index(pos._ptr));
-
-        /* iterator it = begin(); */
-
-        /* for (; it != pos; ++it) { */
-        /*     if (it == end()) */
-        /*         return end(); */
-        /* } */
-
-        /* size_t index = get_index(it._ptr); */
-
-        /* delete _items[index]; */
-        /* _items[index] = nullptr; */
-        /* _size--; */
-
-        /* shift(index, -1); */
-
-        /* return iterator(this, _items[index]); */
     }
 
     iterator
@@ -324,11 +307,22 @@ public:
         int next = delete_item(pos);
         shift(pos + 1, _capacity, -1);
 
-        /* delete item_ptr; */
-        /* item_ptr = nullptr; */
         _size--;
 
         return (next > 0 ? iterator(this, _items[next - 1]) : end());
+    }
+
+    iterator
+    find(const_reference value) const
+    {
+        iterator iter = begin();
+
+        for (; iter != end(); ++iter) {
+            if (*iter == value)
+                return iter;
+        }
+
+        return iter;
     }
 
 private:
