@@ -4,6 +4,7 @@
 #include <iterator>
 #include <exception>
 #include <stdexcept>
+#include <ostream>
 
 
 template<typename T>
@@ -136,6 +137,22 @@ public:
         }
 
         return *this;
+    }
+
+    friend std::ostream&
+    operator<<(std::ostream& os, const list_v3<value_type>& rhs)
+    {
+        size_t item_n = 0;
+        os << "[ ";
+
+        for (const auto& item : rhs) {
+            os << item;
+            if (++item_n < rhs.size())
+                os << ", ";    
+        }
+
+        os << " ]";
+        return os;
     }
 
     size_type

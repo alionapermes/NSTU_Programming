@@ -1,5 +1,7 @@
 #include "container.hpp"
 
+#include <sstream>
+
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -37,6 +39,17 @@ TEST(operator, copy_assignment)
 
     for (size_t n = 0; n < list1.size(); n++)
         ASSERT_EQ(list1[n], list2[n]);
+}
+
+TEST(operator, output)
+{
+    const string list_output = "[ 0, 1, 2, 3 ]";
+    const list_v3<size_t> l  = make_list(4);
+
+    stringstream ss;
+    ss << l;
+
+    ASSERT_STREQ(list_output.c_str(), ss.str().c_str());
 }
 
 TEST(method, size)
