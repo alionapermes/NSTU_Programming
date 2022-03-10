@@ -1,251 +1,268 @@
 #pragma once
 
+#include "tl/expected.hpp"
+
 #include <initializer_list>
+#include <optional>
 #include <utility>
 #include <iterator>
 #include <cstddef>
-#include <exception>
-#include <stdexcept>
 
+
+enum class evector_error
+{
+    out_of_range
+};
 
 template<typename T>
 class evector
 {
 public:
+    struct evector_iterator;
+    /* enum class evector_error; */
+
+    using value_type             = T;
+    using error                  = evector_error;
+    using size_type              = size_t;
+    using reference              = value_type&;
+    using const_reference        = const value_type&;
+    using pointer                = value_type*;
+    using const_pointer          = const value_type*;
+    using iterator               = evector_iterator;
+    using const_iterator         = const evector_iterator;
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
     struct evector_iterator
     {
     public:
         using iterator_category = std::random_access_iterator_tag;
-        using iterator          = evector_iterator;
         using difference_type   = ptrdiff_t;
-        using value_type        = T;
-        using reference         = value_type&;
-        using pointer           = value_type*;
 
-        evector_iterator(pointer ptr) : m_ptr(ptr) {}
+        evector_iterator(pointer ptr) : _ptr(ptr) {}
 
-        auto operator++() -> iterator& {
-            m_ptr++;
+        iterator&
+        operator++()
+        {
+            _ptr++;
             return *this;
         }
 
-        auto operator++(int) -> iterator {
-            iterator old = *this;
+        iterator
+        operator++(int)
+        {
+            auto old = *this;
             ++(*this);
             return old;
         }
 
-        auto operator--() -> iterator& {
-            m_ptr--;
+        iterator&
+        operator--()
+        {
+            _ptr--;
             return *this;
         }
 
-        auto operator--(int) -> iterator {
-            iterator old = *this;
+        iterator
+        operator--(int)
+        {
+            auto old = *this;
             --(*this);
             return old;
         }
 
-        auto operator*() -> reference {
-            return *m_ptr;
-        }
+        reference
+        operator*()
+        { return *_ptr; }
 
-        auto operator->() -> pointer {
-            return m_ptr;
-        }
+        const_reference
+        operator*() const
+        { return *_ptr; }
 
-        friend
-        auto operator==(const iterator& lhs, const iterator& rhs) -> bool {
-            return lhs.m_ptr == rhs.m_ptr;
-        }
+        pointer
+        operator->()
+        { return _ptr; }
 
-        friend
-        auto operator!=(const iterator& lhs, const iterator& rhs) -> bool {
-            return lhs.m_ptr != rhs.m_ptr;
-        }
+        const_pointer
+        operator->() const
+        { return _ptr; }
+
+        friend bool
+        operator==(const_iterator& lhs, const_iterator& rhs)
+        { return lhs._ptr == rhs._ptr; }
+
+        friend bool
+        operator!=(const_iterator& lhs, const_iterator& rhs)
+        { return lhs.m_ptr != rhs.m_ptr; }
 
     private:
-        pointer m_ptr = nullptr;
+        pointer _ptr = nullptr;
     };
 
-    using value_type             = T;
-    using size_type              = size_t;
-    using pointer                = value_type*;
-    using reference              = value_type&;
-    using const_reference        = const value_type&;
-    using iterator               = evector_iterator;
-    using const_iterator         = const iterator;
-    using reverse_iterator       = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    evector() = default;
 
-    evector() {}
+    evector(size_type cap)
+    { reserve(cap); }
 
-    evector(size_t __size) : _size(__size) {
-        data  = new T[_size];
-        first = data;
-        last  = data;
+    evector(const evector& src)
+    { *this = src; }
+
+    evector(evector&& src)
+        : _size(src._size)
+        , _capacity(src._capacity)
+        , _data(std::exchange(src._data,   nullptr))
+        , _first(std::exchange(src._first, nullptr))
+        , _last(std::exchange(src._last,   nullptr)) {}
+
+    ~evector()
+    {
+        clear();
+        delete[] _data;
     }
 
-    auto operator[](size_type index) -> reference {
-        return data[index];
-    }
+    reference
+    operator[](size_type pos)
+    { return _first[pos]; }
 
-    auto begin() -> iterator {
-        return iterator(first);
-    }
+    const_reference
+    operator[](size_type pos) const
+    { return _first[pos]; }
 
-    auto end() -> iterator {
-        return iterator(last);
-    }
+    size_type
+    size() const
+    { return _size; }
 
-    auto begin() const -> const_iterator {
-        return iterator(first);
-    }
+    size_type
+    capacity() const
+    { return _capacity; }
 
-    auto end() const -> const_iterator {
-        return iterator(last);
-    }
+    void
+    clear()
+    { _size = 0; }
 
-    auto rbegin() -> reverse_iterator {
-        return reverse_iterator(end());
-    }
-
-    auto rend() -> reverse_iterator {
-        return reverse_iterator(begin());
-    }
-
-    auto rbegin() const -> const_reverse_iterator {
-        return const_reverse_iterator(end());
-    }
-
-    auto rend() const -> const_reverse_iterator {
-        return const_reverse_iterator(begin());
-    }
-
-    auto front() -> reference {
-        return *first;
-    }
-
-    auto back() -> reference {
-        return *last;
-    }
-
-    auto front() const -> const_reference {
-        return *first;
-    }
-
-    auto back() const -> const_reference {
-        return *last;
-    }
-
-    auto size() const -> size_type {
-        return _size;
-    }
-
-    auto capacity() const -> size_type {
-        return _capacity;
-    }
-
-    auto empty() const -> bool {
-        return _size == 0;
-    }
-
-    auto clear() -> void {
-        delete[] data;
-        data  = nullptr;
-        first = nullptr;
-        last  = nullptr;
-    }
-
-    auto resize(size_type new_size) -> void {
-        auto tmp      = new T[new_size];
-        auto size_old = _size;
-
-        _capacity = new_size;
-        _size     = new_size;
-
-        for (size_type n = 0; ((n < _size) && (n < size_old)); ++n) {
-            tmp[n] = data[n];
-        }
-
-        delete[] data;
-        data  = tmp;
-        first = data;
-        last  = data + _size - 1;
-    }
-
-    auto reserve(size_type new_capacity) -> void {
-        //
-    }
-
-    auto push_front(const_reference value) -> void {
-        if (_size == _capacity) {
-            resize((_size == 0 ? 1 : (_capacity << 1)));
-        }
-        
-        shift(1);
-        data[0] = value;
-    }
-
-    auto push_back(const_reference value) -> void {
-        if (_size == 0) {
-            resize(1);
-
-            data[0] = value;
-            first   = data;
-            last    = data;
-
+    void
+    reserve(size_type new_cap)
+    {
+        if (new_cap <= _capacity)
             return;
-        }
 
-        if (_size == _capacity) {
-            resize(_capacity << 1);
-        }
+        pointer old_data  = _data;
+        size_type old_cap = _capacity;
 
-        data[_size] = value;
-        ++last;
+        allocate(new_cap);
+        _first = _data;
+        _last  = _first + _size;
+
+        if (!old_data)
+            return;
+
+        for (size_type n = 0; n < old_cap; n++)
+            _data[n] = old_data[n];
+
+        delete[] old_data;
     }
 
-    auto pop_front() -> void {
-        --_size;
-        ++first;
+    tl::expected<pointer, error>
+    at(size_type pos)
+    {
+        if (pos >= _capacity)
+            return tl::unexpected(error::out_of_range);
+
+        return _first + pos;
     }
 
-    auto pop_back() -> void {
-        --_size;
-        --last;
+    tl::expected<const_pointer, error>
+    at(size_type pos) const
+    {
+        if (pos >= _capacity)
+            return tl::unexpected(error::out_of_range);
+
+        return _first + pos;
+    }
+
+    iterator
+    begin()
+    { return iterator(_first); }
+
+    iterator
+    end()
+    { return iterator(_border); }
+
+    const_iterator
+    begin() const
+    { return iterator(_first); }
+
+    const_iterator
+    end() const
+    { return iterator(_border); }
+
+    reference
+    front()
+    { return *_first; }
+
+    reference
+    back()
+    { return *_last; }
+
+    const_reference
+    front() const
+    { return *_first; }
+
+    const_reference
+    back() const
+    { return *_last; }
+
+    tl::expected<size_t, error>
+    shift(size_type start, size_type end, ssize_t offset)
+    {
+        if (end > _capacity)
+            return tl::unexpected(error::out_of_range);
+
+        if (!offset || (start == end))
+            return start;
+
+        auto f = (offset < 0 ? &evector::shift_back : &evector::shift_front);
+        f(std::abs(offset));
+
+        return start + offset;
     }
 
 private:
-    pointer data        = nullptr;
-    pointer first       = nullptr;
-    pointer last        = nullptr;
+    value_type _border;
     size_type _size     = 0;
     size_type _capacity = 0;
+    pointer _data       = nullptr;
+    pointer _first      = nullptr;
+    pointer _last       = nullptr;
 
-    auto shift(int offset) -> void {
-        if (offset == 0) return;
-
-        if (offset > 0) {
-            shift_front(std::abs(offset));
-        } else {
-            shift_back(std::abs(offset));
-        }
+    void
+    allocate(size_type cap)
+    {
+        _data     = new value_type[cap]();
+        _capacity = cap;
     }
 
-    auto shift_front(size_type offset) -> void {
-        last += offset;
+    void
+    shift_front(size_type start, size_type end, size_type offset)
+    {
+        size_type pos = end - 1;
 
-        for (size_type n = 0; n < _size + offset; ++n) {
-            data[n] = data[n + offset];
-        }
+        do {
+            if (pos + offset >= _capacity)
+                continue;
+
+            _data[pos + offset] = _data[pos];
+        } while (pos-- > start);
     }
 
-    auto shift_back(size_type offset) -> void {
-        first -= offset;
+    void
+    shift_back(size_type start, size_type end, size_type offset)
+    {
+        for (size_type pos = start; pos < end; pos++) {
+            if (pos < offset)
+                continue;
 
-        for (size_type n = 0; n < _size + offset; ++n) {
-            data[n] = data[n - offset];
+            _data[pos - offset] = _data[pos];
         }
     }
 };

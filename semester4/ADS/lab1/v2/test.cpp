@@ -1,74 +1,48 @@
 #include "container.hpp"
 
 #include "gtest/gtest.h"
+#include "tl/expected.hpp"
 
 using namespace std;
 
-auto make_evector(size_t count) -> evector<size_t>;
+evector<size_t>
+make_evector(size_t count);
 
 
-TEST(reserve, ctor) {
-    const size_t count = 10;
-    evector<int> ev(count);
+TEST(operator, index)
+{
+    evector<size_t> ev(3);
 
-    ASSERT_EQ(ev.size(), count);
-}
-
-TEST(resize, methods) {
-    const size_t count1 = 10;
-    const size_t count2 = count1 - 4;
-
-    evector<int> ev;
-    ASSERT_EQ(ev.size(), 0);
-
-    ev.resize(count1);
-    ASSERT_EQ(ev.size(), count1);
-
-    for (size_t n = 0; n < count1; ++n) {
+    for (size_t n = 0; n < 3; n++) {
         ev[n] = n;
-    }
-
-    ev.resize(count2);
-    ASSERT_EQ(ev.size(), count2);
-
-    for (size_t n = 0; n < count2; ++n) {
         ASSERT_EQ(ev[n], n);
     }
 }
 
-TEST(push_back, methods) {
-    const size_t count = 10;
-    evector<size_t> ev;
+TEST(method, at)
+{
+    evector<size_t> ev = make_evector(3);
 
-    for (size_t n = 0; n < count; ++n) {
-        ev.push_back(n);
-        ASSERT_EQ(ev.back(), n);
+    for (size_t n = 0; n < 3; n++) {
+        auto item = ev.at(n);
+        ASSERT_EQ(**item, n);
     }
-
-    ASSERT_EQ(ev.size(), count);
 }
 
-/* TEST(default, iterator) { */
-/*     const size_t count = 10; */
-/*     auto ev = make_evector(count); */
 
-/*     size_t item = 0; */
-/*     for (auto it = ev.begin(); it != ev.end(); ++it) { */
-/*         ASSERT_EQ(*it, item++); */
-/*     } */
-/* } */
-
-
-auto main(int argc, char** argv) -> int {
+int main(int argc, char** argv)
+{
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
 
-auto make_evector(size_t count) -> evector<size_t> {
-    evector<size_t> ev(count);
+evector<size_t>
+make_evector(size_t cap)
+{
+    evector<size_t> ev(cap);
 
-    for (size_t n = 0; n < count; ++n) {
-        ev.push_back(n);
+    for (size_t n = 0; n < cap; ++n) {
+        ev[n] = n;
     }
 
     return ev;
