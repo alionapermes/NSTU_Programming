@@ -105,7 +105,8 @@ public:
         pointer _ptr = nullptr;
     };
 
-    evector() = default;
+    evector()
+    { reserve(1); }
 
     evector(size_type cap) : _size(cap)
     { reserve(cap); }
