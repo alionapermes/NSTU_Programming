@@ -4,12 +4,23 @@
 #include "tl/expected.hpp"
 
 #include <string>
+#include <sstream>
 
 using namespace std;
 
 evector<size_t>
 make_evector(size_t count);
 
+
+TEST(ctor, init_list)
+{
+    evector<size_t> ev = {0, 1, 2, 3};
+    ASSERT_EQ(ev.size(), 4);
+    ASSERT_EQ(ev.capacity(), 4);
+
+    for (size_t n = 0; n < ev.size(); n++)
+        ASSERT_EQ(ev[n], n);
+}
 
 TEST(operator, index)
 {
@@ -52,6 +63,17 @@ TEST(operator, copy_assignment)
 
     for (size_t n = 0; n < ev1.size(); n++)
         ASSERT_EQ(ev1[n], n);
+}
+
+TEST(operator, output)
+{
+    const evector<size_t> ev    = {1, 2, 3};
+    const char* expected_output = "{1, 2, 3}";
+
+    stringstream ss;
+    ss << ev;
+
+    ASSERT_STREQ(ss.str().c_str(), expected_output);
 }
 
 TEST(iterator, begin_end)
@@ -229,6 +251,69 @@ TEST(method, push_front)
 
         ASSERT_STRNE(base.c_str(), str.c_str());
         ASSERT_TRUE(str.empty());
+    }
+}
+
+TEST(method, find)
+{
+    evector<size_t> ev = make_evector(10);
+
+    for (size_t n = 0; n < ev.size(); n++)
+        ASSERT_EQ(*ev.find(n), n);
+}
+
+TEST(method, insert)
+{
+    {
+        evector<size_t> ev = {0, 1, 3, 4};
+        ev.insert(ev.find(3), 2);
+
+        for (size_t n = 0; n < ev.size(); n++)
+            ASSERT_EQ(ev[n], n);
+    }
+
+    {
+        evector<size_t> ev = {0, 1, 2, 3};
+
+        ev.insert(ev.end(), 4);
+        ASSERT_EQ(ev.back(), 4);
+        ASSERT_EQ(ev.size(), 5);
+        ASSERT_EQ(ev.capacity(), 8);
+
+        ev.insert(ev.begin(), 5);
+        ASSERT_EQ(ev.front(), 5);
+        ASSERT_EQ(ev.size(), 6);
+        ASSERT_EQ(ev.capacity(), 8);
+    }
+}
+
+TEST(method, erase)
+{
+    {
+        evector<size_t> ev = {0, 1, 2, 3};
+        
+        for (size_t n = 0; n < ev.capacity(); n++) {
+            auto next = ev.erase(ev.find(n));
+
+            if (n + 1 < ev.capacity())
+                ASSERT_EQ(ev.front(), *next);
+            else
+                ASSERT_EQ(next, ev.end());
+        }
+    }
+
+    {
+        evector<size_t> ev = {0, 1, 2, 3};
+
+        ev.erase(ev.begin());
+        ASSERT_EQ(ev.front(), 1);
+        ASSERT_EQ(ev.size(), 3);
+        ASSERT_EQ(ev.capacity(), 4);
+
+        ev.erase(ev.find(3));
+        ASSERT_EQ(ev.back(), 2);
+        ASSERT_EQ(ev.size(), 2);
+        ASSERT_EQ(ev.capacity(), 4);
     }
 }
 
