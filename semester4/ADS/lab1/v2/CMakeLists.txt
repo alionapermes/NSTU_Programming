@@ -14,9 +14,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(EXEC test)
 set(SRC test.cpp)
 
-# find_package(GTest REQUIRED)
-# include_directories(${GTEST_INCLUDE_DIRS})
-
 add_executable(${EXEC} ${SRC})
 target_link_libraries(${EXEC} ${CONAN_LIBS})
-
