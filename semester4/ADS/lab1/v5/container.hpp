@@ -83,13 +83,13 @@ public:
         operator->()
         { return &m_ptr->value; }
 
-        friend bool
-        operator==(const iterator& lhs, const iterator& rhs)
-        { return lhs.m_ptr == rhs.m_ptr; }
+        bool
+        operator==(const iterator& rhs) const
+        { return m_ptr == rhs.m_ptr; }
 
-        friend bool
-        operator!=(const iterator& lhs, const iterator& rhs)
-        { return lhs.m_ptr != rhs.m_ptr; }
+        bool
+        operator!=(const iterator& rhs) const
+        { return m_ptr != rhs.m_ptr; }
 
     private:
         member* m_ptr = nullptr;
@@ -153,25 +153,25 @@ public:
         }
     }
 
-    friend bool
-    operator==(const bidir_list& lhs, const bidir_list& rhs)
+    bool
+    operator==(const bidir_list& rhs) const
     {
-        if (lhs.size() != rhs.size()) { return false; }
+        if (size() != rhs.size()) { return false; }
 
-        auto lhs_it = lhs.begin();
+        auto it     = begin();
         auto rhs_it = rhs.begin();
 
-        while ((lhs_it != lhs.end()) && (rhs_it != rhs.end())) {
-            if (*lhs_it != *rhs_it) { return false; }
-            lhs_it++; rhs_it++;
+        while ((it != end()) && (rhs_it != rhs.end())) {
+            if (*it != *rhs_it) { return false; }
+            it++; rhs_it++;
         }
 
         return true;
     }
 
-    friend bool
-    operator!=(const bidir_list& lhs, const bidir_list& rhs)
-    { return !(lhs == rhs); }
+    bool
+    operator!=(const bidir_list& rhs) const
+    { return !(*this == rhs); }
 
     friend std::ostream&
     operator<<(std::ostream& os, const bidir_list& rhs)

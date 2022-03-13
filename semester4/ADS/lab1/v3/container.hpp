@@ -11,10 +11,10 @@ template<typename T>
 class list_v3
 {
 private:
-    struct list_item;
+    struct list_item; // объявление структуры элемента
 
 public:
-    struct list_iterator;
+    struct list_iterator; // объявление структуры итераторы
 
     using value_type             = T;
     using size_type              = size_t;
@@ -43,6 +43,7 @@ public:
         iterator&
         operator++()
         {
+            // проверка на конец контейнера
             if (_ptr->_next < 0)
                 _ptr = _owner->_border;
             else
@@ -54,7 +55,9 @@ public:
         iterator
         operator++(int)
         {
+            // сохранение состояния итератора
             auto old = *this;
+            // итерирование
             ++(*this);
             return old;
         }
@@ -65,7 +68,7 @@ public:
 
         const_reference
         operator*() const
-        { return this->operator*(); }
+        { return _ptr->_value; }
 
         pointer
         operator->()
@@ -73,15 +76,15 @@ public:
 
         const_pointer
         operator->() const
-        { return this->operator->(); }
+        { return &_ptr->_value; }
 
-        friend bool
-        operator==(const_iterator& lhs, const_iterator& rhs)
-        { return lhs._ptr == rhs._ptr; }
+        bool
+        operator==(const_iterator& rhs) const
+        { return _ptr == rhs._ptr; }
 
-        friend bool
-        operator!=(const_iterator& lhs, const_iterator& rhs)
-        { return !(lhs == rhs); }
+        bool
+        operator!=(const_iterator& rhs) const
+        { return !(*this== rhs); }
 
     private:
         const list_v3* const _owner;
@@ -90,9 +93,11 @@ public:
 
     list_v3() = default;
 
+    // резервирующий конструктор
     list_v3(size_t cap)
     { reserve(cap); }
 
+    // конструктор копирования
     list_v3(const list_v3<T>& src)
     { *this = src; }
 
@@ -106,6 +111,8 @@ public:
             std::out_of_range("pos is out of range!");
 
         list_item*& item_ptr = _items[pos];
+
+        // создание элемента, если в ячейке nullptr
         if (!item_ptr) {
             item_ptr = replace(pos);
             _size++;
@@ -117,18 +124,24 @@ public:
     const_reference
     operator[](size_t pos) const
     {
+        // снятие константности с указателя на объект
         list_v3<value_type>& tmp = *const_cast<list_v3<value_type>*>(this);
+        // вызов неконстантной версии оператора
         return tmp[pos];
     }
 
+    // копирующий оператор присваивания
     list_v3<T>&
     operator=(const list_v3<T>& rhs)
     {
+        // удаление старых элементов
         clear();
+        // выделение памяти под новые
         allocate(rhs._capacity);
 
         _size = rhs._size;
 
+        // цикл копирования
         for (size_t n = 0; n < _capacity; n++) {
             list_item* item_ptr = rhs._items[n];
 
@@ -139,6 +152,7 @@ public:
         return *this;
     }
 
+    // оператор вывода в поток
     friend std::ostream&
     operator<<(std::ostream& os, const list_v3<value_type>& rhs)
     {
@@ -184,15 +198,14 @@ public:
         if (new_cap <= _capacity)
             return;
 
-        if (!_items) {
-            allocate(new_cap);
-            return;
-        }
+        if (!_items)
+            return allocate(new_cap);
 
         list_item** old_ptr = _items;
         size_t old_capacity = _capacity;
         allocate(new_cap);
 
+        // копирование указателей на элементы
         for (size_t n = 0; n < old_capacity; n++)
             _items[n] = old_ptr[n];
 
@@ -268,6 +281,8 @@ public:
     {
         if (pos >= _capacity)
             throw std::out_of_range("pos is out of range!");
+
+        delete _items[pos];
 
         int nearest_prev = nearest_index(pos, false);
         auto item_ptr    = new list_item();
@@ -429,15 +444,22 @@ private:
     shift_front(ssize_t pos_from, ssize_t pos_to, ssize_t offset)
     {
         for (ssize_t n = pos_to - 1; n >= pos_from; n--) {
+            // ежели сдвиг уместен
             if (n + offset < _capacity) {
+                // ежели сдвиг _next уместен
                 if (_items[n]->_next + offset < _capacity)
                     _items[n]->_next += offset;
+                // иначе - текущий элемент последний в контейнере
                 else
                     _items[n]->_next = -1;
 
+                // сдвиг
                 _items[n + offset] = _items[n];
                 _items[n]          = nullptr;
-            } else if (_items[n]) {
+            }
+            // если с учётом сдвига элемент выходит
+            // за границы контейнера, то он удаляется
+            else if (_items[n]) {
                 delete_item(n);
                 _size--;
             }
@@ -448,10 +470,13 @@ private:
     shift_back(ssize_t pos_from, ssize_t pos_to, ssize_t offset)
     {
         for (ssize_t n = pos_from; n < pos_to; n++) {
+            // ежели сдвиг не выходит за границы
             if (n - offset >= 0) {
                 _items[n - offset] = _items[n];
                 _items[n]          = nullptr;
-            } else if (_items[n]) {
+            }
+            // иначе удаляем элемент
+            else if (_items[n]) {
                 delete_item(n);
                 _size--;
             }

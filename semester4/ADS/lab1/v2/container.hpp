@@ -3,43 +3,42 @@
 #include "tl/expected.hpp"
 
 #include <initializer_list>
-#include <optional>
 #include <utility>
 #include <iterator>
 #include <cstddef>
+#include <ostream>
 
-
-enum class evector_error
-{
-    out_of_range
-};
 
 template<typename T>
 class evector
 {
 public:
-    struct evector_iterator;
-    /* enum class evector_error; */
+    struct iterator;
+
+    enum class error
+    {
+        out_of_range,
+        invalid_param
+    };
 
     using value_type             = T;
-    using error                  = evector_error;
     using size_type              = size_t;
     using reference              = value_type&;
     using const_reference        = const value_type&;
     using pointer                = value_type*;
     using const_pointer          = const value_type*;
-    using iterator               = evector_iterator;
-    using const_iterator         = const evector_iterator;
+    using const_iterator         = const iterator;
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    struct evector_iterator
+    struct iterator
     {
     public:
+        using value_type        = T;
         using iterator_category = std::random_access_iterator_tag;
         using difference_type   = ptrdiff_t;
 
-        evector_iterator(pointer ptr) : _ptr(ptr) {}
+        iterator(pointer ptr) : _ptr(ptr) {}
 
         iterator&
         operator++()
@@ -87,13 +86,16 @@ public:
         operator->() const
         { return _ptr; }
 
-        friend bool
-        operator==(const_iterator& lhs, const_iterator& rhs)
-        { return lhs._ptr == rhs._ptr; }
+        auto
+        operator<=>(const_iterator& other) const = default;
 
-        friend bool
-        operator!=(const_iterator& lhs, const_iterator& rhs)
-        { return lhs.m_ptr != rhs.m_ptr; }
+        iterator
+        operator+(size_type offset) const
+        { return iterator(_ptr + offset); }
+
+        iterator
+        operator-(size_type offset) const
+        { return iterator(_ptr - offset); }
 
     private:
         pointer _ptr = nullptr;
@@ -101,18 +103,18 @@ public:
 
     evector() = default;
 
-    evector(size_type cap)
-    { reserve(cap); }
+    evector(size_type cap) : _size(cap)
+    {
+        reserve(cap);
+        _first = _data;
+        _last  = _first + (_size > 0 ? _size - 1 : 0);
+    }
 
     evector(const evector& src)
     { *this = src; }
 
-    evector(evector&& src)
-        : _size(src._size)
-        , _capacity(src._capacity)
-        , _data(std::exchange(src._data,   nullptr))
-        , _first(std::exchange(src._first, nullptr))
-        , _last(std::exchange(src._last,   nullptr)) {}
+    evector(evector&& src) noexcept
+    { *this = std::move(src); }
 
     ~evector()
     {
@@ -128,6 +130,53 @@ public:
     operator[](size_type pos) const
     { return _first[pos]; }
 
+    evector&
+    operator=(const evector& other)
+    {
+        iterator iter = other.begin();
+
+        reserve(other._capacity);
+        _size  = other._size;
+        _first = _data;
+        _last  = _first + (_size > 0 ? _size - 1 : 0);
+
+        for (size_t n = 0; n < _size; n++)
+            _data[n] = *iter++;
+
+        return *this;
+    }
+
+    evector&
+    operator=(evector&& other) noexcept
+    {
+        delete[] _data;
+
+        _data     = std::exchange(other._data, nullptr);
+        _first    = std::exchange(other._first, nullptr);
+        _last     = std::exchange(other._last, nullptr);
+        _size     = std::exchange(other._size, 0);
+        _capacity = std::exchange(other._capacity, 0);
+
+        return *this;
+    }
+
+    friend std::ostream&
+    operator<<(std::ostream& os, const evector& rhs)
+    {
+        size_t n = 0;
+        os << "[";
+
+        for (const auto& item : rhs) {
+            os << item;
+            if (++n < rhs.size())
+                os << ", ";
+        }
+
+        os << "]";
+        return os;
+    }
+
+
     size_type
     size() const
     { return _size; }
@@ -136,9 +185,17 @@ public:
     capacity() const
     { return _capacity; }
 
+    bool
+    empty() const
+    { return !_size; }
+
     void
     clear()
-    { _size = 0; }
+    {
+        _first = nullptr;
+        _last  = nullptr;
+        _size  = 0;
+    }
 
     void
     reserve(size_type new_cap)
@@ -149,9 +206,10 @@ public:
         pointer old_data  = _data;
         size_type old_cap = _capacity;
 
+        if (auto start_index = get_index(_first))
+            shift(*start_index, *start_index + _size, *start_index);
+
         allocate(new_cap);
-        _first = _data;
-        _last  = _first + _size;
 
         if (!old_data)
             return;
@@ -186,7 +244,7 @@ public:
 
     iterator
     end()
-    { return iterator(_border); }
+    { return iterator(_last + 1); }
 
     const_iterator
     begin() const
@@ -194,7 +252,23 @@ public:
 
     const_iterator
     end() const
-    { return iterator(_border); }
+    { return iterator(_last + 1); }
+
+    reverse_iterator
+    rbegin()
+    { return reverse_iterator(end()); }
+
+    reverse_iterator
+    rend()
+    { return reverse_iterator(begin()); }
+
+    const_reverse_iterator
+    rbegin() const
+    { return const_reverse_iterator(end()); }
+
+    const_reverse_iterator
+    rend() const
+    { return const_reverse_iterator(begin()); }
 
     reference
     front()
@@ -212,7 +286,11 @@ public:
     back() const
     { return *_last; }
 
-    tl::expected<size_t, error>
+    tl::expected<size_type, error>
+    shift(ssize_t offset)
+    { return shift(*get_index(_first), _size, offset); }
+
+    tl::expected<size_type, error>
     shift(size_type start, size_type end, ssize_t offset)
     {
         if (end > _capacity)
@@ -222,13 +300,88 @@ public:
             return start;
 
         auto f = (offset < 0 ? &evector::shift_back : &evector::shift_front);
-        f(std::abs(offset));
+        (this->*f)(start, end, std::abs(offset));
 
         return start + offset;
     }
 
+    void
+    shrink_to_fit()
+    {
+        size_type index   = 0;
+        pointer old_data  = _data;
+        iterator iter     = begin();
+        iterator iter_end = end();
+
+        allocate(_size);
+        _first = _data;
+        _last  = _first + _size - 1;
+
+        for (; iter != iter_end; ++iter)
+            _data[index++] = *iter;
+
+        delete[] old_data;
+    }
+
+    template<typename U>
+    void
+    push_front(U&& value)
+    {
+        if (_size == _capacity) {
+            reserve(_capacity > 0 ? _capacity << 1 : 1);
+            return push_front(std::forward<U>(value));
+        }
+
+        if (!_size) {
+            _first = _data;
+            _last  = _first;
+        } else {
+            if (_first == _data)
+                shift(1);
+            _first--;
+        }
+
+        *_first = std::forward<U>(value);
+        _size++;
+    }
+
+    template<typename U>
+    void
+    push_back(U&& value)
+    {
+        if (_size == _capacity) {
+            reserve(_capacity > 0 ? _capacity << 1 : 1);
+            return push_back(std::forward<U>(value));
+        }
+
+        if (!_size) {
+            _first = _data;
+            _last  = _first;
+        } else {
+            if (_last == (_data + _capacity - 1))
+                shift(-1);
+            _last++;
+        }
+
+        *_last = std::forward<U>(value);
+        _size++;
+    }
+
+    void
+    pop_front()
+    {
+        _first++;
+        _size--;
+    }
+
+    void
+    pop_back()
+    {
+        _last--;
+        _size--;
+    }
+
 private:
-    value_type _border;
     size_type _size     = 0;
     size_type _capacity = 0;
     pointer _data       = nullptr;
@@ -238,7 +391,7 @@ private:
     void
     allocate(size_type cap)
     {
-        _data     = new value_type[cap]();
+        _data     = new value_type[cap + 1]();
         _capacity = cap;
     }
 
@@ -253,6 +406,13 @@ private:
 
             _data[pos + offset] = _data[pos];
         } while (pos-- > start);
+
+        _first += offset;
+        _last   = (
+            (*get_index(_last) + offset) >= _capacity
+            ? _data + (_capacity - 1)
+            : _last + offset
+        );
     }
 
     void
@@ -264,6 +424,22 @@ private:
 
             _data[pos - offset] = _data[pos];
         }
+
+        _first  = (*get_index(_first) >= offset ? _first - offset : _data);
+        _last  -= offset;
+    }
+
+    tl::expected<size_type, error>
+    get_index(const_pointer ptr)
+    {
+        if (!ptr)
+            return tl::unexpected(error::invalid_param);
+
+        size_type index = 0;
+        while (ptr-- != _data)
+            index++;
+
+        return index;
     }
 };
 
