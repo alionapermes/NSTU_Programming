@@ -12,6 +12,13 @@ evector<size_t>
 make_evector(size_t count);
 
 
+TEST(ctor, default)
+{
+    evector<size_t> ev;
+    ASSERT_EQ(ev.size(), 0);
+    ASSERT_EQ(ev.capacity(), 1);
+}
+
 TEST(ctor, init_list)
 {
     evector<size_t> ev = {0, 1, 2, 3};
