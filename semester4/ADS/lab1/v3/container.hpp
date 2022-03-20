@@ -192,6 +192,10 @@ public:
         _capacity  = 0;
     }
 
+    bool
+    empty() const
+    { return !_size; }
+
     void
     reserve(size_t new_cap)
     {
@@ -259,13 +263,17 @@ public:
     }
 
     iterator
+    insert(iterator pos, const_reference value)
+    { return insert(get_index(pos._ptr), value); }
+
+    iterator
     insert(size_t pos, const_reference value)
     {
         if (pos >= _capacity)
             throw std::out_of_range("pos is out of range!");
 
         reserve(_capacity + 1);
-        shift(pos + 1, 1);
+        shift(pos + 1, _size, 1);
 
         list_item* item_ptr = replace(pos + 1, &value);
         _size++;
