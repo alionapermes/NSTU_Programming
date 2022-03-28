@@ -63,7 +63,7 @@ public:
         }
 
         reference
-        operator*()
+        operator*() // получение ссылки на значение итератора
         { return _ptr->_value; }
 
         const_reference
@@ -71,7 +71,7 @@ public:
         { return _ptr->_value; }
 
         pointer
-        operator->()
+        operator->() // получение указателя на значение итератора
         { return &_ptr->_value; }
 
         const_pointer
@@ -266,6 +266,7 @@ public:
     insert(iterator pos, const_reference value)
     { return insert(get_index(pos._ptr), value); }
 
+    // вставка после позиции
     iterator
     insert(size_t pos, const_reference value)
     {
@@ -362,7 +363,7 @@ public:
                 return iter;
         }
 
-        return iter;
+        return iter; // end()
     }
 
 private:
@@ -376,7 +377,7 @@ private:
         list_item(const_reference value, int next)
             : _next(next), _value(value) {}
 
-        list_item(const list_item& item)
+        list_item(const list_item& item) // конструктор копирования
             : list_item(item._value, item._next) {}
 
     private:
@@ -392,6 +393,7 @@ private:
     list_item** _items = nullptr;
 
 
+    // выделение памяти под хранение элементов контейнера
     void
     allocate(size_t cap)
     {
@@ -415,7 +417,7 @@ private:
             return -1;
 
         for (size_t n = pos + 1; n < _capacity; n++) {
-            if (_items[n])
+            if (_items[n]) // если элемент не nullptr
                 return n;
         }
 
@@ -429,7 +431,7 @@ private:
             return -1;
 
         for (size_t n = pos - 1; n >= 0; n--) {
-            if (_items[n])
+            if (_items[n]) // если элемент не nullptr
                 return n;
         }
 

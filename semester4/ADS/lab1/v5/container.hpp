@@ -18,17 +18,19 @@ public:
     public:
         friend class bidir_list;
 
-        member() {}
+        member() = default;
 
         member(const T& _value) : value(_value) {}
+
+        member(member* _prev, member* _next) : prev(_prev), next(_next) {}
 
         member(const T& _value, member* _prev, member* _next)
             : value(_value), prev(_prev), next(_next) {}
 
     private:
         T value;
-        member* next = nullptr;
         member* prev = nullptr;
+        member* next = nullptr;
     };
 
     struct list_iterator
@@ -106,7 +108,7 @@ public:
 
     bidir_list()
     {
-        border = new member();
+        border       = new member();
         border->next = first;
         border->prev = last;
     }
@@ -143,14 +145,15 @@ public:
         return *end();
     }
 
-    reference
+    bidir_list<value_type>&
     operator=(const bidir_list& list)
     {
         clear();
 
-        for (auto it = list.begin(); it != list.end(); it++) {
-            push_back(*it);
-        }
+        for (const auto& item : list)
+            push_back(item);
+
+        return *this;
     }
 
     bool
@@ -162,8 +165,11 @@ public:
         auto rhs_it = rhs.begin();
 
         while ((it != end()) && (rhs_it != rhs.end())) {
-            if (*it != *rhs_it) { return false; }
-            it++; rhs_it++;
+            if (*it != *rhs_it)
+                return false;
+
+            it++;
+            rhs_it++;
         }
 
         return true;

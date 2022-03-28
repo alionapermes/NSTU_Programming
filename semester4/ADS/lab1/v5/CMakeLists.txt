@@ -11,9 +11,14 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(EXEC test)
-set(SRC test.cpp)
+set(TEST_EXEC test)
+set(TEST_SRC test.cpp)
+set(MENU_EXEC menu)
+set(MENU_SRC menu.cpp)
 
-add_executable(${EXEC} ${SRC})
-target_link_libraries(${EXEC} ${CONAN_LIBS})
+add_executable(${TEST_EXEC} ${TEST_SRC})
+target_link_libraries(${TEST_EXEC} ${CONAN_LIBS})
+
+add_executable(${MENU_EXEC} ${MENU_SRC})
+target_link_libraries(${MENU_EXEC} ${CONAN_LIBS})
 
