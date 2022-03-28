@@ -1,20 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
-project(test)
+project(lab2)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
-set(EXEC test)
-set(SRC test.cpp)
+include_directories(include)
+
+if (TESTS)
+    add_subdirectory(test)
+endif()
+
+if (DOCS)
+    add_subdirectory(docs)
+endif()
 
 if (DEBUG)
     add_compile_options(-g3 -ggdb)
 endif()
 
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-
-add_executable(${EXEC} ${SRC})
-
-target_link_libraries(${EXEC} ${GTEST_LIBRARIES} pthread)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
