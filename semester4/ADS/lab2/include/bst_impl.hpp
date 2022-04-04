@@ -41,10 +41,10 @@ public:
         using pointer           = value_type*;
 
     private: // fields
-        node_type*& _node;
+        node_type* _node;
 
     public: // ctors
-        explicit bst_iterator(node_type*& node) : _node(node) {}
+        explicit bst_iterator(node_type* node) : _node(node) {}
 
         bst_iterator(const_iterator& other) : bst_iterator(other._node) {}
 
@@ -138,19 +138,12 @@ public:
         operator->() const;
 
         bool
+        operator==(const_iterator& other)
+        { return _node == other._node; }
+
+        bool
         operator!=(const_iterator& other)
-        { return _node != other._node; }
-
-        auto
-        operator<=>(const_iterator& other) const //= default;
-        { return _node <=> other._node; }
-
-        /* iterator& */
-        /* operator=(const_iterator& other) */
-        /* { */
-        /*     _node = other._node; */
-        /*     return *this; */
-        /* } */
+        { return !(*this == other); }
     };
 
 private:
