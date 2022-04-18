@@ -34,6 +34,62 @@ TEST(iterator, forward)
     ASSERT_EQ(n, 0);
 }
 
+TEST(method, find)
+{
+    bst<int> tree;
+    for (int n = 0; n < 10; n++) {
+        tree.insert(n);
+        ASSERT_EQ(*tree.find(n), n);
+    }
+}
+
+TEST(method, erase)
+{
+    {
+        bst<int> tree;
+        tree.insert(5);
+        tree.insert(4);
+        tree.insert(6);
+        tree.insert(3);
+        tree.insert(7);
+        tree.insert(2);
+        tree.insert(8);
+        tree.insert(1);
+        tree.insert(9);
+
+        tree.erase(tree.find(3));
+
+        int n = 1;
+        for (const auto& item : tree) {
+            ASSERT_EQ(n++, item);
+            if (n == 3)
+                n++;
+        }
+    }
+    {
+        bst<int> tree;
+    
+        tree.insert(5);
+        tree.insert(3);
+        tree.insert(7);
+        tree.insert(2);
+        tree.insert(4);
+        tree.insert(6);
+        tree.insert(8);
+        tree.insert(1);
+        tree.insert(9);
+
+        tree.erase(tree.find(3));
+
+        int n = 1;
+        for (const auto& item : tree) {
+            ASSERT_EQ(n++, item);
+            if (n == 3)
+                n++;
+        }
+    }
+}
+
 
 int
 main(int argc, char** argv)

@@ -210,8 +210,9 @@ public: // operators
     operator=(bst&& other);
 
 public: // methods
+    template <typename Val> requires std::is_convertible_v<Val, value_type>
     iterator
-    insert(value_type&& value)
+    insert(Val&& value)
     {
         if (_root != nullptr)
             return insert(iterator(_root), std::forward<value_type>(value));
@@ -232,19 +233,19 @@ public: // methods
         if (value == *hint)
             return hint;
 
-        node_type*& node = hint._node;
+        node_type*& node  = hint._node;
         node_type*& child = (
-            value < *hint
+            Compare{}(value, *hint)
             ? node->_left
             : node->_right
         );
 
         if (child == nullptr) {
             child = new node_type(std::forward<value_type>(value), node);
-            if (*child < *_first) {
+            if (Compare{}(child->_value, _first->_value)) {
                 _first        = child;
                 _base->_right = _first;
-            } else if (*child > *_last) {
+            } else if (Compare{}(_last->_value, child->_value)) {
                 _last        = child;
                 _base->_left = _last;
             }
@@ -257,40 +258,79 @@ public: // methods
     }
 
     void
-    erase(iterator& pos)
-    { erase(*pos); }
+    erase(iterator pos)
+    {
+        if (pos == end())
+            return;
 
-    size_type
-    erase(value_type&& key);
+        node_type* node   = pos._node;
+        node_type* parent = node->_parent;
+
+        if (node == _root)
+            _root = _root->_right;
+        else if (node == _first)
+            _first = (++begin())._node;
+        else if (node == _last)
+            _last = (++rbegin()).base()._node;
+
+        // no cildren
+        if ((node->_left == nullptr) && (node->_right == nullptr)) {
+            (node == parent->_left
+                ? parent->_left
+                : parent->_right
+            ) = nullptr;
+        }
+        // left to right
+        else if ((node->_left != nullptr) && (node->_right != nullptr)) {
+            node_type* new_parent      = get_first(node->_right);
+            new_parent->_left          = std::exchange(node->_left, nullptr);
+            new_parent->_left->_parent = new_parent;
+
+            node->_right->_parent = parent;
+
+            (node == parent->_left
+                ? parent->_left
+                : parent->_right
+            ) = node->_right;
+        }
+        // one child
+        else if (parent != nullptr) {
+            node_type* child = (
+                node->_left == nullptr
+                ? node->_right
+                : node->_left
+            );
+            child->_parent   = parent;
+
+            (node == parent->_left
+                ? parent->_left
+                : parent->_right
+            ) = child;
+        }
+
+        _size--;
+        delete node;
+    }
 
     void
     clear()
-    {
-        /* auto prev = begin(); */
-        /* auto iter = begin(); */
-        /* ++iter; */
-
-        /* for (; iter != end(); ++iter) { */
-        /*     delete prev._node; */
-        /*     prev = iter; */
-        /*     /1* prev._node = nullptr; *1/ */
-        /* } */
-
-        /* delete iter._node; */
-    }
+    { delete_tree(_root); }
 
     size_type
     size() const
     { return _size; }
 
     iterator
-    find(const_reference key);
+    find(const_reference key)
+    { return bsearch(iterator(_root), key); }
 
     const_iterator
-    find(const_reference key) const;
+    find(const_reference key) const
+    { return bsearch(const_iterator(_root), key); }
 
     bool
-    contains() const;
+    contains(const_reference key) const
+    { return find(key) != end(); }
 
     bool
     empty() const
@@ -335,5 +375,56 @@ public: // methods
     const_reverse_iterator
     rend() const
     { return const_reverse_iterator(begin()); }
+
+private:
+    template <typename Iterator> requires
+        std::is_convertible_v<Iterator, iterator>
+    Iterator
+    bsearch(Iterator hint, const_reference key)
+    {
+        if ((hint == end()) || (*hint == key))
+            return hint;
+
+        node_type* node = (
+            key < *hint
+            ? hint._node->_left
+            : hint._node->_right
+        );
+
+        if (node == nullptr)
+            return end();
+
+        return bsearch(Iterator(node), key);
+    }
+
+    static node_type*
+    get_first(node_type* node)
+    {
+        while (node->_left != nullptr)
+            node = node->_left;
+        return node;
+    }
+
+    static node_type*
+    get_last(node_type* node)
+    {
+        while (node->_right != nullptr)
+            node = node->_right;
+        return node;
+    }
+
+    size_t
+    delete_tree(node_type* node)
+    {
+        size_t deleted = 1;
+
+        if (node->_left != nullptr)
+            deleted += delete_tree(node->_left);
+        if (node->_right != nullptr)
+            deleted += delete_tree(node->_right);
+
+        delete node;
+        return deleted;
+    }
 };
 
