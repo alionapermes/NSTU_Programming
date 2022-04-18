@@ -1,9 +1,12 @@
 #pragma once
 
+#define tLR
+
 #include <cstddef>
 #include <functional>
 #include <iterator>
 #include <utility>
+#include <vector>
 
 
 template <typename Key = int, typename Compare = std::less<Key>>
@@ -311,6 +314,19 @@ public: // methods
         _size--;
         delete node;
     }
+
+#ifdef tLR
+    std::vector<value_type>
+    output() const
+    {
+        std::vector<value_type> items;
+
+        for (const auto& item : *this)
+            items[items.size()];
+
+        return items;
+    }
+#endif
 
     void
     clear()

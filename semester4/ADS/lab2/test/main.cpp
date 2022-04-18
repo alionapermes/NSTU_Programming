@@ -56,8 +56,10 @@ TEST(method, erase)
         tree.insert(8);
         tree.insert(1);
         tree.insert(9);
+        int old_size = tree.size();
 
         tree.erase(tree.find(3));
+        ASSERT_EQ(old_size, tree.size() + 1);
 
         int n = 1;
         for (const auto& item : tree) {
@@ -78,8 +80,10 @@ TEST(method, erase)
         tree.insert(8);
         tree.insert(1);
         tree.insert(9);
+        int old_size = tree.size();
 
         tree.erase(tree.find(3));
+        ASSERT_EQ(old_size, tree.size() + 1);
 
         int n = 1;
         for (const auto& item : tree) {
@@ -88,6 +92,19 @@ TEST(method, erase)
                 n++;
         }
     }
+}
+
+TEST(method, output)
+{
+    bst<int> tree;
+
+    tree.insert(2);
+    tree.insert(1);
+    tree.insert(3);
+
+    int n = 1;
+    for (const auto& item : tree.output())
+        ASSERT_EQ(item, n++);
 }
 
 
