@@ -1,6 +1,8 @@
 #pragma once
 
-#define tLR
+#define TLR
+#define INDEX_OF
+#define RECURSIVE
 
 #include <cstddef>
 #include <functional>
@@ -213,6 +215,7 @@ public: // operators
     operator=(bst&& other);
 
 public: // methods
+#ifdef RECURSIVE
     template <typename Val> requires std::is_convertible_v<Val, value_type>
     iterator
     insert(Val&& value)
@@ -229,7 +232,9 @@ public: // methods
         _base->_left  = _last;
         return iterator(_root);
     }
+#endif
 
+#ifdef RECURSIVE
     iterator
     insert(iterator hint, value_type&& value)
     {
@@ -259,6 +264,7 @@ public: // methods
 
         return insert(iterator(child), std::forward<value_type>(value));
     }
+#endif
 
     void
     erase(iterator pos)
@@ -315,7 +321,7 @@ public: // methods
         delete node;
     }
 
-#ifdef tLR
+#ifdef TLR
     std::vector<value_type>
     output() const
     {
@@ -325,6 +331,33 @@ public: // methods
             items[items.size()];
 
         return items;
+    }
+#endif
+
+#ifdef INDEX_OF
+    size_t
+    index_of(value_type key)
+    {
+        size_t index      = 0;
+        iterator pos      = find(key);
+        node_type* node   = pos._node;
+        node_type* parent = node->_parent;
+
+        if (node->_left != nullptr)
+            index = tree_size(node->_left);
+
+        while (parent != _base) {
+            if (node == parent->_right) {
+                index++;
+                if (parent->_left != nullptr)
+                    index += tree_size(parent->_left);
+            }
+
+            node   = parent;
+            parent = parent->_parent;
+        }
+
+        return index;
     }
 #endif
 
@@ -393,6 +426,7 @@ public: // methods
     { return const_reverse_iterator(begin()); }
 
 private:
+#ifdef RECURSIVE
     template <typename Iterator> requires
         std::is_convertible_v<Iterator, iterator>
     Iterator
@@ -412,6 +446,7 @@ private:
 
         return bsearch(Iterator(node), key);
     }
+#endif
 
     static node_type*
     get_first(node_type* node)
@@ -441,6 +476,19 @@ private:
 
         delete node;
         return deleted;
+    }
+
+    size_t
+    tree_size(node_type* node)
+    {
+        size_t size = 1;
+
+        if (node->_left != nullptr)
+            size += tree_size(node->_left);
+        if (node->_right != nullptr)
+            size += tree_size(node->_right);
+
+        return size;
     }
 };
 

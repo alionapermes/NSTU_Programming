@@ -107,6 +107,24 @@ TEST(method, output)
         ASSERT_EQ(item, n++);
 }
 
+TEST(method, index_of)
+{
+    bst<int> tree;
+
+    tree.insert(5);
+    tree.insert(3);
+    tree.insert(7);
+    tree.insert(2);
+    tree.insert(4);
+    tree.insert(6);
+    tree.insert(8);
+    tree.insert(1);
+    tree.insert(9);
+
+    for (const auto& item : tree)
+        ASSERT_EQ(item, tree.index_of(item) + 1);
+}
+
 
 int
 main(int argc, char** argv)
