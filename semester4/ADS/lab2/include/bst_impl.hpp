@@ -1,9 +1,5 @@
 #pragma once
 
-#define TLR
-#define INDEX_OF
-#define RECURSIVE
-
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -70,14 +66,14 @@ public:
                 node_type* parent = _node->_parent;
 
                 // пока текущий узел является правым для родительского
-                while (_node == parent->_right) {
+                while (parent != nullptr && _node == parent->_right) {
                     // поднимаем текущий указатель на один уровень вверх
                     _node  = parent;
                     // поднимаем также родительский указатель
                     parent = parent->_parent;
                 }
 
-                if (_node->_right != parent)
+                if (parent != nullptr && _node->_right != parent)
                     _node = parent;
             }
 
@@ -111,7 +107,7 @@ public:
 
                 // поднимамся на уровень выше до тех пор
                 // пока текущий узел для своего родителя левый
-                while (_node == parent->_left) {
+                while (parent != nullptr && _node == parent->_left) {
                     _node  = parent;
                     parent = parent->_parent;
                 }
@@ -194,11 +190,15 @@ public: // ctors
     bst()
     { _base = new node_type(); }
 
-    bst(const bst& other);
+    bst(const bst& other) : bst()
+    { *this = other; }
 
     bst(bst&& other)
-        : _root(std::exchange(other._root, nullptr))
-        , _size(std::exchange(other._root, 0))
+        : _size(std::exchange(other._size,   0))
+        , _base(std::exchange(other._base,   nullptr))
+        , _root(std::exchange(other._root,   nullptr))
+        , _first(std::exchange(other._first, nullptr))
+        , _last(std::exchange(other._last,   nullptr))
     {}
 
     ~bst()
@@ -209,13 +209,33 @@ public: // ctors
 
 public: // operators
     bst&
-    operator=(const bst& other);
+    operator=(const bst& other)
+    {
+        clear();
+        _size  = 0;
+        _first = nullptr;
+        _last  = nullptr;
+        _root  = nullptr;
+
+        for (auto& item : other)
+            insert(item);
+
+        return *this;
+    }
 
     bst&
-    operator=(bst&& other);
+    operator=(bst&& other)
+    {
+        clear();
+
+        _size  = std::exchange(other._size,  0);
+        _base  = std::exchange(other._base,  nullptr);
+        _root  = std::exchange(other._root,  nullptr);
+        _first = std::exchange(other._first, nullptr);
+        _last  = std::exchange(other._last,  nullptr);
+    }
 
 public: // methods
-#ifdef RECURSIVE
     template <typename Val> requires std::is_convertible_v<Val, value_type>
     iterator
     insert(Val&& value)
@@ -232,39 +252,79 @@ public: // methods
         _base->_left  = _last;
         return iterator(_root);
     }
-#endif
 
 #ifdef RECURSIVE
+    template <typename Val> requires std::is_convertible_v<Val, value_type>
     iterator
-    insert(iterator hint, value_type&& value)
+    insert(iterator hint, Val&& value)
     {
         if (value == *hint)
             return hint;
 
-        node_type*& node  = hint._node;
+        node_type* node   = hint._node;
         node_type*& child = (
             Compare{}(value, *hint)
             ? node->_left
             : node->_right
         );
 
-        if (child == nullptr) {
-            child = new node_type(std::forward<value_type>(value), node);
-            if (Compare{}(child->_value, _first->_value)) {
-                _first        = child;
-                _base->_right = _first;
-            } else if (Compare{}(_last->_value, child->_value)) {
-                _last        = child;
-                _base->_left = _last;
-            }
+        return (
+            child == nullptr
+            ? __insert(child, node, std::forward<value_type>(value))
+            : insert(iterator(child), std::forward<value_type>(value))
+        );
+    }
+#elif defined ITERATIVE
+    template <typename Val> requires std::is_convertible_v<Val, value_type>
+    iterator
+    insert(iterator hint, Val&& value)
+    {
+        auto iter = begin();
+        auto prev = iterator(_base);
 
-            _size++;
-            return iterator(child);
+        /* do { */
+        while (iter != end() && value > *iter) {
+            if (value == *iter)
+                return iter;
+
+            prev = iter;
+            ++iter;
+        }
+        /* } while (iter != end() && value > *iter); */
+
+        if (iter == end()) {
+            return __insert(
+                &prev._node->_right,
+                prev._node,
+                std::forward<value_type>(value)
+            );
         }
 
-        return insert(iterator(child), std::forward<value_type>(value));
+        if (prev == end() || iter._node == prev._node->_right) {
+            return __insert(
+                &iter._node->_left,
+                iter._node,
+                std::forward<value_type>(value)
+            );
+        } else if (iter._node == prev._node->_left) {
+            return __insert(
+                &iter._node->_right,
+                iter._node,
+                std::forward<value_type>(value)
+            );
+        }
+
+        return __insert(
+            &prev._node->_right,
+            prev._node,
+            std::forward<value_type>(value)
+        );
     }
 #endif
+
+    void
+    erase(value_type value)
+    { erase(find(value)); }
 
     void
     erase(iterator pos)
@@ -321,17 +381,24 @@ public: // methods
         delete node;
     }
 
-#ifdef TLR
+#ifdef LTR
     std::vector<value_type>
     output() const
     {
         std::vector<value_type> items;
+        items.reserve(size());
 
         for (const auto& item : *this)
             items[items.size()];
 
         return items;
     }
+#endif
+
+#if defined TLR || defined LRT
+    std::vector<value_type>
+    output() const
+    { return __output(_root); }
 #endif
 
 #ifdef INDEX_OF
@@ -361,6 +428,34 @@ public: // methods
     }
 #endif
 
+#ifdef COUNT_MORE_THAN
+    size_t
+    count_more_than(value_type value)
+    { return count_more_than(find(value)); }
+
+    size_t
+    count_more_than(iterator pos)
+    {
+        if ((pos._node->_right == nullptr) || (pos._node->_right == _base))
+            return 0;
+        return tree_size(pos._node->_right);
+    }
+#endif
+
+#ifdef BALANCE_FACTOR
+    size_t
+    balance_factor() const
+    { return balance_factor(iterator(_root)); }
+
+    size_t
+    balance_factor(iterator pos) const
+    {
+        if (size() == 0)
+            return 0;
+        return tree_height(pos._node->_right) - tree_height(pos._node->_left);
+    }
+#endif
+
     void
     clear()
     { delete_tree(_root); }
@@ -369,6 +464,7 @@ public: // methods
     size() const
     { return _size; }
 
+#ifdef RECURSIVE
     iterator
     find(const_reference key)
     { return bsearch(iterator(_root), key); }
@@ -376,6 +472,18 @@ public: // methods
     const_iterator
     find(const_reference key) const
     { return bsearch(const_iterator(_root), key); }
+#elif defined ITERATIVE
+    iterator
+    find(const_reference key)
+    {
+        for (auto iter = begin(); iter != end(); ++iter) {
+            if (*iter == key)
+                return iter;
+        }
+
+        return end();
+    }
+#endif
 
     bool
     contains(const_reference key) const
@@ -385,11 +493,11 @@ public: // methods
     empty() const
     { return _size == 0; }
 
-    value_type&
+    reference
     front()
     { return _first->_value; }
 
-    value_type&
+    reference
     back()
     { return _last->_value; }
 
@@ -467,6 +575,9 @@ private:
     size_t
     delete_tree(node_type* node)
     {
+        if (node == nullptr)
+            return 0;
+
         size_t deleted = 1;
 
         if (node->_left != nullptr)
@@ -478,7 +589,7 @@ private:
         return deleted;
     }
 
-    size_t
+    static size_t
     tree_size(node_type* node)
     {
         size_t size = 1;
@@ -489,6 +600,60 @@ private:
             size += tree_size(node->_right);
 
         return size;
+    }
+
+#ifdef BALANCE_FACTOR
+    static size_t
+    tree_height(node_type* node)
+    {
+        return (
+            node == nullptr
+            ? 0
+            : 1 + tree_height(node->_left) + tree_height(node->_right)
+        );
+    }
+#endif
+
+    std::vector<value_type>
+    __output(node_type* node) const
+    {
+        static std::vector<value_type> items;
+        items.reserve(size());
+
+        if (node != nullptr) {
+#ifdef TLR
+            items.push_back(node->_value);
+#endif
+
+            if (node->_left != nullptr)
+                __output(node->_left);
+            if (node->_right != nullptr)
+                __output(node->_right);
+
+#ifdef LRT
+            items.push_back(node->_value);
+#endif
+        }
+
+        return items;
+    }
+
+    template <typename Val> requires std::is_convertible_v<Val, value_type>
+    iterator
+    __insert(node_type** child, node_type* parent, Val&& value)
+    {
+        *child = new node_type(std::forward<value_type>(value), parent);
+
+        if (Compare{}((*child)->_value, _first->_value)) {
+            _first        = *child;
+            _base->_right = _first;
+        } else if (Compare{}(_last->_value, (*child)->_value)) {
+            _last        = *child;
+            _base->_left = _last;
+        }
+
+        _size++;
+        return iterator(*child);
     }
 };
 
