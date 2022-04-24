@@ -130,13 +130,16 @@ public:
         { return _node->_value; }
 
         const_reference
-        operator*() const;
+        operator*() const
+        { return _node->_value; }
 
         pointer
-        operator->();
+        operator->()
+        { return &_node->_value; }
 
         const_pointer
-        operator->() const;
+        operator->() const
+        { return &_node->_value; }
 
         bool
         operator==(const_iterator& other)
@@ -212,10 +215,6 @@ public: // operators
     operator=(const bst& other)
     {
         clear();
-        _size  = 0;
-        _first = nullptr;
-        _last  = nullptr;
-        _root  = nullptr;
 
         for (auto& item : other)
             insert(item);
@@ -233,6 +232,8 @@ public: // operators
         _root  = std::exchange(other._root,  nullptr);
         _first = std::exchange(other._first, nullptr);
         _last  = std::exchange(other._last,  nullptr);
+
+        return *this;
     }
 
 public: // methods
@@ -282,7 +283,6 @@ public: // methods
         auto iter = begin();
         auto prev = iterator(_base);
 
-        /* do { */
         while (iter != end() && value > *iter) {
             if (value == *iter)
                 return iter;
@@ -290,11 +290,10 @@ public: // methods
             prev = iter;
             ++iter;
         }
-        /* } while (iter != end() && value > *iter); */
 
         if (iter == end()) {
             return __insert(
-                &prev._node->_right,
+                prev._node->_right,
                 prev._node,
                 std::forward<value_type>(value)
             );
@@ -302,20 +301,20 @@ public: // methods
 
         if (prev == end() || iter._node == prev._node->_right) {
             return __insert(
-                &iter._node->_left,
+                iter._node->_left,
                 iter._node,
                 std::forward<value_type>(value)
             );
         } else if (iter._node == prev._node->_left) {
             return __insert(
-                &iter._node->_right,
+                iter._node->_right,
                 iter._node,
                 std::forward<value_type>(value)
             );
         }
 
         return __insert(
-            &prev._node->_right,
+            prev._node->_right,
             prev._node,
             std::forward<value_type>(value)
         );
@@ -458,7 +457,13 @@ public: // methods
 
     void
     clear()
-    { delete_tree(_root); }
+    {
+        delete_tree(_root);
+        _size  = 0;
+        _first = nullptr;
+        _last  = nullptr;
+        _root  = nullptr;
+    }
 
     size_type
     size() const
@@ -493,6 +498,7 @@ public: // methods
     empty() const
     { return _size == 0; }
 
+#ifdef OPTIONAL
     reference
     front()
     { return _first->_value; }
@@ -500,6 +506,7 @@ public: // methods
     reference
     back()
     { return _last->_value; }
+#endif
 
     iterator
     begin()
@@ -544,7 +551,7 @@ private:
             return hint;
 
         node_type* node = (
-            key < *hint
+            Compare{}(key, *hint)
             ? hint._node->_left
             : hint._node->_right
         );
@@ -578,12 +585,9 @@ private:
         if (node == nullptr)
             return 0;
 
-        size_t deleted = 1;
-
-        if (node->_left != nullptr)
-            deleted += delete_tree(node->_left);
-        if (node->_right != nullptr)
-            deleted += delete_tree(node->_right);
+        size_t deleted = 1
+            + delete_tree(node->_left)
+            + delete_tree(node->_right);
 
         delete node;
         return deleted;
@@ -592,25 +596,24 @@ private:
     static size_t
     tree_size(node_type* node)
     {
-        size_t size = 1;
-
-        if (node->_left != nullptr)
-            size += tree_size(node->_left);
-        if (node->_right != nullptr)
-            size += tree_size(node->_right);
-
-        return size;
+        return (
+            node == nullptr
+            ? 0
+            : 1 + tree_size(node->_left) + tree_size(node->_right)
+        );
     }
 
 #ifdef BALANCE_FACTOR
     static size_t
     tree_height(node_type* node)
     {
-        return (
-            node == nullptr
-            ? 0
-            : 1 + tree_height(node->_left) + tree_height(node->_right)
-        );
+        if (node == nullptr)
+            return 0;
+
+        size_t left_h  = 1 + tree_height(node->_left);
+        size_t right_h = 1 + tree_height(node->_right);
+
+        return (left_h > right_h ? left_h : right_h);
     }
 #endif
 
@@ -640,20 +643,20 @@ private:
 
     template <typename Val> requires std::is_convertible_v<Val, value_type>
     iterator
-    __insert(node_type** child, node_type* parent, Val&& value)
+    __insert(node_type*& child, node_type* parent, Val&& value)
     {
-        *child = new node_type(std::forward<value_type>(value), parent);
+        child = new node_type(std::forward<value_type>(value), parent);
 
-        if (Compare{}((*child)->_value, _first->_value)) {
-            _first        = *child;
+        if (Compare{}((child)->_value, _first->_value)) {
+            _first        = child;
             _base->_right = _first;
-        } else if (Compare{}(_last->_value, (*child)->_value)) {
-            _last        = *child;
+        } else if (Compare{}(_last->_value, (child)->_value)) {
+            _last        = child;
             _base->_left = _last;
         }
 
         _size++;
-        return iterator(*child);
+        return iterator(child);
     }
 };
 

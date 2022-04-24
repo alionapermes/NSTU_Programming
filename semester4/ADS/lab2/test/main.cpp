@@ -40,8 +40,10 @@ TEST(method, insert)
     ASSERT_EQ(*tree.insert(3), 3);
 
     ASSERT_EQ(tree.size(),  3);
+#ifdef OPTIONAL
     ASSERT_EQ(tree.front(), 1);
     ASSERT_EQ(tree.back(),  3);
+#endif
 }
 
 TEST(iterator, forward)
