@@ -45,7 +45,7 @@ public:
         node_type* _node;
 
     public: // ctors
-        explicit bst_iterator(node_type* node) : _node(node) {}
+        explicit bst_iterator(node_type* node = nullptr) : _node(node) {}
 
         bst_iterator(const_iterator& other) : bst_iterator(other._node) {}
 
@@ -144,10 +144,6 @@ public:
         bool
         operator==(const_iterator& other)
         { return _node == other._node; }
-
-        bool
-        operator!=(const_iterator& other)
-        { return !(*this == other); }
     };
 
 private:
@@ -191,7 +187,11 @@ private: // fields
 
 public: // ctors
     bst()
-    { _base = new node_type(); }
+    {
+        _base  = new node_type();
+        _first = _base;
+        _last  = _base;
+    }
 
     bst(const bst& other) : bst()
     { *this = other; }
@@ -400,9 +400,9 @@ public: // methods
     { return __output(_root); }
 #endif
 
-#ifdef INDEX_OF
+#if defined INDEX_OF || defined COUNT_MORE_THAN
     size_t
-    index_of(value_type key)
+    index_of(const_reference key)
     {
         size_t index      = 0;
         iterator pos      = find(key);
@@ -428,25 +428,21 @@ public: // methods
 #endif
 
 #ifdef COUNT_MORE_THAN
-    size_t
-    count_more_than(value_type value)
-    { return count_more_than(find(value)); }
+    size_type
+    count_more_than(const_reference value)
+    { return _size - (index_of(value) + 1); }
 
-    size_t
+    size_type
     count_more_than(iterator pos)
-    {
-        if ((pos._node->_right == nullptr) || (pos._node->_right == _base))
-            return 0;
-        return tree_size(pos._node->_right);
-    }
+    { return _size - (index_of(*pos) + 1); }
 #endif
 
 #ifdef BALANCE_FACTOR
-    size_t
+    ssize_t
     balance_factor() const
     { return balance_factor(iterator(_root)); }
 
-    size_t
+    ssize_t
     balance_factor(iterator pos) const
     {
         if (size() == 0)
@@ -459,9 +455,9 @@ public: // methods
     clear()
     {
         delete_tree(_root);
+        _first = _base;
+        _last  = _base;
         _size  = 0;
-        _first = nullptr;
-        _last  = nullptr;
         _root  = nullptr;
     }
 
@@ -488,10 +484,14 @@ public: // methods
 
         return end();
     }
+
+    const_iterator
+    find(const_reference key) const
+    { return find(key); }
 #endif
 
     bool
-    contains(const_reference key) const
+    contains(const_reference key)
     { return find(key) != end(); }
 
     bool
@@ -579,7 +579,7 @@ private:
         return node;
     }
 
-    size_t
+    size_type
     delete_tree(node_type* node)
     {
         if (node == nullptr)
@@ -593,7 +593,7 @@ private:
         return deleted;
     }
 
-    static size_t
+    static size_type
     tree_size(node_type* node)
     {
         return (
@@ -604,7 +604,7 @@ private:
     }
 
 #ifdef BALANCE_FACTOR
-    static size_t
+    static size_type
     tree_height(node_type* node)
     {
         if (node == nullptr)
