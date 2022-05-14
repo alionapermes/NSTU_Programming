@@ -1,18 +1,27 @@
 #include "gtest/gtest.h"
 
-#include "two_three_tree.hpp"
+#include "t234.hpp"
 
 
-TEST(ctor, default)
+TEST(insert, default)
 {
-    TwoThreeTree ttt;
-    ttt.insert(4);
+    t234 ttt;
     ttt.insert(3);
+    ttt.insert(1);
     ttt.insert(5);
+    ttt.insert(4);
+    ttt.insert(2);
+    ttt.insert(9);
+    ttt.insert(10);
+    ttt.insert(8);
+    ttt.insert(7);
+    ttt.insert(6);
 
-    ASSERT_EQ(ttt.get<1>(), 3);
-    ASSERT_EQ(ttt.get<2>(), 4);
-    ASSERT_EQ(ttt.get<3>(), 5);
+    int n = 0;
+    for (auto item : ttt)
+        ASSERT_EQ(item, ++n);
+
+    ASSERT_EQ(n, 10);
 }
 
 
