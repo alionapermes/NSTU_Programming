@@ -38,13 +38,12 @@ public:
         using difference_type   = ptrdiff_t;
 
     private: // fields
-        node_type* root_ = nullptr;
         node_type* node_ = nullptr;
         size_t key_num_  = 0;
 
     public: // ctors
-        Iterator(node_type* root, node_type* node, size_t key_num)
-            : root_(root), node_(node), key_num_(key_num) {}
+        Iterator(node_type* node, size_t key_num)
+            : node_(node), key_num_(key_num) {}
 
         Iterator(const_iterator& other) = default;
 
@@ -59,7 +58,7 @@ public:
                 }
             }
 
-            *this = get_next(root_, node_, key_num_);
+            *this = get_next(node_, key_num_);
             return *this;
         }
 
@@ -74,7 +73,7 @@ public:
         iterator&
         operator--()
         {
-            // todo...
+            // todo…
         }
         
         iterator
@@ -107,23 +106,23 @@ public:
 
     private:
         static iterator
-        get_next(node_type* root, node_type* node, size_t key_num)
+        get_next(node_type* node, size_t key_num)
         {
             auto child = node->nodes_[key_num + 1];
             if (child != nullptr) {
-                return iterator(root, child->get_leftest(), 0);
+                return iterator(child->get_leftest(), 0);
             }
 
             size_t index;
             do {
                 if (node->parent_ == nullptr)
-                    return iterator(root, nullptr, 0);
+                    return iterator(nullptr, 0);
 
                 index = index_of(node, node->parent_);
                 node  = node->parent_;
             } while (index == node->size());
 
-            return iterator(root, node, index);
+            return iterator(node, index);
         }
 
         static size_t
@@ -172,6 +171,9 @@ private:
             return n == nodes_.size();
         }
 
+        /**
+         * @return number of sotred keys
+         */
         size_t
         size() const
         {
@@ -180,6 +182,9 @@ private:
             return n;
         }
 
+        /**
+         * @brief check it's a 4-node
+         */
         bool
         full() const
         {
@@ -188,6 +193,11 @@ private:
             return n == keys_.size();
         }
 
+        /**
+         * @brief checks on having a key
+         *
+         * @return index of the key or std::nullopt_t
+         */
         std::optional<size_t>
         has(const_reference key) const
         {
@@ -215,6 +225,18 @@ private:
             return sort_shift(pos);
         }
 
+        /**
+         * @brief splits one 4-node into two 2-nodes
+         *
+         * @details Every of 3 keys is being placed into its own node.
+         * If original node doesn't have a parent, it will be created.
+         * k0 stays in original node, optionally getting a new parent.
+         * k1 becomes a new separating key for its neighbors.
+         * k2 is being placed into a new node that will become
+         * an original node's right sibling.
+         *
+         * @return pointer to node having become a new parent for splitted nodes
+         */
         node_type*
         split()
         {
@@ -225,14 +247,16 @@ private:
             else
                 index = parent_->raw_insert(*std::exchange(keys_[1], {}));
 
-            auto right       = new node_type(std::exchange(keys_[2], {}));
+            auto right     = new node_type(std::exchange(keys_[2], {}));
+            right->parent_ = parent_;
+
             right->nodes_[0] = std::exchange(nodes_[2], nullptr);
             if (right->nodes_[0] != nullptr)
                 right->nodes_[0]->parent_ = right;
+
             right->nodes_[1] = std::exchange(nodes_[3], nullptr);
             if (right->nodes_[1] != nullptr)
                 right->nodes_[1]->parent_ = right;
-            right->parent_   = parent_;
 
             parent_->nodes_[index]     = this; // left
             parent_->nodes_[index + 1] = right;
@@ -240,6 +264,11 @@ private:
             return parent_;
         }
 
+        /**
+         * @brief shifts a key (with subnodes) to its order place
+         *
+         * @return index of the key's new position
+         */
         size_t
         sort_shift(size_t pos)
         {
@@ -262,6 +291,8 @@ private:
          * @details there is no sense to consider the case when node is empty,
          * because the only case where it possible is node is root
          * (also calling this method you guarantee the key is not dublicate)
+         *
+         * @return pointer to insertion node
          */
         node_type*
         find_yourself(reference key)
@@ -299,9 +330,9 @@ private:
         get_rightest()
         {
             return (
-                nodes_.back() == nullptr
+                nodes_[size()] == nullptr
                 ? this
-                : nodes_.back()->get_rightest()
+                : nodes_[size()]->get_rightest()
             );
         }
     };
@@ -309,26 +340,27 @@ private:
 private:
     size_type size_  = 0;
     node_type* root_ = nullptr;
-    node_type* base_ = nullptr;
 
 public:
     t234() = default;
 
-    const_reference
-    get(int node_num, int key_num) const
+    t234(const t234& other)
     {
-        if (node_num == 0)
-            return *root_->keys_[key_num - 1];
-        return *root_->nodes_[node_num - 1]->keys_[key_num - 1];
+        clear();
+        for (const_reference item : other)
+            insert(item);
     }
+
+    ~t234()
+    { clear(); }
 
     iterator
     insert(value_type&& key)
     {
         if (root_ == nullptr) {
-            root_          = new node_type(std::move(key));
-            root_->parent_ = base_;
-            return iterator(root_, root_, 0);
+            ++size_;
+            root_ = new node_type(std::move(key));
+            return iterator(root_, 0);
         }
 
         return insert(root_, std::move(key));
@@ -338,23 +370,21 @@ public:
     insert(node_type* node, value_type&& key)
     {
         if (auto index = node->has(key))
-            return iterator(root_, node, *index);
+            return iterator(node, *index);
 
         if (node->full()) {
             node_type* parent = node->split();
 
-            if (node == root_) {
-                /* parent->parent_ = base_; */
-                /* root_->parent_  = parent; */
-                root_           = parent;
-            }
+            if (node == root_)
+                root_ = parent;
 
             return insert(parent, std::move(key));
         }
 
         if (node->is_leaf()) {
+            ++size_;
             size_t index = node->raw_insert(std::move(key));
-            return iterator(root_, node, index);
+            return iterator(node, index);
         }
 
         node_type* insert_node = node->find_yourself(key);
@@ -363,24 +393,36 @@ public:
 
     iterator
     begin()
-    { return iterator(root_, root_->get_leftest(), 0); }
+    { return iterator(root_->get_leftest(), 0); }
 
     iterator
     end()
-    { return iterator(root_, base_, 0); }
+    { return iterator(nullptr, 0); }
 
-    /* typename base::iterator */
-    /* erase(typename base::iterator pos) override */
-    /* {} */
+    iterator
+    find(const_reference key)
+    {
+        for (auto iter = begin(); iter != end(); ++iter) {
+            if (key == *iter)
+                return iter;
+        }
+        return end();
+    }
 
-    /* void */
-    /* clear() override */
-    /* {} */
+    void
+    erase(const_iterator pos)
+    {
+        // todo…
+    }
 
-    /* typename base::iterator */
-    /* find(typename base::const_reference key) override */
-    /* {} */
+    void
+    clear()
+    {
+        // todo…
+    }
 
-private:
+    size_t
+    size() const
+    { return size_; }
 };
 

@@ -21,7 +21,7 @@ TEST(insert, default)
     for (auto item : ttt)
         ASSERT_EQ(item, ++n);
 
-    ASSERT_EQ(n, 10);
+    ASSERT_EQ(n, ttt.size());
 }
 
 
