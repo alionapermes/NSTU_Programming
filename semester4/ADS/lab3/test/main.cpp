@@ -1,41 +1,80 @@
 #include "gtest/gtest.h"
 
+#include <array>
+
 /* #define ITERATIVE */
 #define RECURSIVE
 #include "t234.hpp"
 
 
-TEST(insert, default)
+std::array<int, 10> items = {3, 1, 5, 4, 2, 9, 10, 8, 7, 6};
+
+TEST(method, insert)
 {
-    t234 ttt;
-    ttt.insert(3);
-    ttt.insert(1);
-    ttt.insert(5);
-    ttt.insert(4);
-    ttt.insert(2);
-    ttt.insert(9);
-    ttt.insert(10);
-    ttt.insert(8);
-    ttt.insert(7);
-    ttt.insert(6);
+    t234 t;
+    for (int item : items)
+        ASSERT_EQ(item, *t.insert(item));
+    ASSERT_EQ(t.size(), items.size());
+}
+
+TEST(method, find)
+{
+    t234 t;
+    for (int item : items)
+        t.insert(item);
+
+    for (int item : items)
+        ASSERT_EQ(*t.find(item), item);
+}
+
+TEST(method, erase)
+{
+    t234 t;
+    for (int item : items)
+        t.insert(item);
+
+    auto iter = items.begin();
+    for (size_t n = t.size(); t.size() > 0; --n, ++iter) {
+        t.erase(t.find(*iter));
+        ASSERT_EQ(t.size() + 1, n);
+        ASSERT_EQ(t.find(*iter), t.end());
+    }
+    ASSERT_TRUE(t.empty());
+}
+
+TEST(method, clear)
+{
+    t234 t;
+    for (int item : items)
+        t.insert(item);
+    t.clear();
+    ASSERT_EQ(t.size(), 0);
+    ASSERT_TRUE(t.empty());
+}
+
+TEST(iterator, forward)
+{
+    t234 t;
+    for (int item : items)
+        t.insert(item);
 
     int n = 0;
-    for (auto item : ttt)
-        ASSERT_EQ(item, ++n);
+    for (auto it = t.begin(); it != t.end(); ++it)
+        ASSERT_EQ(*it, ++n);
+    ASSERT_EQ(n, t.size());
+}
 
-    ASSERT_EQ(n, ttt.size());
+TEST(iterator, reverse)
+{
+    t234 t;
+    for (int item : items)
+        t.insert(item);
 
-    ttt.erase(ttt.find(3));
-    ttt.erase(ttt.find(1));
-    ttt.erase(ttt.find(5));
-    ttt.erase(ttt.find(4));
-    ttt.erase(ttt.find(2));
-    ttt.erase(ttt.find(9));
-    ttt.erase(ttt.find(10));
-    ttt.erase(ttt.find(8));
-    ttt.erase(ttt.find(7));
-    ttt.erase(ttt.find(6));
-    ASSERT_EQ(ttt.size(), 0);
+    int n    = t.size();
+    auto rit = t.rbegin();
+    for (; rit != t.rend(); --rit)
+        ASSERT_EQ(*rit, n--);
+    ASSERT_EQ(n, 0);
 }
 
 
