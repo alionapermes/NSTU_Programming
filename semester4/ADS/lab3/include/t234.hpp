@@ -38,6 +38,7 @@ public:
     public: // typedefs
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type   = ptrdiff_t;
+        using value_type        = Key;
 
     private: // fields
         node_type* node_ = nullptr;
@@ -75,7 +76,15 @@ public:
         iterator&
         operator--()
         {
-            // todo…
+            if (node_->is_leaf()) {
+                if (key_num_ > 0) {
+                    --key_num_;
+                    return *this;
+                }
+            }
+
+            *this = get_prev(node_, key_num_);
+            return *this;
         }
         
         iterator
@@ -103,16 +112,16 @@ public:
         { return &*node_->keys_[key_num_]; }
 
         bool
-        operator==(const_iterator& other)
+        operator==(const_iterator& other) const
         { return node_ == other.node_; }
 
+    private:
         static iterator
         get_next(node_type* node, size_t key_num)
         {
             auto child = node->nodes_[key_num + 1];
-            if (child != nullptr) {
+            if (child != nullptr)
                 return iterator(child->get_leftest(), 0);
-            }
 
             size_t index;
             do {
@@ -124,6 +133,27 @@ public:
             } while (index == node->size());
 
             return iterator(node, index);
+        }
+
+        static iterator
+        get_prev(node_type* node, size_t key_num)
+        {
+            auto child = node->nodes_[key_num];
+            if (child != nullptr) {
+                node_type* prev = child->get_rightest();
+                return iterator(prev, prev->size() - 1);
+            }
+
+            size_t index;
+            do {
+                if (node->parent_ == nullptr)
+                    return iterator(nullptr, 0);
+
+                index = node->parent_->index_of(node);
+                node  = node->parent_;
+            } while (index == 0);
+
+            return iterator(node, index - 1);
         }
     };
 
@@ -139,7 +169,6 @@ private:
 
         Keys keys_{};
         Nodes nodes_{};
-
         node_type* parent_ = nullptr;
 
     public:
@@ -324,9 +353,6 @@ private:
             );
         }
 
-        void
-        rotating_deletion();
-
         /**
          * @brief merging the node with its child nodes
          *
@@ -436,9 +462,11 @@ private:
             right->nodes_[2] = right->nodes_[1];
             right->nodes_[1] = right->nodes_[0];
 
-            right->keys_[0]           = std::exchange(keys_[0], {});
-            right->nodes_[0]          = left->nodes_[left->size()];
-            right->nodes_[0]->parent_ = right;
+            right->keys_[0]  = std::exchange(keys_[0], {});
+            right->nodes_[0] = left->nodes_[left->size()];
+
+            if (right->nodes_[0] != nullptr)
+                right->nodes_[0]->parent_ = right;
 
             keys_[0] = std::exchange(left->keys_[left->size() - 1], {});
         }
@@ -453,17 +481,10 @@ private:
             size_t index = index_of(left);
 
             left->keys_[1]  = std::exchange(keys_[index], {});
-            /* left->nodes_[2] = right->nodes_[1]; */
             left->nodes_[2] = right->nodes_[0];
 
             keys_[index] = std::exchange(right->keys_[0], {});
             right->soft_shift();
-
-            /* left->keys_[0]           = std::exchange(keys_[0], {}); */
-            /* left->nodes_[0]          = left->nodes_[left->size()]; */
-            /* left->nodes_[0]->parent_ = right; */
-
-            /* keys_[0] = std::exchange(left->keys_[left->size() - 1], {}); */
         }
 
         size_t
@@ -523,20 +544,22 @@ public:
     ~t234()
     { clear(); }
 
+    template <typename T> requires std::is_convertible_v<T, value_type>
     iterator
-    insert(value_type&& key)
+    insert(T&& key)
     {
         if (root_ == nullptr) {
             ++size_;
-            root_ = new node_type(std::move(key));
+            root_ = new node_type(std::forward<value_type>(key));
             return iterator(root_, 0);
         }
 
-        return insert(root_, std::move(key));
+        return insert(root_, std::forward<value_type>(key));
     }
 
+    template <typename T> requires std::is_convertible_v<T, value_type>
     iterator
-    insert(node_type* node, value_type&& key)
+    insert(node_type* node, T&& key)
     {
         if (auto index = node->has(key))
             return iterator(node, *index);
@@ -547,17 +570,17 @@ public:
             if (node == root_)
                 root_ = parent;
 
-            return insert(parent, std::move(key));
+            return insert(parent, std::forward<value_type>(key));
         }
 
         if (node->is_leaf()) {
             ++size_;
-            size_t index = node->raw_insert(std::move(key));
+            size_t index = node->raw_insert(std::forward<value_type>(key));
             return iterator(node, index);
         }
 
         node_type* insert_node = node->find_yourself(key);
-        return insert(insert_node, std::move(key));
+        return insert(insert_node, std::forward<value_type>(key));
     }
 
     iterator
@@ -571,6 +594,19 @@ public:
     iterator
     end()
     { return iterator(nullptr, 0); }
+
+    iterator
+    rbegin()
+    {
+        if (empty())
+            return end();
+        node_type* rightest = root_->get_rightest();
+        return (iterator(rightest, rightest->size() - 1));
+    }
+
+    iterator
+    rend()
+    { return end(); }
 
 #ifdef ITERATIVE
     template <typename T> requires std::is_convertible_v<T, value_type>
@@ -648,14 +684,12 @@ public:
                 }
             }
 
-            // root case
-
-            // index
             size_t index = parent->index_of(node);
 
             // merge case
             if (l_sibling != nullptr && l_sibling->size() == 1) {
-                // left merge
+                parent->merge_right(l_sibling, node);
+                return erase(iterator(node, node->size() - 1));
             }
 
             if (r_sibling != nullptr && r_sibling->size() == 1) {
@@ -714,9 +748,7 @@ public:
 
     void
     clear()
-    {
-        // todo…
-    }
+    { size_ -= delete_node(root_); }
 
     inline size_t
     size() const
@@ -725,5 +757,22 @@ public:
     inline bool
     empty() const
     { return size() == 0; }
+
+private:
+    static size_t
+    delete_node(node_type*& node)
+    {
+        if (node == nullptr)
+            return 0;
+
+        size_t deleted = node->size();
+        for (auto& sub : node->nodes_)
+            deleted += delete_node(sub);
+
+        delete node;
+        node = nullptr;
+
+        return deleted;
+    }
 };
 
