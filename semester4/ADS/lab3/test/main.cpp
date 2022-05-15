@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+/* #define ITERATIVE */
+#define RECURSIVE
 #include "t234.hpp"
 
 
@@ -22,6 +24,18 @@ TEST(insert, default)
         ASSERT_EQ(item, ++n);
 
     ASSERT_EQ(n, ttt.size());
+
+    ttt.erase(ttt.find(3));
+    ttt.erase(ttt.find(1));
+    ttt.erase(ttt.find(5));
+    ttt.erase(ttt.find(4));
+    ttt.erase(ttt.find(2));
+    ttt.erase(ttt.find(9));
+    ttt.erase(ttt.find(10));
+    ttt.erase(ttt.find(8));
+    ttt.erase(ttt.find(7));
+    ttt.erase(ttt.find(6));
+    ASSERT_EQ(ttt.size(), 0);
 }
 
 

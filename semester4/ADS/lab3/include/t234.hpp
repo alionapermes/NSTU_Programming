@@ -33,6 +33,8 @@ public: // typedefs
 public:
     struct Iterator
     {
+        friend t234;
+
     public: // typedefs
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type   = ptrdiff_t;
@@ -104,7 +106,6 @@ public:
         operator==(const_iterator& other)
         { return node_ == other.node_; }
 
-    private:
         static iterator
         get_next(node_type* node, size_t key_num)
         {
@@ -118,24 +119,11 @@ public:
                 if (node->parent_ == nullptr)
                     return iterator(nullptr, 0);
 
-                index = index_of(node, node->parent_);
+                index = node->parent_->index_of(node);
                 node  = node->parent_;
             } while (index == node->size());
 
             return iterator(node, index);
-        }
-
-        static size_t
-        index_of(const node_type* target, const node_type* parent)
-        {
-            size_t n = 0;
-
-            for (; n < parent->nodes_.size(); ++n) {
-                if (parent->nodes_[n] == target)
-                    break;
-            }
-
-            return n;
         }
     };
 
@@ -335,6 +323,187 @@ private:
                 : nodes_[size()]->get_rightest()
             );
         }
+
+        void
+        rotating_deletion();
+
+        /**
+         * @brief merging the node with its child nodes
+         *
+         * @details calling this method you guarantee the current node
+         * and its child nodes are 2-nodes
+         */
+        void
+        shrink_tree()
+        {
+            node_type* left  = nodes_[0];
+            node_type* right = nodes_[1];
+
+            keys_[1] = std::exchange(keys_[0], {});
+            keys_[0] = std::exchange(left->keys_[0], {});
+            keys_[2] = std::exchange(right->keys_[0], {});
+
+            nodes_[0] = left->nodes_[0];
+            nodes_[1] = left->nodes_[1];
+            nodes_[2] = right->nodes_[0];
+            nodes_[3] = right->nodes_[1];
+
+            if (nodes_[0] != nullptr)
+                nodes_[0]->parent_ = this;
+            if (nodes_[1] != nullptr)
+                nodes_[1]->parent_ = this;
+
+            if (nodes_[2] != nullptr)
+                nodes_[2]->parent_ = this;
+            if (nodes_[3] != nullptr)
+                nodes_[3]->parent_ = this;
+
+            delete left;
+            delete right;
+        }
+
+        /**
+         * @details Calling this method you guarantee the current node
+         * is a 3-node at least.
+         * Also both of param nodes must be siblings
+         */
+        void
+        merge_left(node_type* left, node_type* right)
+        {
+            left->keys_[1] = std::exchange(keys_[0], {});
+            left->keys_[2] = std::exchange(right->keys_[0], {});
+
+            soft_shift();
+            nodes_[0] = left;
+
+            left->nodes_[2] = right->nodes_[0];
+            if (left->nodes_[2] != nullptr)
+                left->nodes_[2]->parent_ = left;
+
+            left->nodes_[3] = right->nodes_[1];
+            if (left->nodes_[3] != nullptr)
+                left->nodes_[3]->parent_ = left;
+
+            delete right;
+        }
+
+        void
+        merge_right(node_type* left, node_type* right)
+        {
+            size_t index = index_of(left);
+
+            right->keys_[2] = std::exchange(right->keys_[0], {});
+            right->keys_[1] = std::exchange(keys_[index], {});
+            right->keys_[0] = std::exchange(left->keys_[0], {});
+
+            soft_shift();
+            nodes_[index] = right;
+
+            right->nodes_[3] = right->nodes_[1];
+            right->nodes_[2] = right->nodes_[0];
+            right->nodes_[1] = left->nodes_[1];
+            right->nodes_[0] = left->nodes_[0];
+
+            if (right->nodes_[0] != nullptr)
+                right->nodes_[0]->parent_ = right;
+
+            if (right->nodes_[1] != nullptr)
+                right->nodes_[1]->parent_ = right;
+
+            delete left;
+        }
+
+        void
+        soft_shift()
+        {
+            for (size_t n = 0; n + 1 < keys_.size(); ++n) {
+                if (!keys_[n]) {
+                    keys_[n].swap(keys_[n + 1]);
+                    nodes_[n]     = nodes_[n + 1];
+                    nodes_[n + 1] = nodes_[n + 2];
+                }
+            }
+        }
+
+        /**
+         * @param left - 3-4-node
+         * @param right - 2-node
+         */
+        void
+        rotate_right(node_type* left, node_type* right)
+        {
+            right->keys_[1]  = std::exchange(right->keys_[0], {});
+            right->nodes_[2] = right->nodes_[1];
+            right->nodes_[1] = right->nodes_[0];
+
+            right->keys_[0]           = std::exchange(keys_[0], {});
+            right->nodes_[0]          = left->nodes_[left->size()];
+            right->nodes_[0]->parent_ = right;
+
+            keys_[0] = std::exchange(left->keys_[left->size() - 1], {});
+        }
+
+        /**
+         * @param left - 2-node
+         * @param right - 3-4-node
+         */
+        void
+        rotate_left(node_type* left, node_type* right)
+        {
+            size_t index = index_of(left);
+
+            left->keys_[1]  = std::exchange(keys_[index], {});
+            /* left->nodes_[2] = right->nodes_[1]; */
+            left->nodes_[2] = right->nodes_[0];
+
+            keys_[index] = std::exchange(right->keys_[0], {});
+            right->soft_shift();
+
+            /* left->keys_[0]           = std::exchange(keys_[0], {}); */
+            /* left->nodes_[0]          = left->nodes_[left->size()]; */
+            /* left->nodes_[0]->parent_ = right; */
+
+            /* keys_[0] = std::exchange(left->keys_[left->size() - 1], {}); */
+        }
+
+        size_t
+        index_of(const node_type* subnode)
+        {
+            size_t n = 0;
+
+            for (; n < nodes_.size(); ++n) {
+                if (nodes_[n] == subnode)
+                    break;
+            }
+
+            return n;
+        }
+
+        node_type*
+        left_sibling()
+        {
+            if (parent_ == nullptr)
+                return nullptr;
+
+            size_t index = parent_->index_of(this);
+
+            if (0 < index && index <= parent_->size())
+                return parent_->nodes_[index - 1];
+            return nullptr;
+        }
+
+        node_type*
+        right_sibling()
+        {
+            if (parent_ == nullptr)
+                return nullptr;
+
+            size_t index = parent_->index_of(this);
+
+            if (0 <= index && index < parent_->size())
+                return parent_->nodes_[index + 1];
+            return nullptr;
+        }
     };
 
 private:
@@ -393,14 +562,20 @@ public:
 
     iterator
     begin()
-    { return iterator(root_->get_leftest(), 0); }
+    {
+        if (empty())
+            return end();
+        return iterator(root_->get_leftest(), 0);
+    }
 
     iterator
     end()
     { return iterator(nullptr, 0); }
 
+#ifdef ITERATIVE
+    template <typename T> requires std::is_convertible_v<T, value_type>
     iterator
-    find(const_reference key)
+    find(T&& key)
     {
         for (auto iter = begin(); iter != end(); ++iter) {
             if (key == *iter)
@@ -408,11 +583,133 @@ public:
         }
         return end();
     }
+#endif
+
+#ifdef RECURSIVE
+    template <typename T> requires std::is_convertible_v<T, value_type>
+    iterator
+    find(T&& key)
+    { return find(std::forward<value_type>(key), root_); }
+
+    template <typename T> requires std::is_convertible_v<T, value_type>
+    iterator
+    find(T&& key, node_type* node)
+    {
+        if (auto index = node->has(key))
+            return iterator(node, *index);
+
+        node_type* insert_node = node->find_yourself(key);
+        if (insert_node != nullptr)
+            return find(std::forward<value_type>(key), insert_node);
+
+        return end();
+    }
+#endif
 
     void
     erase(const_iterator pos)
     {
-        // todo…
+        node_type* node   = pos.node_;
+        node_type* parent = node->parent_;
+
+        if (node->is_leaf()) {
+            if (node->size() > 1 || node == root_) {
+                --size_;
+                node->keys_[pos.key_num_].reset();
+                return node->soft_shift();
+            }
+
+            node_type* l_sibling = node->left_sibling();
+            node_type* r_sibling = node->right_sibling();
+
+            // shrink or rotate
+            if (parent->size() == 1) {
+                node_type* sibling = (
+                    r_sibling == nullptr ? l_sibling : r_sibling
+                );
+
+                // shrink case
+                if (sibling->size() == 1) {
+                    parent->shrink_tree();
+                    return erase(iterator(parent, (
+                        sibling == r_sibling ? 0 : 2
+                    )));
+                }
+
+                // rotate case
+                if (r_sibling != nullptr && r_sibling->size() > 1) {
+                    parent->rotate_left(node, r_sibling);
+                    return erase(pos);
+                }
+
+                if (l_sibling != nullptr && l_sibling->size() > 1) {
+                    parent->rotate_right(l_sibling, node);
+                    return erase(iterator(node, pos.key_num_ + 1));
+                }
+            }
+
+            // root case
+
+            // index
+            size_t index = parent->index_of(node);
+
+            // merge case
+            if (l_sibling != nullptr && l_sibling->size() == 1) {
+                // left merge
+            }
+
+            if (r_sibling != nullptr && r_sibling->size() == 1) {
+                parent->merge_left(node, r_sibling);
+                return erase(iterator(node, 0));
+            }
+
+            // rotate case
+            if (r_sibling != nullptr && r_sibling->size() > 1) {
+                parent->rotate_left(node, r_sibling);
+                return erase(pos);
+            }
+
+            if (l_sibling != nullptr && l_sibling->size() > 1) {
+                parent->rotate_right(l_sibling, node);
+                return erase(iterator(node, pos.key_num_ + 1));
+            }
+        }
+
+        if (node->size() > 1) {
+            node_type* left  = node->nodes_[pos.key_num_];
+            node_type* right = node->nodes_[pos.key_num_ + 1];
+
+            // swap case
+            if (left->size() > 1) {
+                auto& pred = left->keys_[left->size() - 1];
+                pred.swap(node->keys_[pos.key_num_]);
+                return erase(iterator(left, left->size() - 1));
+            }
+
+            // rotate case
+            if (right->size() > 1) {
+                node->rotate_left(left, node->nodes_[pos.key_num_ + 1]);
+                return erase(iterator(left, left->size() - 1));
+            }
+
+            // merge case
+            if (left->size() == 1 && right->size() == 1) {
+                node->merge_right(left, right);
+                return erase(iterator(right, 1));
+            }
+        }
+
+        if (node->size() == 1) {
+            if (parent == nullptr) {
+                node->shrink_tree();
+                return erase(iterator(node, 1));
+            }
+
+            if (parent->size() == 1 && parent->nodes_[1]->size() == 1) {
+                parent->shrink_tree();
+                return erase(iterator(parent, 0));
+            }
+        }
     }
 
     void
@@ -421,8 +718,12 @@ public:
         // todo…
     }
 
-    size_t
+    inline size_t
     size() const
     { return size_; }
+
+    inline bool
+    empty() const
+    { return size() == 0; }
 };
 
