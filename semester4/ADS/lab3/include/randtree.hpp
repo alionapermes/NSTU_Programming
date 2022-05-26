@@ -73,7 +73,7 @@ private:
         float var  = 100.f / (get_weight(node) + 1);
         int random = std::rand() % 101;
 
-        return random >= var;
+        return random <= var;
     }
 
     node_type*
