@@ -387,11 +387,19 @@ public: // methods
 #ifdef RECURSIVE
     iterator
     find(const_reference key)
-    { return bsearch(iterator(_root), key); }
+    {
+        if (_root == nullptr)
+            return end();
+        return bsearch(iterator(_root), key);
+    }
 
     const_iterator
     find(const_reference key) const
-    { return bsearch(const_iterator(_root), key); }
+    {
+        if (_root == nullptr)
+            return end();
+        return bsearch(const_iterator(_root), key);
+    }
 #elif defined ITERATIVE
     iterator
     find(const_reference key)
