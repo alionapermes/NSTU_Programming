@@ -24,7 +24,8 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 public:
-    randtree() : base() {}
+    randtree() : base()
+    { std::srand(std::time(nullptr)); }
 
     iterator
     insert(const_reference value) override
@@ -41,6 +42,28 @@ public:
         base::_base->_left  = base::_last;
 
         return iterator(base::_root);
+    }
+
+    void
+    erase(const_reference value) override
+    { erase(base::find(value)); }
+
+    void
+    erase(iterator pos) override
+    {
+        node_type* node   = pos._node;
+        node_type* parent = node->_parent;
+
+        node_type* merged_node = merge(node->_left, node->_right);
+        merged_node->_parent   = parent;
+
+        (parent->_left == node
+            ? parent->_left
+            : parent->_right
+        ) = merged_node;
+
+        delete node;
+        --base::_size;
     }
 
 private:
@@ -62,11 +85,29 @@ private:
         return (lw > rw ? left : right);
     }
 
-    void
+    node_type*
     merge(node_type* left, node_type* right)
     {
+        if (left == nullptr)
+            return right;
+
+        if (right == nullptr)
+            return left;
+
         node_type* merging_root = get_merging_root(left, right);
-        // todo…
+        node_type* new_parent;
+
+        if (merging_root == left) {
+            new_parent         = base::get_last(merging_root);
+            new_parent->_right = right;
+            right->_parent     = new_parent;
+        } else {
+            new_parent        = base::get_first(merging_root);
+            new_parent->_left = left;
+            left->_parent     = new_parent;
+        }
+        
+        return merging_root;
     }
 
     int
@@ -84,19 +125,25 @@ private:
         if (value == node->_value)
             return iterator(node);
 
-        if (is_root_insertion(node))
-            return iterator(root_insert(value, node));
+        if (is_root_insertion(node)) {
+            node_type* inserted = root_insert(value, node);
+
+            if (node == base::_root)
+                base::_root = inserted;
+
+            return iterator(inserted);
+        }
 
         // left insertion
         if (value < node->_value) {
             if (node->_left == nullptr)
-                return iterator(raw_insert(value, node->_left, node));
+                return base::raw_insert(node->_left, node, value);
             return __insert(value, node->_left);
         }
 
         // right insertion
         if (node->_right == nullptr)
-            return iterator(raw_insert(value, node->_right, node));
+            return base::raw_insert(node->_right, node, value);
         return __insert(value, node->_right);
     }
 
@@ -106,36 +153,28 @@ private:
         if (value == node->_value)
             return node;
 
+        node_type* new_root;
+
         // left insertion
         if (value < node->_value) {
-            if (node->_left == nullptr) {
-                node_type* new_root = raw_insert(value, node->_left, node);
+            if (node->_left == nullptr)
+                new_root = base::raw_insert(node->_left, node, value)._node;
+            else
+                new_root = root_insert(value, node->_left);
 
-                rotate_right(node, new_root);
-                return new_root;
-            }
-
-            return root_insert(value, node->_left);
+            rotate_right(node, new_root);
         }
-
         // right insertion
-        if (node->_right == nullptr) {
-            node_type* new_root = raw_insert(value, node->_right, node);
+        else {
+            if (node->_right == nullptr)
+                new_root = base::raw_insert(node->_right, node, value)._node;
+            else
+                new_root = root_insert(value, node->_right);
 
             rotate_left(node, new_root);
-            return new_root;
         }
 
-        return root_insert(value, node->_right);
-    }
-
-    node_type*
-    raw_insert(const_reference value, node_type*& node, node_type* parent)
-    {
-        node = new node_type(value, parent);
-
-        ++base::_size;
-        return node;
+        return new_root;
     }
 
     void

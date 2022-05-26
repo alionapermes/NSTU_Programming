@@ -43,7 +43,6 @@ public:
         using reference         = value_type&;
         using pointer           = value_type*;
 
-    private: // fields
         node_type* _node;
 
     public: // ctors
@@ -255,11 +254,11 @@ public: // methods
         return iterator(_root);
     }
 
-    void
-    erase(value_type value)
+    virtual void
+    erase(const_reference value)
     { erase(find(value)); }
 
-    void
+    virtual void
     erase(iterator pos)
     {
         if (pos == end())
@@ -515,6 +514,24 @@ protected:
         return node;
     }
 
+    template <typename Val> requires std::is_convertible_v<Val, value_type>
+    iterator
+    raw_insert(node_type*& child, node_type* parent, Val&& value)
+    {
+        child = new node_type(value, parent);
+
+        if (Compare{}(child->_value, _first->_value)) {
+            _first        = child;
+            _base->_right = _first;
+        } else if (Compare{}(_last->_value, child->_value)) {
+            _last        = child;
+            _base->_left = _last;
+        }
+
+        _size++;
+        return iterator(child);
+    }
+
 private:
     iterator
     insert(iterator hint, const_reference value)
@@ -531,7 +548,7 @@ private:
 
         return (
             child == nullptr
-            ? __insert(child, node, value)
+            ? raw_insert(child, node, value)
             : insert(iterator(child), value)
         );
     }
@@ -625,32 +642,6 @@ private:
         }
 
         return items;
-    }
-
-    template <typename Val> requires std::is_convertible_v<Val, value_type>
-    iterator
-    __insert(node_type*& child, node_type* parent, Val&& value)
-    {
-        child = new node_type(value, parent);
-
-        if (Compare{}((child)->_value, _first->_value)) {
-            _first        = child;
-            _base->_right = _first;
-        } else if (Compare{}(_last->_value, (child)->_value)) {
-            _last        = child;
-            _base->_left = _last;
-        }
-
-        _size++;
-        return iterator(child);
-    }
-
-    inline bool
-    is_root_insertion(const node_type* node)
-    {
-        float chance = 100 / (node->_weight + 1);
-        float random = std::rand() % (100 + 1);
-        return random >= chance;
     }
 };
 
