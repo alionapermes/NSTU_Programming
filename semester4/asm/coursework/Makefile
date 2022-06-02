@@ -1,6 +1,6 @@
 all:
 	nasm -f elf64 swap.asm -o swap.o
-	g++ main.cpp -o main.o -c
+	g++ main.cpp -o main.o -c -g3 -ggdb
 	g++ main.o swap.o -o out -g3 -ggdb
 
 clean:

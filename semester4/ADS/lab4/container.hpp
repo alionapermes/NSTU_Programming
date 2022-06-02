@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cmath>
-#include <optional>
+#include <iterator>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
@@ -20,35 +20,36 @@ private:
     struct item;
 
 public:
-    using value_type      = Value;
-    using item_type       = item;
-    using size_type       = size_t;
-    using reference       = value_type&;
-    using pointer         = value_type*;
-    using const_reference = const value_type&;
-    using const_pointer   = const value_type*;
-    using iterator        = htab_iterator;
+    using value_type       = Value;
+    using item_type        = item;
+    using size_type        = size_t;
+    using reference        = value_type&;
+    using pointer          = value_type*;
+    using const_reference  = const value_type&;
+    using const_pointer    = const value_type*;
+    using iterator         = htab_iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
 
 private:
     enum class item_state : char
     {
-        used,
-        unused,
-        empty
+        empty  = 0,
+        used   = 1,
+        unused = 2,
     };
 
     struct item
     {
     private:
-        value_type _value;
+        Value _value;
         item_state _state = item_state::empty;
 
     public:
-        item() = default;
+        item() : _state(item_state::empty) {}
 
         item(
             value_type&& value,
-            item_state state
+            item_state state = item_state::empty
         )
             : _value(std::move(value))
             , _state(state)
@@ -59,20 +60,31 @@ private:
         { return _value; }
 
         void
-        set(value_type&& value)
+        set(value_type value)
         {
-            _value = std::move(value);
+            _value = value;
             _state = item_state::used;
         }
 
+        void
+        set_state(item_state state)
+        { _state = state; }
+
         item_state
-        state()
+        state() const
         { return _state; }
     };
 
 public:
     struct htab_iterator
     {
+        friend htab;
+
+    public:
+        using iterator_category = std::bidirectional_iterator_tag;
+        using difference_type   = ptrdiff_t;
+        using value_type        = Value;
+
     private:
         item_type* _ptr = nullptr;
 
@@ -80,6 +92,36 @@ public:
         htab_iterator() = default;
 
         htab_iterator(item_type* ptr) : _ptr(ptr) {}
+
+        iterator&
+        operator++()
+        {
+            while ((++_ptr)->state() != item_state::used);
+            return *this;
+        }
+
+        iterator
+        operator++(int)
+        {
+            iterator old(_ptr);
+            ++(*this);
+            return old;
+        }
+
+        iterator&
+        operator--()
+        {
+            while ((--_ptr)->state() != item_state::used);
+            return *this;
+        }
+
+        iterator
+        operator--(int)
+        {
+            iterator old(_ptr);
+            --(*this);
+            return old;
+        }
 
         reference
         operator*()
@@ -90,17 +132,17 @@ public:
         { return &_ptr->value(); }
 
         bool
-        operator==(const iterator& other)
+        operator==(const iterator& other) const
         { return other._ptr == _ptr; }
     };
 
 private:
-    size_type _cap   = 0;
-    size_type _size  = 0;
-    item_type* _data = nullptr;
+    size_type _cap     = 0;
+    size_type _size    = 0;
+    item_type* _data   = nullptr;
 
 public:
-    htab(size_type cap) : _cap(cap), _data(new item_type[cap]()) {}
+    htab() : _cap(1000) {}
 
     ~htab()
     { clear(); }
@@ -117,22 +159,31 @@ public:
     size() const
     { return _size; }
 
+    bool
+    empty() const
+    { return _size == 0; }
+
     template <typename T>
     iterator
     insert(T&& value)
     {
-        if (_data == nullptr)
-            _data = new item_type[_cap]();
+        if (_data == nullptr) {
+            _data = new item_type[_cap + 1]();
+            _data[_cap].set_state(item_state::used);
+        }
 
         iterator iter;
+        std::pair<iterator, bool> res;
 
 #ifdef LINEAR
-        iter = linear_insert(std::forward<value_type>(value));
+        res  = linear_insert(value);
+        iter = res.first;
 #elif defined QUADRATIC
-        iter = quadratic_insert(std::forward<value_type>(value));
+        res  = quadratic_insert(value);
+        iter = res.first;
 #endif
 
-        if (iter != end())
+        if (iter != end() && res.second)
             ++_size;
         return iter;
     }
@@ -144,36 +195,70 @@ public:
 
     void
     erase(iterator pos)
-    { pos->set_state(item_state::unused); }
+    { pos._ptr->set_state(item_state::unused); }
 
-    template <typename T>
     iterator
-    find(T&& value)
+    find(value_type value)
     {
-        size_type index = get_hash(std::forward<value_type>(value));
-        return _data[index];
+        size_type index;
+
+#ifdef LINEAR
+        index = linear_find(value);
+#elif defined QUADRATIC
+        index = quadratic_find(value);
+#endif
+
+        return (index < _cap ? iterator(_data + index) : end());
+    }
+
+    iterator
+    begin()
+    {
+        if (empty())
+            return end();
+
+        iterator iter(_data);
+
+        if (_data->state() == item_state::used)
+            return iter;
+        return ++iter;
     }
 
     iterator
     end()
-    { return iterator(nullptr); }
+    { return iterator(_data + _cap); }
 
-private:
+    reverse_iterator
+    rbegin()
+    {
+        if (empty())
+            return rend();
+
+        iterator iter(_data + _cap - 1);
+
+        if (iter._ptr->state() == item_state::used)
+            return reverse_iterator(iter);
+        return reverse_iterator(--iter);
+    }
+
+    reverse_iterator
+    rend()
+    { return reverse_iterator(begin()); }
+
     size_type
     get_hash(reference value)
     {
 #ifdef MULTIPLICATIVE
         return multiplicative_hashing(value);
-
-#elif defined MUDULE
+#elif defined MODULE
         uint64_t key;
 
         if (value > 100'000) {
-#ifdef CHOOSING_NUMBER
+    #ifdef CHOOSING_NUMBER
             key = choosing_number(value);
-#elif defined CONVOLUTION
+    #elif defined CONVOLUTION
             key = convolution(value);
-#endif
+    #endif
         } else
             key = value;
 
@@ -182,20 +267,45 @@ private:
     }
 
 #ifdef LINEAR
-    iterator
-    linear_insert(value_type&& value, size_type try_n = 0)
+    std::pair<iterator, bool>
+    linear_insert(reference value, size_type try_n = 0)
     {
         size_type index = get_hash(value) + try_n;
 
-        if (_data[index].state() != item_state::empty)
-            return linear_insert(std::move(value), try_n + 1);
+        if (index >= _cap)
+            return std::make_pair(end(), false);
 
-        _data[index].set(std::move(value));
-        return iterator(_data + index);
+        if (_data[index].state() == item_state::empty) {
+            _data[index].set(value);
+            return std::make_pair(iterator(_data + index), true);
+        }
+
+        if (_data[index].value() == value) {
+            if (_data[index].state() == item_state::unused)
+                _data[index].set_state(item_state::used);
+            return std::make_pair(iterator(_data + index), false);
+        }
+
+        return linear_insert(value, try_n + 1);
+    }
+
+    size_type
+    linear_find(reference value, size_type try_n = 0)
+    {
+        size_type index = get_hash(value) + try_n;
+
+        if (index + try_n == _cap)
+            return _cap;
+
+        if (_data[index].state() == item_state::used
+            && _data[index].value() == value
+        ) { return index; }
+
+        return linear_find(value, try_n + 1);
     }
 #elif defined QUADRATIC
-    iterator
-    quadratic_insert(value_type&& value, size_t try_n = 0)
+    std::pair<iterator, bool>
+    quadratic_insert(reference value, size_t try_n = 0)
     {
         static const int c1 = 3;
         static const int c2 = 8;
@@ -203,14 +313,40 @@ private:
         size_type index =
             (get_hash(value) + (c1 * try_n) + (c2 * try_n * try_n)) % _cap;
 
-        if (_data[index].state() != item_state::empty)
-            return quadratic_insert(std::move(value), try_n + 1);
+        if (index >= _cap)
+            return std::make_pair(end(), false);
 
-        _data[index].set(std::move(value));
-        return iterator(_data + index);
+        if (_data[index].state() == item_state::empty) {
+            _data[index].set(value);
+            return std::make_pair(iterator(_data + index), true);
+        }
+
+        if (_data[index].value() == value) {
+            if (_data[index].state() == item_state::unused)
+                _data[index].set_state(item_state::used);
+            return std::make_pair(iterator(_data + index), false);
+        }
+
+        return quadratic_insert(value, try_n + 1);
+    }
+
+    size_type
+    quadratic_find(reference value, size_type try_n = 0)
+    {
+        size_type index = get_hash(value) + try_n;
+
+        if (index + try_n == _cap)
+            return _cap;
+
+        if (_data[index].state() == item_state::used
+            && _data[index].value() == value
+        ) { return index; }
+
+        return quadratic_find(value, try_n + 1);
     }
 #endif
 
+private:
 #ifdef CHOOSING_NUMBER
     uint64_t
     choosing_number(uint64_t num)
@@ -274,10 +410,10 @@ private:
     { return num - static_cast<int>(num); }
 
     uint64_t
-    str_to_natural(std::string_view sw)
+    horner(std::string_view sw)
     {
         size_type digit = sw.length() - 1;
-        uint64_t nat = 0;
+        uint64_t nat    = 0;
 
         for (auto ltr : sw)
             nat += static_cast<uint64_t>(ltr) * (10 * digit--);
@@ -288,7 +424,7 @@ private:
     multiplicative_hashing(std::string key)
     {
         static const float A = (std::sqrt(5) - 1) / 2;
-        return _cap * fract(str_to_natural(key) * A);
+        return _cap * fract(horner(key) * A);
     }
 #endif
 };

@@ -45,7 +45,7 @@ main()
     read(arr2, size);
 
     cout << "\n*swap magic*\n";
-    swap(arr1, arr2, size * sizeof(arr1));
+    swap(arr1, arr2, size * sizeof(float));
     print(arr1, size, ", ");
     print(arr2, size, ", ");
 
@@ -61,7 +61,7 @@ main()
     read(s2, size);
 
     cout << "\n*swap magic*\n";
-    swap(s1, s2, size * sizeof(s1));
+    swap(s1, s2, size * sizeof(char));
     print(s1, size);
     print(s2, size);
 
