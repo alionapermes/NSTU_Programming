@@ -5,13 +5,14 @@ swap:
     ; arg2 (void* mem2) - rsi
     ; arg3 (long len)   - rdx
 
-    mov rcx, rdx ; counter
-    jrcxz func_exit
-
-    cmp rcx, 8
-    jl swap_byte
+    mov rcx, rdx
 
     swap_qword:
+        jrcxz func_exit
+
+        cmp rcx, 8
+        jl swap_byte
+
         xor rbx, rbx
 
         mov rbx, [rsi]
@@ -21,20 +22,16 @@ swap:
 
         add rdi, 8
         add rsi, 8
-
         add rcx, -8
-        cmp rcx, 8
-    jge swap_qword
-
-    jrcxz func_exit
+    jmp swap_qword
 
     swap_byte:
         xor bl, bl
+        xor al, al
 
-        lodsb             ; si -> al
-        mov bl, [rdi]     ; tmp copy of [rdi]
-        stosb             ; al -> di
-        mov [rsi - 1], bl ; bl -> [rsi - 1]
+        mov bl, [rdi]
+        movsb
+        mov [rsi - 1], bl
     loop swap_byte
 
     func_exit:
