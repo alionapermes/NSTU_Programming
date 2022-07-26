@@ -6,7 +6,11 @@ type Vector struct {
 	data []float64
 }
 
-func New(length int) *Vector {
+func New(data []float64) *Vector {
+	return &Vector{data: data}
+}
+
+func NewReserved(length int) *Vector {
 	return &Vector{data: make([]float64, length)}
 }
 
@@ -29,7 +33,7 @@ func Omit(vec *Vector, index int) (*Vector, error) {
 		return nil, fmt.Errorf("out of range")
 	}
 
-	newVec := New(vec.Length() - 1)
+	newVec := NewReserved(vec.Length() - 1)
 
 	for i, item := range vec.Items() {
 		if i == index {
