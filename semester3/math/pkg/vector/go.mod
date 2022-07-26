@@ -1,3 +1,3 @@
-module github.com/alionapermes/nstu/semester3/math/vector
+module github.com/alionapermes/nstu
 
 go 1.18

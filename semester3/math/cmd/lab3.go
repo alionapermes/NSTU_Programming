@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	_ "github.com/alionapermes/nstu/semester3/math/vector"
+	_ "github.com/alionapermes/nstu/vector"
 )
 
 const eps = 1e-5
