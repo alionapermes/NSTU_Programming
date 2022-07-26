@@ -1,3 +1,3 @@
-module github.com/alionapermes/nstu
+module vector
 
 go 1.18
