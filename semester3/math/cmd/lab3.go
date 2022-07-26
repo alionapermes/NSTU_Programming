@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math"
+
+	_ "github.com/alionapermes/nstu/semester3/math/vector"
 )
 
 const eps = 1e-5
@@ -71,35 +73,35 @@ func f(matrix [][]float64, free, base []float64, count int) ([]float64, int) {
 	return _base, count + 1
 }
 
-func Product(v1, v2 []float64) float64 {
-	var prod float64
+// func Product(v1, v2 []float64) float64 {
+// 	var prod float64
 
-	for i := 0; i < len(v1); i++ {
-		prod += v1[i] * v2[i]
-	}
+// 	for i := 0; i < len(v1); i++ {
+// 		prod += v1[i] * v2[i]
+// 	}
 
-	return prod
-}
+// 	return prod
+// }
 
-func Sum(vec []float64) float64 {
-	var sum float64
+// func Sum(vec []float64) float64 {
+// 	var sum float64
 
-	for _, item := range vec {
-		sum += item
-	}
+// 	for _, item := range vec {
+// 		sum += item
+// 	}
 
-	return sum
-}
+// 	return sum
+// }
 
-func Omit(vec []float64, index int) []float64 {
-	newVec := make([]float64, len(vec)-1)
+// func Omit(vec []float64, index int) []float64 {
+// 	newVec := make([]float64, len(vec)-1)
 
-	for i, item := range vec {
-		if i == index {
-			continue
-		}
-		newVec = append(newVec, item)
-	}
+// 	for i, item := range vec {
+// 		if i == index {
+// 			continue
+// 		}
+// 		newVec = append(newVec, item)
+// 	}
 
-	return newVec
-}
+// 	return newVec
+// }
