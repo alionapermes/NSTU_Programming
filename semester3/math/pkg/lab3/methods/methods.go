@@ -3,21 +3,21 @@ package methods
 import (
 	"math"
 
-	"nstu/semester3/math/pkg/common/vector"
+	. "nstu/semester3/math/pkg/common"
 )
 
 func Iterations(
-	matrix []*vector.Vector,
-	free, base *vector.Vector,
+	matrix []*Vector,
+	free, base *Vector,
 	count int,
 	eps float64,
-) (*vector.Vector, int) {
-	_base := vector.NewReserved(base.Length())
+) (*Vector, int) {
+	_base := NewVectorReserved(base.Length())
 
 	for i := 0; i < free.Length(); i++ {
-		tmpRow, _ := vector.Omit(matrix[i], i)
-		tmpBase, _ := vector.Omit(base, i)
-		prod, _ := vector.Product(tmpRow, tmpBase)
+		tmpRow, _ := Omit(matrix[i], i)
+		tmpBase, _ := Omit(base, i)
+		prod, _ := Product(tmpRow, tmpBase)
 
 		*_base.At(i) = (free.Get(i) - prod) / matrix[i].Get(i)
 	}

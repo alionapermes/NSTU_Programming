@@ -1,4 +1,4 @@
-package vector
+package common
 
 import (
 	"fmt"
@@ -9,11 +9,11 @@ type Vector struct {
 	data []float64
 }
 
-func New(data []float64) *Vector {
+func NewVector(data []float64) *Vector {
 	return &Vector{data: data}
 }
 
-func NewReserved(length int) *Vector {
+func NewVectorReserved(length int) *Vector {
 	return &Vector{data: make([]float64, length)}
 }
 
@@ -36,7 +36,7 @@ func Omit(v *Vector, index int) (*Vector, error) {
 		return nil, fmt.Errorf("out of range")
 	}
 
-	newVec := NewReserved(v.Length() - 1)
+	newVec := NewVectorReserved(v.Length() - 1)
 
 	for i, item := range v.Items() {
 		if i == index {
