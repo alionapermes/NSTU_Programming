@@ -1,5 +1,4 @@
-.PHONY: lab3
-lab3:
-	rm -rf build/$@
-	go build -o build/$@ cmd/$@.go
+.PHONY: all
 
+test:
+	go test -v nstu/semester3/math/test/lab3/methods
