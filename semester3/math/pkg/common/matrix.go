@@ -9,6 +9,10 @@ type Matrix struct {
 	rows []*Vector
 }
 
+func NewMatrix(rows []*Vector) *Matrix {
+	return &Matrix{rows: rows}
+}
+
 func (m *Matrix) IsDiagonallyDominant() (bool, error) {
 	rowsCount, colsCount := m.Size()
 
@@ -39,6 +43,14 @@ func (m *Matrix) Rows() []*Vector {
 	return m.rows
 }
 
+func (m *Matrix) RowsCount() int {
+	return len(m.Rows())
+}
+
 func (m *Matrix) Size() (rowsCount int, colsCount int) {
-	return len(m.Rows()), m.Rows()[0].Length()
+	return m.RowsCount(), m.Rows()[0].Length()
+}
+
+func (m *Matrix) Pick(row, col int) float64 {
+	return m.rows[row].Get(col)
 }
