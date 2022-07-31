@@ -2,9 +2,10 @@ package methods
 
 import (
 	"fmt"
+	"testing"
+
 	. "nstu/semester3/math/pkg/common"
 	"nstu/semester3/math/pkg/lab3"
-	"testing"
 )
 
 const eps = 1e-5
