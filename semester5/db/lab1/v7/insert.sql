@@ -15,7 +15,7 @@ VALUES
 
 INSERT INTO
     lab_1v7.city
-    (name)
+    (title)
 VALUES
     ('Novosibirsk'),
     ('Berdsk'),

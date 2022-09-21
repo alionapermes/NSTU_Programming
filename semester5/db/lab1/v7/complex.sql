@@ -1,23 +1,24 @@
 CREATE TABLE lab_1v7.complex AS (
     SELECT
-        "order".id                        AS order_id,
-        "order".date                      AS date,
-        "order".distance                  AS distance,
-        "car".km_price                    AS fare,
-        "car".km_price * "order".distance AS total_price,
-        "driver".surname                  AS driver_surname,
-        "city".name                       AS driver_city,
-        "car".model                       AS car_model
+        "order".id              AS "order_id",
+        "details".customer_name AS "customer_name",
+        "city".title            AS "customer_city",
+        "product_type".title    AS "product_type",
+        "material".title        AS "material_type",
+        "order".total_price     AS "order_price"
     FROM
         lab_1v7.order AS "order"
     LEFT JOIN
-        lab_1v7.driver AS "driver"
-        ON "order".driver_id = driver.id
+        lab_1v7.order_details AS "details"
+        ON "order".id = "details".order_id
+    LEFT JOIN
+        lab_1v7.product_type AS "product_type"
+        ON "order".product_type_id = "product_type".id
+    LEFT JOIN
+        lab_1v7.material AS "material"
+        ON "order".material_id = "material".id
     LEFT JOIN
         lab_1v7.city AS "city"
-        ON "driver".city_id = city.id
-    LEFT JOIN
-        lab_1v7.car AS "car"
-        ON "driver".car_id = car.id
+        ON "details".city_id = "city".id
 );
 

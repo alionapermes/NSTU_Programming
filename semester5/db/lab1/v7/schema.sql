@@ -1,4 +1,4 @@
-DROP SCHEMA IF EXISTS lab_1v7;
+DROP SCHEMA IF EXISTS lab_1v7 CASCADE;
 
 CREATE SCHEMA lab_1v7;
 
@@ -34,9 +34,6 @@ CREATE TABLE lab_1v7.order (
     total_price     REAL    NOT NULL,
 
     PRIMARY KEY (id),
-
-    FOREIGN KEY (id) REFERENCES lab_1v7.order_details(order_id)
-        ON DELETE CASCADE,
 
     FOREIGN KEY (product_type_id) REFERENCES lab_1v7.product_type(id),
 
