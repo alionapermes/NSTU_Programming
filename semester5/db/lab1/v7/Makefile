@@ -1,20 +1,17 @@
-SQL_SCHEMA=schema.sql
-SQL_INSERT=insert.sql
-SQL_COMPLEX=complex.sql
-
+FLAGS=-U $(USER) -d $(DB) -q
 
 .PHONY: all
-all: schema data complex
+all: schema insert complex
 
 .PHONY: schema
 schema:
-	psql -U $(USER) -d $(DB) -c '$(shell cat $(SQL_SCHEMA))'
+	psql -c '\i $@.sql' $(FLAGS)
 
-.PHONY: data
-data:
-	pqsl -U $(USER) -d $(DB) -c $(SQL_INSERT)
+.PHONY: insert
+insert:
+	psql -c '\i $@.sql' $(FLAGS)
 
 .PHONY: complex
 complex:
-	psql -U $(USER) -d $(DB) -c $(SQL_COMPLEX)
+	psql -c '\i $@.sql' $(FLAGS)
 

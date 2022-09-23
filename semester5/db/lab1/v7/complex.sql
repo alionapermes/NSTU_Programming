@@ -20,5 +20,7 @@ CREATE TABLE lab_1v7.complex AS (
     LEFT JOIN
         lab_1v7.city AS "city"
         ON "details".city_id = "city".id
+    WHERE
+        "details".customer_name IS NOT NULL
 );
 

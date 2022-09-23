@@ -24,3 +24,8 @@ labs=# \i insert.sql
 labs=# \i complex.sql
 ```
 
+Или если имеется [make](https://www.gnu.org/software/make/):
+```sh
+make USER=<username> DB=<db_name> [{all, schema, insert, complex}]
+```
+

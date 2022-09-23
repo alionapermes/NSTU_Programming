@@ -58,5 +58,3 @@ CREATE TABLE lab_1v7.order_details (
     -- FOREIGN KEY (customer_id) REFERENCES lab_1v7.customer(id)
 );
 
-SET timezone = 'Asia/Novosibirsk';
-
