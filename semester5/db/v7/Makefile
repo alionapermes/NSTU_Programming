@@ -11,6 +11,9 @@ lab2: lab1 constraint
 constraint:
 	psql -c '\i $@.sql' $(FLAGS)
 
+.PHONY: transaction
+	psql -c '\i $@_step$(STEP).sql' $(FLAGS)
+
 ##### lab1 #####
 .PHONY: lab1
 lab1: schema insert
