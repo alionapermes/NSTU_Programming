@@ -1,22 +1,22 @@
-DROP SCHEMA IF EXISTS lab_1v7 CASCADE;
+DROP SCHEMA IF EXISTS v7 CASCADE;
 
-CREATE SCHEMA lab_1v7;
+CREATE SCHEMA v7;
 
-CREATE TABLE lab_1v7.city (
+CREATE TABLE v7.city (
     id    SERIAL,
     title VARCHAR NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE lab_1v7.product_type (
+CREATE TABLE v7.product_type (
     id    SERIAL,
     title VARCHAR NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE lab_1v7.material (
+CREATE TABLE v7.material (
     id             SERIAL,
     title          VARCHAR NOT NULL,
     amount         INTEGER NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE lab_1v7.material (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE lab_1v7.order (
+CREATE TABLE v7.order (
     id              SERIAL,
     product_id      INTEGER NOT NULL,
     product_type_id INTEGER NOT NULL,
@@ -35,14 +35,14 @@ CREATE TABLE lab_1v7.order (
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (product_type_id) REFERENCES lab_1v7.product_type(id),
+    FOREIGN KEY (product_type_id) REFERENCES v7.product_type(id),
 
-    FOREIGN KEY (material_id) REFERENCES lab_1v7.material(id)
+    FOREIGN KEY (material_id) REFERENCES v7.material(id)
 
-    -- FOREIGN KEY (product_id) REFERENCES lab_1v7.product(id)
+    -- FOREIGN KEY (product_id) REFERENCES v7.product(id)
 );
 
-CREATE TABLE lab_1v7.order_details (
+CREATE TABLE v7.order_details (
     order_id      INTEGER,
     city_id       INTEGER NOT NULL,
     customer_id   INTEGER NOT NULL,
@@ -50,11 +50,11 @@ CREATE TABLE lab_1v7.order_details (
 
     PRIMARY KEY (order_id),
 
-    FOREIGN KEY (order_id) REFERENCES lab_1v7.order(id)
+    FOREIGN KEY (order_id) REFERENCES v7.order(id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (city_id) REFERENCES lab_1v7.city(id)
+    FOREIGN KEY (city_id) REFERENCES v7.city(id)
     
-    -- FOREIGN KEY (customer_id) REFERENCES lab_1v7.customer(id)
+    -- FOREIGN KEY (customer_id) REFERENCES v7.customer(id)
 );
 

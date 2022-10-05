@@ -1,5 +1,5 @@
 INSERT INTO
-    lab_1v7.product_type
+    v7.product_type
     (title)
 VALUES
     ('note'),
@@ -14,7 +14,7 @@ VALUES
     ('lamp');
 
 INSERT INTO
-    lab_1v7.city
+    v7.city
     (title)
 VALUES
     ('Novosibirsk'),
@@ -29,7 +29,7 @@ VALUES
     ('Ekaterinburg');
 
 INSERT INTO
-    lab_1v7.material
+    v7.material
     (title, amount, supplies_price)
 VALUES
     ('leather',   412, 8880),
@@ -44,7 +44,7 @@ VALUES
     ('silks',     666, 1535);
 
 INSERT INTO
-    lab_1v7.order
+    v7.order
     (product_id, product_type_id, material_id, amount, total_price)
 VALUES
     (1,  1,  1,  12, 3948),
@@ -59,7 +59,7 @@ VALUES
     (10, 10, 10, 11, 6532);
 
 INSERT INTO
-    lab_1v7.order_details
+    v7.order_details
     (order_id, city_id, customer_id, customer_name)
 VALUES
     (1,  1,  1,  'aboba'),
