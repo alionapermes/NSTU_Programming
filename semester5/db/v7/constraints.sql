@@ -1,18 +1,6 @@
-DROP ROLE IF EXISTS abobus;
-
-CREATE ROLE
-    abobus
-WITH
-    LOGIN
-    PASSWORD 'onetwo';
-
-DROP TYPE IF EXISTS PaymentMethod;
-
-CREATE TYPE PaymentMethod AS ENUM('cash', 'cashless');
-
 ALTER TABLE
     v7."order"
-ADD COLUMN
+ADD COLUMN IF NOT EXISTS
     payment_method PaymentMethod;
 
 ALTER TABLE
@@ -48,16 +36,20 @@ ALTER TABLE
     DROP CONSTRAINT IF EXISTS title_set;
 
 -- packing products
+WITH types(names, num) AS (
+    VALUES ('[0:2]={note,ticket,box}'::ProductType[], 3)
+)
 UPDATE
     v7."product_type"
 SET
-    title = 'box'
+    title = names[floor(random() * num)]
+FROM
+    types
 WHERE
     title NOT IN ('ticket', 'box', 'note');
 
 ALTER TABLE
     v7."product_type"
-ADD CONSTRAINT
-    title_set
-    CHECK (title IN ('ticket', 'box', 'note'));
+ALTER COLUMN
+    title TYPE ProductType USING title::ProductType;
 

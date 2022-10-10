@@ -1,33 +1,22 @@
-FLAGS=-U $(USER) -d $(DB) -q
+USERNAME ?= postgres
+DATABASE ?= labs
 
-.PHONY: all
-all: lab1 lab2 complex
+EXEC = psql -U $(USERNAME) -d $(DATABASE) -qc
 
-##### lab2 #####
-.PHONY: lab2
-lab2: lab1 constraint transaction
+LAB1    = schema insert
+LAB2    = role types constraints transaction
+DEFERED = complex
+ALL     = $(LAB1) $(LAB2) $(DEFERED)
 
-.PHONY: constraint
-constraint:
-	psql -c '\i $@.sql' $(FLAGS)
+auth:
+	pgcli -u $(USERNAME) -d $(DATABASE)
 
-.PHONY: transaction
-transaction:
-	psql -c '\i $@.sql' $(FLAGS)
+all: $(ALL)
 
-##### lab1 #####
-.PHONY: lab1
-lab1: schema insert
+lab1: $(LAB1) $(DEFERED)
 
-.PHONY: schema
-schema:
-	psql -c '\i $@.sql' $(FLAGS)
+lab2: $(LAB1) $(LAB2) $(DEFERED)
 
-.PHONY: insert
-insert:
-	psql -c '\i $@.sql' $(FLAGS)
-
-.PHONY: complex
-complex:
-	psql -c '\i $@.sql' $(FLAGS)
+$(ALL):
+	$(EXEC) '\i $@.sql'
 
