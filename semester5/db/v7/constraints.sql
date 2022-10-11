@@ -5,7 +5,8 @@ ADD COLUMN IF NOT EXISTS
 
 ALTER TABLE
     v7."order"
-DROP CONSTRAINT IF EXISTS ge100;
+DROP CONSTRAINT IF EXISTS
+    ge100;
 
 -- delivery had come
 UPDATE
@@ -23,7 +24,8 @@ ADD CONSTRAINT
 
 ALTER TABLE
     v7."order"
-DROP CONSTRAINT IF EXISTS ge0;
+DROP CONSTRAINT IF EXISTS
+    ge0;
 
 ALTER TABLE
     v7."order"
@@ -33,12 +35,14 @@ ADD CONSTRAINT
 
 ALTER TABLE
     v7."product_type"
-    DROP CONSTRAINT IF EXISTS title_set;
+DROP CONSTRAINT IF EXISTS
+    title_set;
 
 -- packing products
-WITH types(names, num) AS (
-    VALUES ('[0:2]={note,ticket,box}'::ProductType[], 3)
-)
+WITH
+    types(names, num) AS (
+        VALUES ('[0:2]={note,ticket,box}'::ProductType[], 3)
+    )
 UPDATE
     v7."product_type"
 SET
