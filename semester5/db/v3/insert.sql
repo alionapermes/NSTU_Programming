@@ -1,5 +1,5 @@
 INSERT INTO
-    lab_1v3.city
+    v3.city
     (name)
 VALUES
     ('Novosibirsk'),
@@ -14,7 +14,7 @@ VALUES
     ('Ekaterinburg');
 
 INSERT INTO
-    lab_1v3.car
+    v3.car
     (model, km_price)
 VALUES
     ('Subaru R2',             30),
@@ -29,7 +29,7 @@ VALUES
     ('Nissan Sentra',         28);
 
 INSERT INTO
-    lab_1v3.driver
+    v3.driver
     (name, surname, birth_date, car_id, city_id, driving_since)
 VALUES
     ('Vladislave', 'Kheynov',    '2002-12-17', 1,  1,  '2020-06-06'),
@@ -44,16 +44,16 @@ VALUES
     ('February',   'Ends',       '2000-03-26', 10, 10, '2022-02-14');
 
 INSERT INTO
-    lab_1v3.order
+    v3.order
     (date, distance, driver_id)
 VALUES
     (TIMESTAMP '2022-09-15 04:01:34', 5.1, 1),
-    (TIMESTAMP '2022-09-14 03:01:34', 3.5, 2),
-    (TIMESTAMP '2022-09-13 02:01:34', 2.0, 3),
+    (TIMESTAMP '2022-09-14 03:01:34', 5.5, 2),
+    (TIMESTAMP '2022-09-13 02:01:34', 6.0, 3),
     (TIMESTAMP '2022-09-12 01:01:34', 5.3, 4),
     (TIMESTAMP '2022-09-11 23:01:34', 7.3, 5),
-    (TIMESTAMP '2022-09-10 22:01:34', 2.5, 6),
-    (TIMESTAMP '2022-09-09 21:01:34', 1.0, 7),
+    (TIMESTAMP '2022-09-10 22:01:34', 7.5, 6),
+    (TIMESTAMP '2022-09-09 21:01:34', 6.1, 7),
     (TIMESTAMP '2022-09-08 20:01:34', 8.4, 8),
     (TIMESTAMP '2022-09-07 19:01:34', 5.0, 9),
     (TIMESTAMP '2022-09-06 18:01:34', 4.9, 10);

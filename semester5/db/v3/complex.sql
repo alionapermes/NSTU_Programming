@@ -1,4 +1,4 @@
-CREATE TABLE lab_1v3.complex AS (
+CREATE TABLE v3.complex AS (
     SELECT
         "order".id                        AS order_id,
         "order".date                      AS date,
@@ -9,15 +9,15 @@ CREATE TABLE lab_1v3.complex AS (
         "city".name                       AS driver_city,
         "car".model                       AS car_model
     FROM
-        lab_1v3.order AS "order"
+        v3.order AS "order"
     LEFT JOIN
-        lab_1v3.driver AS "driver"
+        v3.driver AS "driver"
         ON "order".driver_id = driver.id
     LEFT JOIN
-        lab_1v3.city AS "city"
+        v3.city AS "city"
         ON "driver".city_id = city.id
     LEFT JOIN
-        lab_1v3.car AS "car"
+        v3.car AS "car"
         ON "driver".car_id = car.id
 );
 
