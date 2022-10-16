@@ -1,8 +1,17 @@
 DROP ROLE IF EXISTS abobus;
 
-CREATE ROLE
+CREATE USER
     abobus
 WITH
-    LOGIN
-    PASSWORD 'onetwo';
+    LOGIN;
+
+ALTER DATABASE
+    v7
+OWNER TO
+    abobus;
+
+REASSIGN OWNED BY
+    me
+TO
+    abobus;
 

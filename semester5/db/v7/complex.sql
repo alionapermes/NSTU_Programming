@@ -1,4 +1,4 @@
-CREATE TABLE v7.complex AS (
+CREATE TABLE complex AS (
     SELECT
         "order".id              AS "order_id",
         "details".customer_name AS "customer_name",
@@ -7,18 +7,18 @@ CREATE TABLE v7.complex AS (
         "material".title        AS "material_type",
         "order".total_price     AS "order_price"
     FROM
-        v7.order AS "order"
+        "order"
     LEFT JOIN
-        v7.order_details AS "details"
+        "order_details" AS "details"
         ON "order".id = "details".order_id
     LEFT JOIN
-        v7.product_type AS "product_type"
+        "product_type"
         ON "order".product_type_id = "product_type".id
     LEFT JOIN
-        v7.material AS "material"
+        "material"
         ON "order".material_id = "material".id
     LEFT JOIN
-        v7.city AS "city"
+        "city"
         ON "details".city_id = "city".id
     WHERE
         "details".customer_name IS NOT NULL

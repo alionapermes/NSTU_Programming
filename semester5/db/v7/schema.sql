@@ -1,22 +1,18 @@
-DROP SCHEMA IF EXISTS v7 CASCADE;
-
-CREATE SCHEMA v7;
-
-CREATE TABLE v7.city (
+CREATE TABLE "city" (
     id    SERIAL,
     title VARCHAR NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE v7.product_type (
+CREATE TABLE "product_type" (
     id    SERIAL,
     title VARCHAR NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE v7.material (
+CREATE TABLE "material" (
     id             SERIAL,
     title          VARCHAR NOT NULL,
     amount         INTEGER NOT NULL,
@@ -25,7 +21,7 @@ CREATE TABLE v7.material (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE v7.order (
+CREATE TABLE "order" (
     id              SERIAL,
     product_id      INTEGER NOT NULL,
     product_type_id INTEGER NOT NULL,
@@ -35,14 +31,14 @@ CREATE TABLE v7.order (
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (product_type_id) REFERENCES v7.product_type(id),
+    FOREIGN KEY (product_type_id) REFERENCES "product_type"(id),
 
-    FOREIGN KEY (material_id) REFERENCES v7.material(id)
+    FOREIGN KEY (material_id) REFERENCES "material"(id)
 
-    -- FOREIGN KEY (product_id) REFERENCES v7.product(id)
+    -- FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-CREATE TABLE v7.order_details (
+CREATE TABLE "order_details" (
     order_id      INTEGER,
     city_id       INTEGER NOT NULL,
     customer_id   INTEGER NOT NULL,
@@ -50,11 +46,11 @@ CREATE TABLE v7.order_details (
 
     PRIMARY KEY (order_id),
 
-    FOREIGN KEY (order_id) REFERENCES v7.order(id)
+    FOREIGN KEY (order_id) REFERENCES "order"(id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (city_id) REFERENCES v7.city(id)
+    FOREIGN KEY (city_id) REFERENCES "city"(id)
     
-    -- FOREIGN KEY (customer_id) REFERENCES v7.customer(id)
+    -- FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
