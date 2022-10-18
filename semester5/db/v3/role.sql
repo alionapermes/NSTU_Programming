@@ -6,3 +6,8 @@ WITH
     LOGIN
     PASSWORD 'password';
 
+ALTER DATABASE
+    v7
+OWNER TO
+    student;
+

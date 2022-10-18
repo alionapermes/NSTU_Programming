@@ -115,7 +115,7 @@ is_array_degree(const matches& primes)
 
 bool
 is_number_degree(uint64_t N)
-{ printf("N: %lu\n", N); return is_array_degree(get_primes(N)); }
+{ return is_array_degree(get_primes(N)); }
 
 computing_result
 compute_linear(uint64_t N)
