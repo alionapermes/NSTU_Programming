@@ -21,10 +21,17 @@ struct match
     uint64_t count;
 };
 
+struct check_result
+{
+    bool  status;
+    match value;
+};
+
 struct computing_result
 {
     uint64_t value;
-    double time;
+    double   time;
+    match    degree;
 };
 
 
@@ -69,53 +76,56 @@ get_primes(uint64_t N)
 }
 
 bool
-is_array_degree(const matches& primes)
+compare_matches(const match& lhs, const match& rhs)
 {
-    if (primes[0].count > 0) {
+    if (rhs.count == 0) {
+        return true;
+    }
+    if (lhs.count == 0) {
         return false;
     }
+    return lhs.count < rhs.count;
+}
 
+check_result
+check_primes_degree(const matches& primes)
+{
+    // если в числе хоть один ноль - условие не выполняется
+    if (primes[0].count > 0) {
+        return {false, {}};
+    }
+
+    // проверка на количество разнообразных цифр в числе:
+    // если она одна, и она больше одного, то число является степенью
 	uint8_t variants_count{};
-	uint64_t rarest{};
+	match rarest{};
 
     for (const auto& prime : primes) {
+        // если число встречалось, увеличиваем
         if (prime.count > 0) {
             variants_count++;
         }
     }
 
-    rarest = std::min_element(primes.begin(), primes.end(),
-        [] (const match& lhs, const match& rhs) -> bool {
-            if (rhs.count == 0) {
-                return true;
-            }
-            if (lhs.count == 0) {
-                return false;
-            }
-            return lhs.count < rhs.count;
-        }
-    )->count;
+    rarest = *std::min_element(primes.begin(), primes.end(), compare_matches);
 
-	if (rarest == 1) {
-        return false;
+    // если какое-то из простых чисел встречалась один раз,
+    // то заданное число не может быть степенью
+	if (rarest.count == 1) {
+        return {false, {}};
     }
 
+    // если все простые числа в заданном числе одинаковые
 	if (variants_count == 1) { 
-        return rarest > 1; // is digit
+        return {true, rarest};
 	}
 
-    for (const auto& prime : primes) {
-        if (prime.count % rarest != 0) {
-            return false;
-        }
-    }
-
-	return true;
+	return {true, rarest};
 }
 
-bool
-is_number_degree(uint64_t N)
-{ return is_array_degree(get_primes(N)); }
+check_result
+check_number_degree(uint64_t N)
+{ return check_primes_degree(get_primes(N)); }
 
 computing_result
 compute_linear(uint64_t N)
@@ -123,13 +133,15 @@ compute_linear(uint64_t N)
 	double time = omp_get_wtime();
 
 	for (uint64_t n = N + 1; n < ULLONG_MAX; ++n) {
-		if (is_number_degree(n)) {
-			return {n, omp_get_wtime() - time};
+        auto check = check_number_degree(n);
+
+		if (check.status) {
+			return {n, omp_get_wtime() - time, check.value};
 		}
 	}
 
 	return {0, omp_get_wtime() - time};
-};
+}
 
 computing_result
 compute_parallel(uint64_t N)
@@ -137,9 +149,9 @@ compute_parallel(uint64_t N)
 	const uint8_t threads_count = 4;
 	omp_set_num_threads(threads_count);
 
-	bool found      = false;
-	uint64_t result = ULLONG_MAX;
-	double time     = omp_get_wtime();
+	bool found  = false;
+	double time = omp_get_wtime();
+	computing_result result{ULLONG_MAX, 0, {}};
 
 #pragma omp parallel
     for (
@@ -147,16 +159,21 @@ compute_parallel(uint64_t N)
         !found;
         n += threads_count
     ) {
-        if (is_number_degree(n)) {
+        auto check = check_number_degree(n);
+
+        if (check.status) {
 #pragma omp critical
-            if (n < result) {
-                result = n;
-                found  = true;
+            if (n < result.value) {
+                result.value  = n;
+                result.degree = check.value;
+                found         = true;
             }
         }
     }
 
-	return {result, omp_get_wtime() - time};
+    result.time = omp_get_wtime() - time;
+
+	return result;
 }
 
 int
@@ -189,12 +206,13 @@ main()
             label = "Parallel";
         }
 
-        auto result = f(n);
+        auto result   = f(n);
+        match& degree = result.degree;
 
         printf(
             "\n[RESULTS]\n"
-            "%s: %lu (%fs)\n\n",
-            label, result.value, result.time
+            "%s: %lu -> %d^%lu (%fs)\n\n",
+            label, result.value, degree.value, degree.count, result.time
         );
 	}
 }
