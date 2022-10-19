@@ -122,9 +122,9 @@ compute_linear(uint64_t N)
 {
 	double time = omp_get_wtime();
 
-	for (uint64_t i = N; i < ULLONG_MAX; i++) {
-		if (is_number_degree(i)) {
-			return {i, omp_get_wtime() - time};
+	for (uint64_t n = N + 1; n < ULLONG_MAX; ++n) {
+		if (is_number_degree(n)) {
+			return {n, omp_get_wtime() - time};
 		}
 	}
 
@@ -138,24 +138,23 @@ compute_parallel(uint64_t N)
 	omp_set_num_threads(threads_count);
 
 	bool found      = false;
-	uint64_t result = LLONG_MAX;
-	uint64_t offset = omp_get_thread_num();
+	uint64_t result = ULLONG_MAX;
 	double time     = omp_get_wtime();
 
-#pragma omp parallel 
-	while (!found) {
-		uint64_t n = N + offset;
-
-		if (is_number_degree(n)) {
+#pragma omp parallel
+    for (
+        uint64_t n = N + 1 + omp_get_thread_num();
+        !found;
+        n += threads_count
+    ) {
+        if (is_number_degree(n)) {
 #pragma omp critical
-			if (n < result) {
+            if (n < result) {
                 result = n;
                 found  = true;
-			}
-		}
-
-		offset += threads_count;
-	}
+            }
+        }
+    }
 
 	return {result, omp_get_wtime() - time};
 }
