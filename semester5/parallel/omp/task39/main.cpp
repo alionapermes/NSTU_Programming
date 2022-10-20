@@ -129,7 +129,7 @@ check_primes_degree(const matches& primes)
         if (prime.count % rarest.count > 0) {
             return {false, {}};
         } else {
-            degree.value *= prime.value;
+            degree.value *= std::pow(prime.value, prime.count / rarest.count);
         }
     }
 
