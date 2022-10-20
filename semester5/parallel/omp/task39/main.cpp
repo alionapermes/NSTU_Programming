@@ -98,7 +98,7 @@ check_primes_degree(const matches& primes)
     // проверка на количество разнообразных цифр в числе:
     // если она одна, и она больше одного, то число является степенью
 	uint8_t variants_count{};
-	match rarest{};
+	match rarest{}, degree{};
 
     for (const auto& prime : primes) {
         // если число встречалось, увеличиваем
@@ -120,7 +120,20 @@ check_primes_degree(const matches& primes)
         return {true, rarest};
 	}
 
-	return {true, rarest};
+    degree = rarest;
+    for (const auto& prime : primes) {
+        if ((prime.count == 0) || (prime.value == rarest.value)) {
+            continue;
+        }
+
+        if (prime.count % rarest.count > 0) {
+            return {false, {}};
+        } else {
+            degree.value *= prime.value;
+        }
+    }
+
+	return {true, degree};
 }
 
 check_result
