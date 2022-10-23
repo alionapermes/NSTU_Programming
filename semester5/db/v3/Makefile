@@ -1,22 +1,21 @@
 USERNAME ?= postgres
-DATABASE ?= labs
+DATABASE ?= v3
 
-EXEC = psql -U $(USERNAME) -d $(DATABASE) -qc
-
-LAB1    = schema insert
-LAB2    = role constraints transaction
-DEFERED = complex
-ALL     = $(LAB1) $(LAB2) $(DEFERED)
+DMS  = psql
+LABS = lab1 lab2 lab3 lab4
+lab1 = schema insert complex
+lab2 = schema insert role constraints transaction
+lab3 = schema insert array max_distance toyota avg_distance experience sum
+lab4 = schema insert under recent_months olds
 
 auth:
 	pgcli -u $(USERNAME) -d $(DATABASE)
 
-all: $(ALL)
+init:
+	$(DMS) -U $(USERNAME) -qc '\i src/$@.sql'
 
-lab1: $(LAB1) $(DEFERED)
-
-lab2: $(LAB1) $(LAB2) $(DEFERED)
-
-$(ALL):
-	$(EXEC) '\i $@.sql'
+$(LABS): init
+	for script in $($@); do \
+		$(DMS) -U me -d $(DATABASE) -qc '\i ./src/$@/'$$script'.sql' ; \
+	done
 

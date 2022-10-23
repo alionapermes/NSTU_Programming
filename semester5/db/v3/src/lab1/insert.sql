@@ -1,5 +1,5 @@
 INSERT INTO
-    v3.city
+    "city"
     (name)
 VALUES
     ('Novosibirsk'),
@@ -14,7 +14,7 @@ VALUES
     ('Ekaterinburg');
 
 INSERT INTO
-    v3.car
+    "car"
     (model, km_price)
 VALUES
     ('Subaru R2',             30),
@@ -29,7 +29,7 @@ VALUES
     ('Nissan Sentra',         28);
 
 INSERT INTO
-    v3.driver
+    "driver"
     (name, surname, birth_date, car_id, city_id, driving_since)
 VALUES
     ('Vladislave', 'Kheynov',    '2002-12-17', 1,  1,  '2020-06-06'),
@@ -44,7 +44,7 @@ VALUES
     ('February',   'Ends',       '2000-03-26', 10, 10, '2022-02-14');
 
 INSERT INTO
-    v3.order
+    "order"
     (date, distance, driver_id)
 VALUES
     (TIMESTAMP '2022-09-15 04:01:34', 5.1, 1),

@@ -1,15 +1,16 @@
-DROP SCHEMA IF EXISTS v3 CASCADE;
+DROP TABLE IF EXISTS "order";
+DROP TABLE IF EXISTS "driver";
+DROP TABLE IF EXISTS "city";
+DROP TABLE IF EXISTS "car";
 
-CREATE SCHEMA v3;
-
-CREATE TABLE v3.city (
+CREATE TABLE "city" (
     id   SERIAL,
     name VARCHAR NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE v3.car (
+CREATE TABLE "car" (
     id       SERIAL,
     model    VARCHAR NOT NULL,
     km_price REAL    NOT NULL,
@@ -17,7 +18,7 @@ CREATE TABLE v3.car (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE v3.driver (
+CREATE TABLE "driver" (
     id            SERIAL,
     name          VARCHAR NOT NULL,
     surname       VARCHAR NOT NULL,
@@ -28,13 +29,13 @@ CREATE TABLE v3.driver (
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (car_id) REFERENCES v3.car(id),
+    FOREIGN KEY (car_id) REFERENCES car(id),
 
-    FOREIGN KEY (city_id) REFERENCES v3.city(id)
+    FOREIGN KEY (city_id) REFERENCES city(id)
         ON DELETE CASCADE
 );
 
-CREATE TABLE v3.order (
+CREATE TABLE "order" (
     id        SERIAL,
     date      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     distance  REAL      NOT NULL,
@@ -42,7 +43,7 @@ CREATE TABLE v3.order (
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (driver_id) REFERENCES v3.driver(id)
+    FOREIGN KEY (driver_id) REFERENCES driver(id)
 );
 
 SET timezone = 'Asia/Novosibirsk';
