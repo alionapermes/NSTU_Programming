@@ -8,7 +8,7 @@ lab2 = schema insert role constraints transaction
 lab3 = schema insert array max_distance toyota avg_distance experience sum
 lab4 = schema insert under recent_months olds
 
-auth:
+meow:
 	pgcli -u $(USERNAME) -d $(DATABASE)
 
 init:
