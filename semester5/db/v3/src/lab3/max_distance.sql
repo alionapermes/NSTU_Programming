@@ -4,5 +4,5 @@ FROM
     "order"
 ORDER BY
     distance DESC
-LIMI 1;
+LIMIT 1;
 
