@@ -46,7 +46,7 @@ CREATE TABLE "order" (
     PRIMARY KEY (id)
 
     FOREIGN KEY (driver_id) REFERENCES driver(id)
-      ON DELETE NO ACTION
+      ON DELETE SET NULL
 );
 
 SET timezone = 'Asia/Novosibirsk';
