@@ -24,8 +24,8 @@ CREATE TABLE "driver" (
     surname       VARCHAR NOT NULL,
     birth_date    DATE    NOT NULL,
     driving_since DATE    NOT NULL,
-    car_id        INTEGER NOT NULL,
-    city_id       INTEGER NOT NULL,
+    car_id        INTEGER,
+    city_id       INTEGER,
 
     PRIMARY KEY (id),
 
@@ -40,13 +40,13 @@ CREATE TABLE "order" (
     id          SERIAL,
     date        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     distance    REAL      NOT NULL,
-    driver_id   INTEGER   NOT NULL,
     total_price REAL      NOT NULL,
+    driver_id   INTEGER,
 
     PRIMARY KEY (id),
 
     FOREIGN KEY (driver_id) REFERENCES driver(id)
-      ON DELETE NO ACTION
+      ON DELETE SET NULL
 );
 
 SET timezone = 'Asia/Novosibirsk';
