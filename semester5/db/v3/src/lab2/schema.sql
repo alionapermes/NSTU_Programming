@@ -43,10 +43,10 @@ CREATE TABLE "order" (
     driver_id   INTEGER   NOT NULL,
     total_price REAL      NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
 
     FOREIGN KEY (driver_id) REFERENCES driver(id)
-      ON DELETE SET NULL
+      ON DELETE NO ACTION
 );
 
 SET timezone = 'Asia/Novosibirsk';
