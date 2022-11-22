@@ -29,7 +29,8 @@ CREATE TABLE "driver" (
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (car_id) REFERENCES car(id),
+    FOREIGN KEY (car_id) REFERENCES car(id)
+        ON DELETE SET NULL,
 
     FOREIGN KEY (city_id) REFERENCES city(id)
         ON DELETE CASCADE
@@ -45,6 +46,7 @@ CREATE TABLE "order" (
     PRIMARY KEY (id),
 
     FOREIGN KEY (driver_id) REFERENCES driver(id)
+        ON DELETE SET NULL
 );
 
 SET timezone = 'Asia/Novosibirsk';
