@@ -2,7 +2,7 @@ SELECT
     *
 FROM
     "order"
-ORDER BY
-    distance DESC
+WHERE
+    distance = (SELECT MAX(distance) FROM "order")
 LIMIT 1;
 

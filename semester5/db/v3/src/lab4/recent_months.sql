@@ -1,13 +1,3 @@
-WITH recent(driver_id, total) AS (
-    SELECT
-        driver_id, SUM(total_price) AS total
-    FROM
-        "order"
-    WHERE
-        AGE(date) <= '3 months'::interval
-    GROUP BY
-        driver_id
-)
 SELECT
     "driver".*
 FROM
@@ -27,9 +17,13 @@ WHERE
         SELECT
             driver_id
         FROM
-            recent
+            "order"
         WHERE
-            total > 20000
+            AGE(date) <= '3 months'::interval
+        GROUP BY
+            driver_id
+        HAVING
+            SUM(total_price) > 20000
     )
 GROUP BY
     "driver".id;
