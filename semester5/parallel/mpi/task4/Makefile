@@ -6,8 +6,8 @@ NUMS   = 1000
 
 build:
 	rm -f $(TARGET)
-	mpic++ $(SOURCE) -o $(TARGET) -g3 -ggdb
+	mpic++ $(SOURCE) -o $(TARGET) -g3 -ggdb -std=c++11
 
 run:
-	mpirun --mca opal_warn_on_missing_libcuda 0 -n $(PROCS) ./$(TARGET) $(NUMS)
+	mpirun -n $(PROCS) ./$(TARGET) $(NUMS)
 

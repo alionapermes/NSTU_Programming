@@ -148,7 +148,6 @@ save(
     const char* mode = "a"
 ) {
     FILE* file = std::fopen(filename, mode);
-    char buf[128] = {};
 
     if (!file) {
         std::fprintf(stderr, "fail to open %s (error %d)\n", filename, errno);
@@ -237,8 +236,8 @@ main(int argc, char** argv)
     time_mpi = chrono::duration_cast<fdur>(hrc::now() - start);
 
     if (world.rank == 0) {
-        save("results.txt", {"default", time_default}, set_1, "w");
-        save("results.txt", {"mpi", time_mpi}, set_2);
+        save(OUTPUT, {"default", time_default}, set_1, "w");
+        save(OUTPUT, {"mpi", time_mpi}, set_2);
     }
 
     MPI_Finalize();
