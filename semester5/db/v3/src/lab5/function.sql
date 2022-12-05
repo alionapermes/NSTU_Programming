@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION add_n(n INTEGER) RETURNS CHAR AS $$
 BEGIN
     FOR i IN 0..n LOOP
@@ -16,7 +17,4 @@ END;
 $$ LANGUAGE "plpgsql";
 
 SELECT add_n(1000);
-
-EXPLAIN ANALYZE
-    SELECT * FROM "car" WHERE model = 'Ford';
 

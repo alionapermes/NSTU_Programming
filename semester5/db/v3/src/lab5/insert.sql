@@ -10,38 +10,63 @@ VALUES
     ('Saint Petersburg'),
     ('Moscow'),
     ('Omsk'),
-    ('Belgorod'),
+    ('Krasnoyarsk'),
     ('Ekaterinburg');
-
-INSERT INTO
-    "car"
-    (model, km_price)
-VALUES
-    ('Subaru R2',             30),
-    ('Kia Optima',            35),
-    ('Volkswagen Jetta',      33),
-    ('LADA Classic',          50),
-    ('Toyota Vista',          31),
-    ('Nissan Cube',           24),
-    ('Honda City',            29),
-    ('Nissan Wingroad',       26),
-    ('Mercedes Menz A-Class', 25),
-    ('Nissan Sentra',         28);
 
 INSERT INTO
     "driver"
     (name, surname, birth_date, car_id, city_id, driving_since, married, wage)
 VALUES
-    ('Vladislave', 'Kheynov',    '1990-12-17', 1,  1,  '2010-06-06', true,  30.4),
-    ('Galina',     'Sidorenko',  '2000-07-09', 3,  3,  '2010-05-12', true,  24.4),
-    ('Timur',      'Igenov',     '2000-01-21', 2,  2,  '2009-09-17', true,  64.5),
-    ('Ermak',      'Abdkdrve',   '1990-05-06', 4,  4,  '2009-09-16', true,  43.1),
-    ('Andrew',     'Obidientov', '1990-05-02', 5,  5,  '2009-09-18', false, 55.5),
-    ('Aboba',      'Bibinus',    '1990-12-27', 6,  6,  '2009-06-26', false, 32.5),
-    ('Chivap',     'Chichi',     '1990-07-19', 7,  7,  '2019-01-12', false, 32.4),
-    ('Teddy',      'Bear',       '1990-01-11', 8,  8,  '2019-05-17', false, 31.3),
-    ('Wakeme',     'Upwhen',     '1980-03-26', 9,  9,  '2019-02-24', true,  35.2),
-    ('February',   'Ends',       '1980-03-26', 10, 10, '2019-02-14', true,  42.1);
+    (
+        'Vladislave', 'Kheynov', '1990-12-17',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 1,
+        '2010-06-06', true,  30.4
+    ),
+    (
+        'Galina', 'Sidorenko', '2000-07-09',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 3,
+        '2010-05-12', true,  24.4
+    ),
+    (
+        'Timur', 'Igenov', '2000-01-21',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 2,
+        '2009-09-17', true,  64.5
+    ),
+    (
+        'Ermak', 'Abdkdrve', '1990-05-06',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 4,
+        '2009-09-16', true,  43.1
+    ),
+    (
+        'Andrew', 'Obidientov', '1990-05-02',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 5,
+        '2009-09-18', false, 55.5
+    ),
+    (
+        'Aboba', 'Bibinus', '1990-12-27',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 6,
+        '2009-06-26', false, 32.5
+    ),
+    (
+        'Chivap', 'Chichi', '1990-07-19',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 7,
+        '2019-01-12', false, 32.4
+    ),
+    (
+        'Teddy', 'Bear', '1990-01-11',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 8,
+        '2019-05-17', false, 31.3
+    ),
+    (
+        'Wakeme', 'Upwhen', '1980-03-26',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 9,
+        '2019-02-24', true,  35.2
+    ),
+    (
+        'February', 'Ends', '1980-03-26',
+        (SELECT FLOOR(RANDOM() * 1000 + 1)), 10,
+        '2019-02-14', true,  42.1
+    );
 
 INSERT INTO
     "order"

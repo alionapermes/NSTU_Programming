@@ -2,11 +2,12 @@ USERNAME ?= postgres
 DATABASE ?= v3
 
 DMS  = psql
-LABS = lab1 lab2 lab3 lab4
+LABS = lab1 lab2 lab3 lab4 lab5
 lab1 = schema insert complex
 lab2 = schema insert role constraints transaction
 lab3 = schema insert array max_distance toyota avg_distance experience sum
 lab4 = schema insert under recent_months olds
+lab5 = schema function insert analyze select
 
 meow:
 	pgcli -u $(USERNAME) -d $(DATABASE)
