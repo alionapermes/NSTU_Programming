@@ -1,5 +1,3 @@
--- CREATE OR REPLACE FUNCTION driving_experience
-
 SELECT
   "driver".*,
   SUM("order".total_price) AS "income"
@@ -8,6 +6,8 @@ FROM
 LEFT JOIN
   "order"
   ON "order".driver_id = "driver".id
+WHERE
+  AGE("order".date) <= '1 week'::interval;
 GROUP BY
   "driver".id;
 

@@ -1,3 +1,5 @@
+SET ENABLE_SEQSCAN TO OFF;
+
 EXPLAIN ANALYZE
     SELECT * FROM "car" WHERE number = 'a555aa';
 
