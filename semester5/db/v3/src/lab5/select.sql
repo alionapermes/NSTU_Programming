@@ -1,15 +1,20 @@
+WITH "driver_income" (driver_id, income) AS (
+    SELECT
+      driver_id, SUM(total_price) AS income
+    FROM
+      "order"
+    WHERE
+      AGE(date) <= '1 week'::interval
+    GROUP BY
+      driver_id
+)
 SELECT
-  "driver".*,
-  SUM("order".total_price) AS "income"
+  "driver".*, "driver_income".income
 FROM
-  "driver"
+  "driver_income"
 LEFT JOIN
-  "order"
-  ON "order".driver_id = "driver".id
-WHERE
-  AGE("order".date) <= '1 week'::interval;
-GROUP BY
-  "driver".id;
+  "driver"
+  ON "driver".id = "driver_income".driver_id;
 
 SELECT
   *
@@ -35,7 +40,7 @@ SELECT
 FROM
   "driver"
 WHERE
-  AGE(driving_since, birth_date) = '18 years'::interval;
+  EXTRACT('year' FROM AGE(driving_since, birth_date)) = 18;
 
 SELECT
   *
@@ -55,8 +60,8 @@ LEFT JOIN
   "city"
   ON "driver".city_id = "city".id
 WHERE
-  AGE("driver".driving_since, "driver".birth_date) BETWEEN
-    '15 years'::interval AND '20 years'::interval
+  EXTRACT('year' FROM AGE("driver".driving_since, "driver".birth_date))
+    BETWEEN 15 AND 20
   AND ("car".model = 'Toyota' OR "car".model = 'Ford')
   AND ("city".name = 'Kemerovo' OR "city".name = 'Krasnoyarsk');
 
