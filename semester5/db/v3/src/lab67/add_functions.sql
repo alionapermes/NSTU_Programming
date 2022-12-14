@@ -10,35 +10,44 @@ CREATE OR REPLACE FUNCTION add_order(
     _downtime            INTERVAL,
     _status              order_status
 ) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
     INSERT INTO "order"
-        (date, distance, supplier_id, driver_id, total_price,
+        (date, distance, supplier_id, receiver_id, driver_id, total_price,
          departure_city_id, destination_city_id, downtime, status)
     VALUES
-        (_date, _distance, _supplier_id, _driver_id, _total_price,
-         _departure_city_id, _destination_city_id, _downtime, _status);
-    RETURN NEW.id;
+        (_date, _distance, _supplier_id, _receiver_id, _driver_id, _total_price,
+         _departure_city_id, _destination_city_id, _downtime, _status)
+    RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION add_city(_name VARCHAR) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
-    INSERT INTO "city"(name) VALUES(_name);
-    RETURN NEW.id;
+    INSERT INTO "city"(name) VALUES(_name) RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION add_supplier(_name VARCHAR) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
-    INSERT INTO "supplier"(name) VALUES(_name);
-    RETURN NEW.id;
+    INSERT INTO "supplier"(name) VALUES(_name) RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION add_receiver(_name VARCHAR) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
-    INSERT INTO "receiver"(name) VALUES(_name);
-    RETURN NEW.id;
+    INSERT INTO "receiver"(name) VALUES(_name) RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -47,12 +56,15 @@ CREATE OR REPLACE FUNCTION add_car(
     _km_price REAL,
     _number   CHAR(6)
 ) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
     INSERT INTO "car"
         (model, km_price, number)
     VALUES
-        (_model, _km_price, _number);
-    RETURN NEW.id;
+        (_model, _km_price, _number)
+    RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -66,14 +78,16 @@ CREATE OR REPLACE FUNCTION add_driver(
     _married       BOOLEAN,
     _wage          REAL
 ) RETURNS INTEGER AS $$
+DECLARE
+    _id INTEGER;
 BEGIN
     INSERT INTO "driver"
         (name, surname, birth_date, driving_since,
          car_id, city_id, married, wage)
     VALUES
         (_name, _surname, _birth_date, _driving_since,
-         _car_id, _city_id, _married, _wage);
-    RETURN NEW.id;
+         _car_id, _city_id, _married, _wage)
+    RETURNING id INTO _id;
+    RETURN _id;
 END;
 $$ LANGUAGE 'plpgsql';
-
