@@ -10,7 +10,9 @@ CREATE OR REPLACE FUNCTION update_order(
     _destination_city_id INTEGER,
     _downtime            INTERVAL,
     _status              order_status
-) RETURNS VOID AS $$
+) RETURNS "order" AS $$
+DECLARE
+    row RECORD;
 BEGIN
     UPDATE "order"
     SET
@@ -24,41 +26,53 @@ BEGIN
         destination_city_id = _destination_city_id,
         downtime            = _downtime,
         status              = _status
-    WHERE id = _id;
+    WHERE id = _id
+    RETURNING * INTO row;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'order with id % not found', _id;
     END IF;
+
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION rename_city(_id INTEGER, _new_name VARCHAR)
-    RETURNS VOID AS $$
+    RETURNS "city" AS $$
+DECLARE
+    row RECORD;
 BEGIN
-    UPDATE "city" SET name = _new_name WHERE id = _id;
+    UPDATE "city" SET name = _new_name WHERE id = _id RETURNING * INTO row;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'city with id % not found', _id;
     END IF;
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION rename_supplier(_id INTEGER, _new_name VARCHAR)
-    RETURNS VOID AS $$
+    RETURNS "supplier" AS $$
+DECLARE
+    row RECORD;
 BEGIN
-    UPDATE "supplier" SET name = _new_name WHERE id = _id;
+    UPDATE "supplier" SET name = _new_name WHERE id = _id RETURNING * INTO row;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'supplier with id % not found', _id;
     END IF;
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION rename_receiver(_id INTEGER, _new_name VARCHAR)
-    RETURNS VOID AS $$
+    RETURNS "receiver" AS $$
+DECLARE
+    row RECORD;
 BEGIN
-    UPDATE "receiver" SET name = _new_name WHERE id = _id;
+    UPDATE "receiver" SET name = _new_name WHERE id = _id RETURNING * INTO row;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'receiver with id % not found', _id;
     END IF;
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -67,18 +81,23 @@ CREATE OR REPLACE FUNCTION update_car(
     _model    VARCHAR,
     _km_price REAL,
     _number   CHAR(6)
-) RETURNS VOID AS $$
+) RETURNS "car" AS $$
+DECLARE
+    row RECORD;
 BEGIN
     UPDATE "car"
     SET
         model    = _model,
         km_price = _km_price,
         number   = _number
-    WHERE id = _id;
+    WHERE id = _id
+    RETURNING * INTO row;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'car with id % not found', _id;
     END IF;
+
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -92,7 +111,9 @@ CREATE OR REPLACE FUNCTION update_driver(
     _city_id       INTEGER,
     _married       BOOLEAN,
     _wage          REAL
-) RETURNS VOID AS $$
+) RETURNS "driver" AS $$
+DECLARE
+    row RECORD;
 BEGIN
     UPDATE "driver"
     SET
@@ -104,11 +125,13 @@ BEGIN
         city_id       = _city_id,
         married       = _married,
         wage          = _wage
-    WHERE id = _id;
+    WHERE id = _id
+    RETURNING * INTO row;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'driver with id % not found', _id;
     END IF;
+
+    RETURN row;
 END;
 $$ LANGUAGE 'plpgsql';
-
