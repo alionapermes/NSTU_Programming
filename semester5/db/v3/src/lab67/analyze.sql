@@ -17,7 +17,7 @@ BEGIN
         RETURN 'autumn'::season;
     END IF;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
 -- average driver downtime
 CREATE OR REPLACE FUNCTION get_avg_driver_downtime(_driver_id INTEGER)
@@ -35,7 +35,7 @@ BEGIN
 
     RETURN avg_downtime;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
 -- ratio of intercity to intracity orders qty
 CREATE OR REPLACE FUNCTION get_transit_ratio()
@@ -56,7 +56,7 @@ BEGIN
 
     RETURN intercity_count / intracity_count;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
 -- quantity of daily orders
 CREATE OR REPLACE FUNCTION get_daily_orders_qty() RETURNS INTEGER AS $$
@@ -67,7 +67,7 @@ BEGIN
         WHERE EXTRACT('HOUR' FROM date) BETWEEN 5 AND 24
     );
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
 -- quantity of nightly orders
 CREATE OR REPLACE FUNCTION get_nightly_orders_qty() RETURNS INTEGER AS $$
@@ -78,7 +78,7 @@ BEGIN
         WHERE EXTRACT('HOUR' FROM date) BETWEEN 0 AND 4
     );
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION analyze_failures_by_seasons() RETURNS TABLE (
     season        season,
@@ -98,5 +98,5 @@ BEGIN
         ORDER BY "season" ASC
     );
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' IMMUTABLE;
 
