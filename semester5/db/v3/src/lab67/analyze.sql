@@ -29,7 +29,7 @@ BEGIN
     FROM "order"
     WHERE driver_id = _driver_id;
 
-    IF NOT FOUND THEN
+    IF avg_downtime IS NULL THEN
         RAISE EXCEPTION 'driver with id % not found', _driver_id;
     END IF;
 
@@ -99,4 +99,3 @@ BEGIN
     );
 END;
 $$ LANGUAGE 'plpgsql' IMMUTABLE;
-
