@@ -68,7 +68,7 @@ DECLARE
     _downtime  INTERVAL;
 BEGIN
     FOR i IN 0..n LOOP
-        SELECT FLOOR(RANDOM() * 10 + 1) INTO _driver_id;
+        SELECT FLOOR(RANDOM() * COUNT(*) + 1) INTO _driver_id FROM "driver";
         SELECT FLOOR(RANDOM() * 10 + 1) INTO _distance;
         SELECT random_date('1970-01-01'::timestamp, NOW()::timestamp)
             INTO _date;
@@ -142,4 +142,3 @@ VALUES
 select generate_cars(100);
 select generate_drivers(100);
 select generate_orders(100);
-
