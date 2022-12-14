@@ -102,12 +102,11 @@ merge_sort(vector<int>& src, range sort_range)
 range
 get_range(const std::vector<int>& src, int procs_total, int rank)
 {
-    size_t count = src.size() / procs_total;
-    range part{(size_t)rank * count, count};
+    size_t count = src.size() / procs_total; // число элементов для процесса
+    range part{(size_t)rank * count, count}; // диапазон сортировки для процесса
 
-    if (part.index + part.len > src.size()) {
-        part.len = src.size() - part.index;
-    }
+    if (part.index + part.len > src.size())
+        part.len = src.size() - part.index; // вычисление актуальной длины
 
     return part;
 }
@@ -115,12 +114,15 @@ get_range(const std::vector<int>& src, int procs_total, int rank)
 void
 merge_sort_parallel(vector<int>& src, comm_stats comm)
 {
+    // вычисление длины диапазона сортировки для текущего процесса
     size_t len = (comm.rank == 0
         ? get_range(src, comm.size, comm.rank).len : src.size());
     range sub{0, len};
 
     merge_sort(src, sub);
 
+    // recvcounts - массив длин диапазонов для процессов
+    // displs     - массив индексов для процессов
     vector<int> recvcounts, displs;
 
     for (int i = 0; i < comm.size; i++) {
@@ -133,8 +135,8 @@ merge_sort_parallel(vector<int>& src, comm_stats comm)
 
     if (comm.rank == 0) {
         for (int i = 1; i < comm.size; i++) {
-            range processPart = get_range(tmp, comm.size, i);
-            sub               = merge(tmp, sub, processPart);
+            range processPart = get_range(tmp, comm.size, i); // получение диапазона для слияния
+            sub               = merge(tmp, sub, processPart); // слияние отсортированных диапазонов
         }
         src = tmp;
     }
@@ -195,25 +197,25 @@ main(int argc, char** argv)
     if (world.rank == 0) {
         set_1.resize(size);
 
-        std::iota(set_1.begin(), set_1.end(), -(size >> 1));
-        std::shuffle(
+        std::iota(set_1.begin(), set_1.end(), -(size >> 1)); // наполнение массива
+        std::shuffle( // перетасовка
             set_1.begin(), set_1.end(), std::mt19937{std::random_device{}()});
 
         set_2 = set_1;
 
         for (int i = 1; i < world.size; i++) {
-            range processPart = get_range(set_2, world.size, i);
+            range processPart = get_range(set_2, world.size, i); // получения диапазона сортировки для процесса
             int size = processPart.len;
 
-            mpi_send(&size, 1, i);
-            mpi_send(set_2.data() + processPart.index, size, i);
+            mpi_send(&size, 1, i); // указание дочернему процессу длины диапазона для сортировки
+            mpi_send(set_2.data() + processPart.index, size, i); // передача дочернему процессу данных для сортировки
         }
     } else {
         int len;
-        mpi_recv(&len, 1);
+        mpi_recv(&len, 1); // получение от родителя длины диапазона
 
-        set_2.resize(len);
-        mpi_recv(set_2.data(), len);
+        set_2.resize(len); // выделение памяти для сортировки своего диапазона
+        mpi_recv(set_2.data(), len); // получение данных для сортировки
     }
 
     hrc::time_point start;
