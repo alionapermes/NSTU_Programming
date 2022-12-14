@@ -69,4 +69,3 @@ BEGIN
     RETURN true;
 END;
 $$ LANGUAGE 'plpgsql';
-
