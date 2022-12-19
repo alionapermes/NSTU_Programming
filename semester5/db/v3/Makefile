@@ -11,10 +11,13 @@ lab5  = schema function insert analyze select
 lab67 = schema insert log roles analyze index \
 		add_functions get_functions delete_functions update_functions
 lab8  = schema insert common triggers
-cw    = init schema insert functions index role
+cw    = schema insert functions role
 
 meow:
 	pgcli -u $(USERNAME) -d $(DATABASE)
+
+cw_meow:
+	pgcli -u admin -d v83
 
 init:
 	$(DMS) -U $(USERNAME) -qc '\i src/$@.sql'
@@ -25,6 +28,8 @@ $(LABS): init
 	done
 
 cw:
+	$(DMS) -U $(USERNAME) -d postgres -qc '\i ./src/coursework/init.sql'
 	for script in $($@); do \
-		$(DMS) -U me -d v83 -qc '\i ./src/coursework/'$$script'.sql'; \
+		$(DMS) -U $(USERNAME) -d v83 -qc '\i ./src/coursework/'$$script'.sql'; \
 	done
+
