@@ -1,38 +1,3 @@
-CREATE OR REPLACE FUNCTION find_city(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "city" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_country(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "country" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_customer(_fullname CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "customer" WHERE fullname = _fullname);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_product(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "product" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_product_type(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "product_type" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_provider(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "provider" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION find_producer(_name CHAR) RETURNS INTEGER AS $$
-BEGIN
-    RETURN (SELECT id FROM "producer" WHERE name = _name);
-END; $$ LANGUAGE 'plpgsql';
-
 CREATE OR REPLACE FUNCTION city_part_of_total(_city_id INTEGER)
     RETURNS DOUBLE PRECISION AS $$
 DECLARE
@@ -118,11 +83,16 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION cheap_part_of_total(
     _price       REAL,
     _customer_id INTEGER
-) RETURNS RECORD AS $$
+) RETURNS TABLE (
+    by_customer REAL,
+    total       REAL
+) AS $$
 DECLARE
     qty_total       INTEGER;
     qty_cheap       INTEGER;
     qty_by_customer INTEGER;
+    _by_customer    REAL;
+    _total          REAL;
 BEGIN
     IF _price < 0 THEN
         RAISE EXCEPTION 'price cannot be less than 0';
@@ -133,16 +103,15 @@ BEGIN
     END IF;
 
     SELECT COUNT(*) INTO qty_total FROM "product";
-    IF qty_total = 0 THEN
-        RETURN 0;
-    END IF;
-
     SELECT COUNT(*) INTO qty_cheap FROM "product" WHERE price < _price;
+    SELECT qty_cheap::real / qty_total::real INTO _total;
+
     SELECT COUNT(*) INTO qty_by_customer FROM "product"
         WHERE price < _price AND id IN (
             SELECT DISTINCT product_id FROM "sales"
             WHERE customer_id = _customer_id);
-    RETURN (SELECT (qty_by_customer / qty_total) AS "y_customer",
-        (qty_cheap / qty_total) AS "total");
+    SELECT qty_by_customer::real / qty_total::real INTO _by_customer;
+
+    RETURN QUERY (SELECT _by_customer, _total);
 END;
 $$ LANGUAGE 'plpgsql';

@@ -40,7 +40,7 @@ BEGIN
             (
                 _name,
                 _type_id,
-                random_date('1970-01-01'::timestamp, NOW()::timestamp),
+                random_date('1970-01-01'::date, NOW()::date),
                 (SELECT RANDOM() * 10000),
                 (SELECT FLOOR(RANDOM() * COUNT(*) + 1) FROM "city"),
                 (SELECT FLOOR(RANDOM() * COUNT(*) + 1) FROM "country"),
@@ -158,5 +158,26 @@ VALUES
     ('porkpie'),
     ('beanie');
 
-select generate_products(100);
-select generate_sales(100);
+SELECT generate_products(100);
+SELECT generate_sales(100);
+
+-- Для каждого вида головного убора (шляны, кепи, береты, шапки и т.д.)
+-- указать сведения о нем (наименование, год выпуска, место изготовления, цена, поставщик и т.п.).
+DROP TABLE IF EXISTS "product_info";
+CREATE TABLE "product_info" AS (
+    SELECT
+        "product".name,
+        "product_type".name AS "type",
+        "product".released,
+        "product".price,
+        "city".name         AS "city_name",
+        "country".name      AS "country_name",
+        "provider".name     AS "provider_name",
+        "producer".name     AS "producer_name"
+    FROM "product"
+        LEFT JOIN "product_type" ON "product".type_id     = "product_type".id
+        LEFT JOIN "city"         ON "product".city_id     = "city".id
+        LEFT JOIN "country"      ON "product".country_id  = "country".id
+        LEFT JOIN "producer"     ON "product".producer_id = "producer".id
+        LEFT JOIN "provider"     ON "product".provider_id = "provider".id
+);

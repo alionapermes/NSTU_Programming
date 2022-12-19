@@ -46,14 +46,14 @@ CREATE TABLE "product_type" (
 
 CREATE TABLE "product" (
     id          SERIAL,
-    name        VARCHAR   NOT NULL,
-    type_id     INTEGER   NOT NULL,
-    released    TIMESTAMP NOT NULL,
-    price       REAL      NOT NULL,
-    city_id     INTEGER   NOT NULL,
-    country_id  INTEGER   NOT NULL,
-    producer_id INTEGER   NOT NULL,
-    provider_id INTEGER   NOT NULL,
+    name        VARCHAR NOT NULL,
+    type_id     INTEGER NOT NULL,
+    released    DATE    NOT NULL,
+    price       REAL    NOT NULL,
+    city_id     INTEGER NOT NULL,
+    country_id  INTEGER NOT NULL,
+    producer_id INTEGER NOT NULL,
+    provider_id INTEGER NOT NULL,
 
     CHECK(released <= NOW()),
     CHECK(price >= 0),
@@ -91,4 +91,3 @@ CREATE TABLE "sales" (
 
     PRIMARY KEY (id)
 );
-

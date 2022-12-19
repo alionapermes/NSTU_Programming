@@ -11,6 +11,7 @@ lab5  = schema function insert analyze select
 lab67 = schema insert log roles analyze index \
 		add_functions get_functions delete_functions update_functions
 lab8  = schema insert common triggers
+cw    = init schema insert functions index role
 
 meow:
 	pgcli -u $(USERNAME) -d $(DATABASE)
@@ -23,3 +24,7 @@ $(LABS): init
 		$(DMS) -U me -d $(DATABASE) -qc '\i ./src/$@/'$$script'.sql' ; \
 	done
 
+cw:
+	for script in $($@); do \
+		$(DMS) -U me -d v83 -qc '\i ./src/coursework/'$$script'.sql'; \
+	done
