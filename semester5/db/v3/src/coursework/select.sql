@@ -42,11 +42,12 @@ SELECT sale_period_part_of_total('2022-01-01', '2022-12-31'); -- выбор пе
 
 -- Найти все головные уборы, поступившие от заданного поставщика,
 -- чья стоимость больше, чем средняя стоимость головных уборов, поступивших из заданной страны
-SELECT * FROM "product_info"
-WHERE provider_name = 'IBM' -- выбор поставщика
-    AND price > (
-        SELECT AVG(price) FROM "product_info"
-        WHERE country_name = 'Japan'); -- выбор страны
+WITH avg_price_by_country(avg_price) AS (
+    SELECT AVG(price) FROM "product_info" WHERE country_name = 'Japan' -- выбор страны
+)
+SELECT * FROM "product_info", avg_price_by_country
+    WHERE provider_name = 'IBM' -- выбор поставщика
+        AND price > avg_price;
 
 -- Найти долю дешёвых головных уборов (чья стоимость меньше заданной), проданных заданному клиенту, и в целом
 SELECT * FROM cheap_part_of_total(5432, 5);
@@ -58,6 +59,9 @@ WHERE id IN (
     WHERE date BETWEEN '2022-01-01' AND '2022-12-31'); -- выбор временного промежутка
 
 -- Найти все головные уборы, чья стоимость выше, чем средняя стоимость головных уборов заданного производителя
-SELECT * FROM "product_info"
-WHERE price > (
-    SELECT AVG(price) FROM "product_info" WHERE producer_name = 'one');
+WITH avg_price_by_producer(avg_price) AS (
+    SELECT AVG(price) FROM "product_info" WHERE producer_name = 'one'
+)
+SELECT * FROM "product_info", avg_price_by_producer
+    WHERE price > avg_price
+    ORDER BY price ASC;
