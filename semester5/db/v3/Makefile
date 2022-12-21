@@ -17,7 +17,7 @@ meow:
 	pgcli -u $(USERNAME) -d $(DATABASE)
 
 cw_meow:
-	pgcli -u admin -d v83
+	psql -U admin -d v83
 
 init:
 	$(DMS) -U $(USERNAME) -qc '\i src/$@.sql'
