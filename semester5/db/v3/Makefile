@@ -14,7 +14,7 @@ lab8  = schema insert common triggers
 cw    = schema insert functions role
 
 meow:
-	pgcli -u $(USERNAME) -d $(DATABASE)
+	pgcli -u $(USERNAME) -d $(DATABASE) --echo-all
 
 cw_meow:
 	psql -U admin -d v83
