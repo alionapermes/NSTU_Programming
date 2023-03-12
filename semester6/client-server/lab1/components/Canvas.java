@@ -140,7 +140,7 @@ public class Canvas extends JPanel
                     return;
                 }
 
-                int size = random_.nextInt(50, 159);
+                int size = random_.nextInt(50, 300);
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     sprites_.add(new Img(x, y, size, size, null, null));
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
