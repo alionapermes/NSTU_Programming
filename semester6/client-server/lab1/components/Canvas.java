@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import objects.Img;
 import objects.Sprite;
 import objects.Star;
 import util.Vector2i;
@@ -139,8 +140,10 @@ public class Canvas extends JPanel
                     return;
                 }
 
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    var size = random_.nextInt(50, 159);
+                int size = random_.nextInt(50, 159);
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    sprites_.add(new Img(x, y, size, size, null, null));
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
                     var vertices = random_.nextInt(5, 9);
                     sprites_.add(
                         new Star(x, y, size, size, Color.RED, vertices));

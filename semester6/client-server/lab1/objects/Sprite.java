@@ -89,15 +89,12 @@ public abstract class Sprite
     public boolean
     contains_point(int x, int y)
     {
-        return (
-            (x >= x_ - w_ >> 1) &&
-            (x <= x_ + w_ >> 1) &&
-            (y >= y_ - h_ >> 1) &&
-            (y <= y_ + h_ >> 1)
-        );
+        return
+            (x_ - (w_ >> 1) <= x) && (x <= x_ + (w_ >> 1)) &&
+            (y_ - (h_ >> 1) <= y) && (y <= y_ + (h_ >> 1));
     }
 
-    public Sprite
+    public DataInputStream
     read_from_stream(InputStream is) throws IOException
     {
         var data = new DataInputStream(is);
@@ -112,10 +109,10 @@ public abstract class Sprite
         int blue  = data.readInt();
 
         color_ = new Color(red, green, blue);
-        return this;
+        return data;
     }
 
-    public Sprite
+    public DataOutputStream
     write_to_stream(OutputStream os) throws IOException
     {
         var data = new DataOutputStream(os);
@@ -126,6 +123,6 @@ public abstract class Sprite
         data.writeInt(color_.getRed());
         data.writeInt(color_.getGreen());
         data.writeInt(color_.getBlue());
-        return this;
+        return data;
     }
 }

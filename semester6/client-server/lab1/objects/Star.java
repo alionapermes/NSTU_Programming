@@ -40,9 +40,20 @@ public class Star extends Sprite
 
         var original_transform = g2d.getTransform();
         var rotated_transform  = AffineTransform.getRotateInstance(
-            angle_, x_ + (w_ >> 1), y_ + (w_ >> 1));
-        g2d.transform(rotated_transform);
+            angle_, x_ + (w_ >> 1), y_ + (h_ >> 1));
 
+        g2d.transform(rotated_transform);
+        draw_lines(graphics);
+        g2d.setTransform(original_transform);
+    }
+
+    @Override public Star
+    move(Vector2i direction)
+    { angle_ += 0.1; return this; }
+
+    private void
+    draw_lines(Graphics graphics)
+    {
         int mid_x = x_ + (w_ >> 1),
             mid_y = y_ + (h_ >> 1);
 
@@ -53,7 +64,6 @@ public class Star extends Sprite
 
         for (int cur = 0; cur < vertices_num_; cur++) {
             double
-                // rad = cur * ((Math.PI * 2) / vertices_num_),
                 rad = (cur << 1) * (Math.PI / vertices_num_),
                 x   = mid_x + Math.cos(rad) * radius,
                 y   = mid_y + Math.sin(rad) * radius;
@@ -81,11 +91,5 @@ public class Star extends Sprite
             vertices_y[vertices_y.length - 2],
             vertices_x[0], vertices_y[0]
         );
-
-        g2d.setTransform(original_transform);
     }
-
-    @Override public Star
-    move(Vector2i direction)
-    { angle_ += 0.1; return this; }
 }
