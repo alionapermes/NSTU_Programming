@@ -144,9 +144,9 @@ public class Canvas extends JPanel
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     sprites_.add(new Img(x, y, size, size, null, null));
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    var vertices = random_.nextInt(5, 9);
+                    var vertices = random_.nextInt(5, 8);
                     sprites_.add(
-                        new Star(x, y, size, size, Color.RED, vertices));
+                        new Star(x, y, size, size, Color.BLACK, vertices));
                 }
             }
         });
