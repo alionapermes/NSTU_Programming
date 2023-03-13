@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 
 import objects.Img;
 import objects.Sprite;
-import objects.Star;
+import objects.Polygon;
 import util.Vector2i;
 
 public class Canvas extends JPanel
@@ -144,9 +144,9 @@ public class Canvas extends JPanel
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     sprites_.add(new Img(x, y, size, size, null, null));
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    var vertices = random_.nextInt(5, 8);
+                    var faces = random_.nextInt(3, 16);
                     sprites_.add(
-                        new Star(x, y, size, size, Color.BLACK, vertices));
+                        new Polygon(x, y, size, size, Color.BLACK, faces));
                 }
             }
         });
