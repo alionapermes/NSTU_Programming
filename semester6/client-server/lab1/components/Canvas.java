@@ -79,8 +79,18 @@ public class Canvas extends JPanel
                 state_ = State.STATE_SWITCHING;
                 sprites_.forEach(sprite -> sprite.set_border_showing(true));
             })
-            .freeze_all_btn_clicked(e -> sprites_.forEach(Sprite::freeze))
-            .liveup_all_btn_clicked(e -> sprites_.forEach(Sprite::liveup));
+            .freeze_all_btn_clicked(e ->
+                sprites_.forEach(sprite -> {
+                    sprite.set_border_showing(false);
+                    sprite.freeze();
+                })
+            )
+            .liveup_all_btn_clicked(e ->
+                sprites_.forEach(sprite -> {
+                    sprite.set_border_showing(false);
+                    sprite.liveup();
+                })
+            );
 
         return this;
     }

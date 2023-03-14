@@ -88,7 +88,15 @@ public abstract class Sprite
 
     public boolean
     contains_point(int x, int y)
-    { return (x_ <= x && x <= x_ + w_) && (y_ <= y && y <= y_ + h_); }
+    {
+        int half_w = w_ >> 1,
+            half_h = h_ >> 1,
+            left   = x_ - half_w,
+            right  = x_ + half_w,
+            top    = y_ - half_h,
+            bottom = y_ + half_h;
+        return (left <= x && x <= right) && (top <= y && y <= bottom);
+    }
 
     public DataInputStream
     read_from_stream(InputStream is) throws IOException

@@ -28,7 +28,7 @@ public class Img extends Sprite
 
         try {
             source_ = url == null
-                ? ImageIO.read(new File("assets/band.png"))
+                ? ImageIO.read(new File("assets/cattt.png"))
                 : ImageIO.read(new URL(url));
         } catch(IOException e) {
             System.out.println("oops: " + e.getMessage());
